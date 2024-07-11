@@ -13,10 +13,10 @@ npm run build
 
 #### Start
 
-> To start the app
+> To start the app locally (requires Docker)
 
 ```shell script
-npm run build && npm run start
+npm run build && npm run start:local
 ```
 
 <br />
