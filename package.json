@@ -2,7 +2,7 @@
   "name": "orch-stubs",
   "version": "1.0.0",
   "description": "Performance and scaling stubs owned by Orchestration",
-  "main": "src/app.ts",
+  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "build": "npx tsc",
@@ -22,6 +22,7 @@
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
     "@eslint/js": "^9.6.0",
+    "@types/aws-lambda": "^8.10.141",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.10",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
