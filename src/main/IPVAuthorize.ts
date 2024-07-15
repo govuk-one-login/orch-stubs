@@ -5,7 +5,7 @@ import {
 } from "aws-lambda";
 
 export const handler: Handler = async (
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   switch (event.httpMethod) {
     case "GET":

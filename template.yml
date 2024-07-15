@@ -40,7 +40,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/IPVAuthorize.ts
+          - src/main/IPVAuthorize.ts
         Minify: true
         Sourcemap: true
         Target: "es2022"
