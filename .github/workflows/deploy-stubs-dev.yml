@@ -1,5 +1,9 @@
 name: Deploy stubs dev
 
+permissions:
+  id-token: write
+  contents: read
+
 on: workflow_dispatch
 
 jobs:
