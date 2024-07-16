@@ -1,0 +1,52 @@
+name: Deploy Stubs
+
+env:
+  AWS_REGION: eu-west-2
+
+on:
+  workflow_call:
+    secrets:
+      GH_ACTIONS_ROLE_ARN:
+        required: true
+      ARTIFACT_BUCKET_NAME:
+        required: true
+      SIGNING_PROFILE_NAME:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up SAM cli
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Set up AWS creds
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Cache SAM
+        uses: actions/cache@v4
+        with:
+          path: .aws-sam/cache
+          key: orch-sam
+
+      - name: SAM build
+        run: sam build --cached --parallel
+
+      - name: Deploy SAM app
+        uses: govuk-one-login/devplatform-upload-action@v3.8
+        with:
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          working-directory: .aws-sam/build
