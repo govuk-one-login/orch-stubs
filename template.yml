@@ -19,7 +19,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/IPVAuthorize.handler
+      Handler: src/ipv-authorize.handler
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -40,7 +40,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/main/IPVAuthorize.ts
+          - src/main/ipv-authorize.ts
         Minify: true
         Sourcemap: true
         Target: "es2022"
