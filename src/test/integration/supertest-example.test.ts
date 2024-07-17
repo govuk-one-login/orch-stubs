@@ -1,12 +1,10 @@
-import { equal } from "node:assert";
-
-// const supertest = require("supertest");
+// import supertest from "supertest";
 // we need this to accept self-signed-certificates in nodejs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 process.env.NODE_TLS_ACCEPT_UNTRUSTED_CERTIFICATES_THIS_IS_INSECURE = "1";
 
 it("placeholder test", () => {
-  equal(1, 1);
+  expect(1).toBe(1);
 });
 
 /*

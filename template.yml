@@ -43,4 +43,4 @@ Resources:
           - src/main/ipv-authorize.ts
         Minify: true
         Sourcemap: true
-        Target: "es2022"
+        Target: node20
