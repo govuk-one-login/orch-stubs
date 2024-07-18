@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "node16",
+    "lib": ["es2023"],
+    "target": "es2022",
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "typeRoots": ["@types", "node_modules/@types"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/test", "coverage", "src/**/**/tests"]
+}
