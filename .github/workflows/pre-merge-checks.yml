@@ -36,7 +36,11 @@ jobs:
           node-version: "20.x"
       - name: Install dependencies
         run: npm install
-      - name: Run tests
-        run: npm run test
+      - name: Build
+        run: npm run build
+      - name: Configure Docker for ARM
+        run: docker run --privileged --rm tonistiigi/binfmt --install all
+      - name: Start and run tests
+        run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test; exit 0)
       - name: Report coverage
         run: npm run test:coverage

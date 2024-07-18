@@ -7,6 +7,7 @@
   "scripts": {
     "build": "sam build",
     "start:local": "sam local start-api",
+    "start:local:warm": "sam local start-api --warm-containers EAGER",
     "check": "npm run check:lint && npm run check:prettier",
     "check:lint": "eslint .",
     "check:prettier": "prettier --check \"**/*.{ts,json}\"",
