@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -42,6 +44,12 @@ jobs:
         run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test; exit 0)
       - name: Report coverage
         run: npm run test:coverage
+      - name: SonarCloud Scan
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   sam-validation:
     runs-on: ubuntu-latest
