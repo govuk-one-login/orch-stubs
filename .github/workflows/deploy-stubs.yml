@@ -49,7 +49,7 @@ jobs:
         run: sam build --cached --parallel -t ipv-stub-template.yml
 
       - name: Deploy SAM app
-        uses: govuk-one-login/devplatform-upload-action@v3.8
+        uses: govuk-one-login/devplatform-upload-action@v3.9
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
