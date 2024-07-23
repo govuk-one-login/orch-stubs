@@ -46,7 +46,7 @@ jobs:
           key: orch-sam
 
       - name: SAM build
-        run: sam build --cached --parallel
+        run: sam build --cached --parallel -t ipv-stub-template.yml
 
       - name: Deploy SAM app
         uses: govuk-one-login/devplatform-upload-action@v3.8

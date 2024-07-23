@@ -64,4 +64,4 @@ jobs:
           aws-region: eu-west-2
 
       - name: SAM validate
-        run: sam validate
+        run: sam validate -t ipv-stub-template.yml
