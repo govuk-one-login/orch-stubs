@@ -9,6 +9,13 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   jest.configs['flat/recommended'],
-  { rules: { "@typescript-eslint/no-var-requires": "off" } },
-  { ignores: ["*.d.ts", "node_modules", "dist", ".aws-sam"] },
+  { rules: { "@typescript-eslint/no-var-requires": "off", "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ] } },
+  { ignores: ["*.d.ts", "node_modules", "dist", ".aws-sam", "build", "**/style.ts"] },
 ];

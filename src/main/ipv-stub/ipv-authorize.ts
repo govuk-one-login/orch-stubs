@@ -3,6 +3,7 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
+import { renderPage } from "../template";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -22,12 +23,18 @@ export const handler: Handler = async (
   }
 };
 
-function get(event: APIGatewayProxyEvent): APIGatewayProxyResult {
+function get(_event: APIGatewayProxyEvent): APIGatewayProxyResult {
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      message: `Reached the ${event.httpMethod} endpoint`,
-    }),
+    headers: { "Content-Type": "text/html" },
+    body: renderPage(
+      `<h1 class="govuk-heading-l">Hello World from the IPV authorize lambda</h1>
+  <p class="govuk-body">This page will show the decrypted JAR</p>
+  <h4 class="govuk-body">This page will also contain the form to submit what you want for the IPV response. On submit it will send a POST request to the authorize lambda.</h4>
+  <form action="" method="post">
+    <button name="continue" value="continue" class="govuk-button">Continue</button>
+  </form>`
+    ),
   };
 }
 
