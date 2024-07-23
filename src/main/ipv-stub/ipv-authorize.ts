@@ -3,6 +3,7 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
+import { logger } from "../logger";
 import { renderPage } from "../template";
 
 export const handler: Handler = async (
@@ -14,6 +15,7 @@ export const handler: Handler = async (
     case "POST":
       return post(event);
     default:
+      logger.error("Method not allowed");
       return {
         statusCode: 405,
         body: JSON.stringify({
@@ -24,6 +26,7 @@ export const handler: Handler = async (
 };
 
 function get(_event: APIGatewayProxyEvent): APIGatewayProxyResult {
+  logger.info("Reached the GET endpoint");
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/html" },
@@ -39,7 +42,7 @@ function get(_event: APIGatewayProxyEvent): APIGatewayProxyResult {
 }
 
 function post(event: APIGatewayProxyEvent): APIGatewayProxyResult {
-  console.log("I'm going to save the form to the database");
+  logger.info("I'm going to save the form to the database");
   return {
     statusCode: 200,
     body: JSON.stringify({

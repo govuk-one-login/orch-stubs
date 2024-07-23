@@ -25,7 +25,8 @@
     "semi": true
   },
   "dependencies": {
-    "esbuild": "^0.23.0"
+    "esbuild": "^0.23.0",
+    "pino": "^9.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
