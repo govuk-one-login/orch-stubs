@@ -44,13 +44,16 @@ jobs:
         with:
           path: .aws-sam/cache
           key: orch-sam
+      
+      - name: Install dependencies
+        run: npm install
 
-      - name: SAM build
-        run: sam build --cached --parallel -t ipv-stub-template.yml
+      - name: Run build
+        run: npm run build
 
       - name: Deploy SAM app
         uses: govuk-one-login/devplatform-upload-action@v3.9
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
-          working-directory: .aws-sam/build
+          working-directory: build/ipv
