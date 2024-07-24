@@ -7,6 +7,22 @@ Description: Authentication, IPV and SPOT stubs
 #        Source: govuk-one-login/orch-stubs
 #        Owner: di-orchestration@digital.cabinet-office.gov.uk
 
+Parameters:
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+
+Conditions:
+  UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+
+Globals:
+  Function:
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
 Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
