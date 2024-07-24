@@ -8,7 +8,12 @@ permissions:
   contents: read
 
 on:
-  workflow_call:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
     secrets:
       GH_ACTIONS_ROLE_ARN:
         required: true
