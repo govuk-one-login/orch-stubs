@@ -7,7 +7,11 @@
   "license": "MIT",
   "scripts": {
     "build": "sam build --template ipv-stub-template.yml --build-dir build/ipv & sam build --template auth-stub-template.yml --build-dir build/auth",
+    "build:auth": "sam build --template auth-stub-template.yml --build-dir build/auth",
+    "build:ipv": "sam build --template ipv-stub-template.yml --build-dir build/ipv",
     "start:local": "sam local start-api --template build/ipv/template.yaml & sam local start-api --template build/auth/template.yaml -p 3001",
+    "start:local:auth": "sam local start-api --template build/auth/template.yaml -p 3001",
+    "start:local:ipv": "sam local start-api --template build/ipv/template.yaml",
     "start:local:warm": "sam local start-api --warm-containers EAGER --template build/ipv/template.yaml & sam local start-api --warm-containers EAGER --template build/auth/template.yaml -p 3001",
     "check": "npm run check:lint && npm run check:prettier",
     "check:lint": "eslint .",
