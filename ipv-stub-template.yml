@@ -36,13 +36,30 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FormResponse
+      KeySchema:
+        - AttributeName: FormId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: FormId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      Tags:
+        - Key: Name
+          Value: FormResponse
+
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub ${AWS::StackName}-ApiGateway
       StageName: Live
       AlwaysDeploy: true
-      
 
   IPVAuthorizeLambda:
     Type: AWS::Serverless::Function
