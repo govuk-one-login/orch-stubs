@@ -8,6 +8,9 @@ Description: Authentication, IPV and SPOT stubs
 #        Owner: di-orchestration@digital.cabinet-office.gov.uk
 
 Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
   CodeSigningConfigArn:
     Type: String
     Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
@@ -46,6 +49,8 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-authorize.handler
+      LoggingConfig:
+        LogGroup: !Ref IPVAuthorizeLambdaLogGroup
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -71,11 +76,19 @@ Resources:
         Sourcemap: true
         Target: node20
 
+  IPVAuthorizeLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-ipv-authorize-lambda
+      RetentionInDays: 30
+
   IPVTokenLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-token.handler
+      LoggingConfig:
+        LogGroup: !Ref IPVTokenLambdaLogGroup
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -101,11 +114,19 @@ Resources:
         Sourcemap: true
         Target: node20
 
+  IPVTokenLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-ipv-token-lambda
+      RetentionInDays: 30
+
   IPVUserIdentityLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-user-identity.handler
+      LoggingConfig:
+        LogGroup: !Ref IPVUserIdentityLambdaLogGroup
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -130,3 +151,9 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+
+  IPVUserIdentityLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-ipv-user-identity-lambda
+      RetentionInDays: 30
