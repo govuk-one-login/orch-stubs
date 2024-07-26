@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "esbuild": "^0.23.0",
-    "pino": "^9.3.1"
+    "pino": "^9.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
