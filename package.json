@@ -33,7 +33,7 @@
     "pino": "^9.3.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.7.0",
+    "@eslint/js": "^9.8.0",
     "@types/aws-lambda": "^8.10.142",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.0.0",
