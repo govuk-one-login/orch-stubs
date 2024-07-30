@@ -3,6 +3,10 @@ These stubs are owned by Orchestration for performance and scaling testing purpo
 
 There will be three stubs - one for Authentication, one for IPV, and one for SPOT. This will allow Orchestration to exercise different journeys, write Orchestration specific acceptance tests, execute Orchestration performance tests, and test IPV in lower environments.
 
+#### Prerequisites
+
+A version of SAM CLI (v1.120.0+) that supports Node.js version 20. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
+
 #### Build
 
 > To build the app
