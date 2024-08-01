@@ -23,7 +23,13 @@ npm run build
 npm run build && npm run start:local
 ```
 
-<br />
+## Private and public keys
+
+Private and public keys are be needed for decryption and signature validation.
+
+The local private key (in _parameters.json_) has been commited deliberately. The key pair was generated fresh and should only be used for testing, both locally and as part of the pre-merge GitHub workflow.
+
+In deployed environments, the private key will be retrieved from AWS Secrets Manager, and the public key from AWS Parameter Store. This key pair is different from the one which has been commited here.
 
 ## Formatting and Linting
 
