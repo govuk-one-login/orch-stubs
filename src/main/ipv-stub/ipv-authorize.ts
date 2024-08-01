@@ -6,7 +6,6 @@ import {
 } from "aws-lambda";
 import { logger } from "../logger";
 import { renderPage } from "../template";
-import { UserIdentity } from "./entity/user-identity";
 import { importPKCS8, compactDecrypt } from "jose";
 
 export const handler: Handler = async (
@@ -96,10 +95,20 @@ function errorResponse(
 
 function post(event: APIGatewayProxyEvent): APIGatewayProxyResult {
   logger.info("I'm going to save the form to the database");
+
+  const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
+  const authCode = "12345";
+
+  const url = new URL(redirectUri);
+  url.searchParams.append("code", authCode);
+
   return {
-    statusCode: 200,
+    statusCode: 302,
+    headers: {
+      Location: url.toString(),
+    },
     body: JSON.stringify({
-      message: `Reached the ${event.httpMethod} endpoint - this will return 302`,
+      message: `Redirecting to ${url.toString()}`,
     }),
   };
 }
