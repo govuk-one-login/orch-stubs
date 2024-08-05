@@ -44,7 +44,8 @@ async function get(
     const { plaintext } = await compactDecrypt(encryptedJwt, privateKey);
     encodedJwt = plaintext.toString();
   } catch (error) {
-    return errorResponse(500, "Decryption failed");
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return errorResponse(500, "Decryption failed: " + message);
   }
 
   const parts = encodedJwt.split(".");
@@ -58,7 +59,8 @@ async function get(
       Buffer.from(part, "base64url").toString("utf8")
     );
   } catch (error) {
-    return errorResponse(500, "Decoding failed");
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return errorResponse(500, "Decoding failed: " + message);
   }
 
   return {

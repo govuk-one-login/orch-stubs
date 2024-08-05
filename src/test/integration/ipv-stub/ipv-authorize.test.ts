@@ -38,6 +38,8 @@ describe("IPV Authorize", () => {
       .get("/authorize")
       .set("Authorization", "Bearer " + invalidJwt);
     expect(response.statusCode).toBe(500);
-    expect(response.body.message).toBe("Decryption failed");
+    expect(response.body.message).toBe(
+      "Decryption failed: Invalid Compact JWE"
+    );
   });
 });
