@@ -24,7 +24,7 @@ export const handler: Handler = async (
 async function get(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  logger.info("Reached the GET endpoint");
+  logger.info("IPV Authorize GET endpoint invoked");
 
   const headers: APIGatewayProxyEventHeaders = event.headers;
   const bearerToken = headers["Authorization"];
