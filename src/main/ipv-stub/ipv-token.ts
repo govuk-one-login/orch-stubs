@@ -13,6 +13,10 @@ import {
   methodNotAllowedError,
   successfulJsonResult,
 } from "./helper/result-helper";
+import {
+  getUserIdentityWithAuthCode,
+  putUserIdentityWithToken,
+} from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -51,6 +55,18 @@ async function post(
     }
 
     throw error;
+  }
+
+  try {
+    const userIdentity = await getUserIdentityWithAuthCode("AuthCode");
+    putUserIdentityWithToken("TestToken", userIdentity);
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: error,
+      }),
+    };
   }
 
   return successfulJsonResult(200, ACCESS_TOKEN);

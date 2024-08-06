@@ -3,12 +3,12 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   handleErrors,
   methodNotAllowedError,
   successfulJsonResult,
 } from "./helper/result-helper";
+import { getUserIdentityWithToken } from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -16,13 +16,25 @@ export const handler: Handler = async (
   return handleErrors(async () => {
     switch (event.httpMethod) {
       case "GET":
-        return await get();
+        return await get(event);
       default:
         throw methodNotAllowedError(event.httpMethod);
     }
   });
 };
 
-function get(): Promise<APIGatewayProxyResult> {
-  return Promise.resolve(successfulJsonResult(200, USER_IDENTITY));
+async function get(
+  _event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const userIdentity = await getUserIdentityWithToken("TestToken");
+    return Promise.resolve(successfulJsonResult(200, userIdentity));
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: error,
+      }),
+    };
+  }
 }

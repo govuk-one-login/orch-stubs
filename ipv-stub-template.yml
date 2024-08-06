@@ -41,12 +41,12 @@ Resources:
   DynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: FormResponse
+      TableName: !Sub ${Environment}-UserIdentity
       KeySchema:
-        - AttributeName: FormId
+        - AttributeName: UserIdentityId
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: FormId
+        - AttributeName: UserIdentityId
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
@@ -54,7 +54,7 @@ Resources:
         Enabled: true
       Tags:
         - Key: Name
-          Value: FormResponse
+          Value: UserIdentity
 
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -65,6 +65,13 @@ Resources:
 
   IPVAuthorizeLambda:
     Type: AWS::Serverless::Function
+    Connectors:
+      DynamoDB:
+        Properties:
+          Destination:
+            Id: DynamoDB
+          Permissions:
+            - Write
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-authorize.handler
@@ -97,6 +104,9 @@ Resources:
         EntryPoints:
           - src/main/ipv-stub/ipv-authorize.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
@@ -108,6 +118,14 @@ Resources:
 
   IPVTokenLambda:
     Type: AWS::Serverless::Function
+    Connectors:
+      DynamoDB:
+        Properties:
+          Destination:
+            Id: DynamoDB
+          Permissions:
+            - Read
+            - Write
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-token.handler
@@ -143,6 +161,9 @@ Resources:
         EntryPoints:
           - src/main/ipv-stub/ipv-token.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
@@ -154,6 +175,13 @@ Resources:
 
   IPVUserIdentityLambda:
     Type: AWS::Serverless::Function
+    Connectors:
+      DynamoDB:
+        Properties:
+          Destination:
+            Id: DynamoDB
+          Permissions:
+            - Read
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-user-identity.handler
@@ -162,6 +190,9 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
       Events:
         Get:
           Type: Api
@@ -181,6 +212,9 @@ Resources:
         EntryPoints:
           - src/main/ipv-stub/ipv-user-identity.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
