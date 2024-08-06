@@ -5,6 +5,8 @@ import {
 } from "aws-lambda";
 import { logger } from "../logger";
 import { renderPage } from "../template";
+import { putUserIdentityWithAuthCode } from "./service/dynamodb-form-response-service";
+import { exampleUserIdentity } from "./utils/user-identity-example-data";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -43,6 +45,7 @@ function get(_event: APIGatewayProxyEvent): APIGatewayProxyResult {
 
 function post(event: APIGatewayProxyEvent): APIGatewayProxyResult {
   logger.info("I'm going to save the form to the database");
+  putUserIdentityWithAuthCode("AuthCode", exampleUserIdentity);
   return {
     statusCode: 200,
     body: JSON.stringify({

@@ -3,6 +3,11 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
+import {
+  deleteUserIdentityWithAuthCode,
+  getUserIdentityWithAuthCode,
+  putUserIdentityWithToken,
+} from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -20,7 +25,13 @@ export const handler: Handler = async (
   }
 };
 
-function get(event: APIGatewayProxyEvent): APIGatewayProxyResult {
+async function get(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const authCode = JSON.parse(event.body as string)["authCode"];
+  const userIdentity = await getUserIdentityWithAuthCode(authCode);
+  putUserIdentityWithToken("test-token", userIdentity);
+  deleteUserIdentityWithAuthCode(authCode);
   return {
     statusCode: 200,
     body: JSON.stringify({
