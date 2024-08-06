@@ -15,6 +15,7 @@ jobs:
     uses: ./.github/workflows/run-checks.yml
     secrets:
       SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.ORCH_STUBS_SAM_APP_VALIDATE_ROLE_ARN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   deploy:
     uses: ./.github/workflows/deploy-stubs.yml
     needs: run-checks
