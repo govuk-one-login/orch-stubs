@@ -5,6 +5,8 @@ on:
     secrets:
       SAM_APP_VALIDATE_ROLE_ARN:
         required: true
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   style-checks:
