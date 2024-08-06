@@ -12,7 +12,7 @@
     "start:local": "sam local start-api --template build/ipv/template.yaml --env-vars parameters.json & sam local start-api --template build/auth/template.yaml --env-vars parameters.json -p 3001",
     "start:local:auth": "sam local start-api --template build/auth/template.yaml --env-vars parameters.json -p 3001",
     "start:local:ipv": "sam local start-api --template build/ipv/template.yaml --env-vars parameters.json",
-    "start:local:warm": "sam local start-api --warm-containers EAGER --template build/ipv/template.yaml & sam local start-api --warm-containers EAGER --template build/auth/template.yaml -p 3001",
+    "start:local:warm": "sam local start-api --warm-containers EAGER --template build/ipv/template.yaml --env-vars parameters.json & sam local start-api --warm-containers EAGER --template build/auth/template.yaml --env-vars parameters.json -p 3001",
     "check": "npm run check:lint && npm run check:prettier",
     "check:lint": "eslint .",
     "check:prettier": "prettier --check \"**/*.{ts,json}\"",
@@ -30,7 +30,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.624.0",
+    "@types/node-jose": "^1.1.13",
     "esbuild": "^0.23.0",
+    "jose": "^5.6.3",
     "pino": "^9.3.2"
   },
   "devDependencies": {

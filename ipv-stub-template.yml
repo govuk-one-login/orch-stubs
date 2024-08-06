@@ -73,9 +73,10 @@ Resources:
         - arm64
       Environment:
         Variables:
-          IPV_PRIVATE_KEY: !Sub
+          IPV_PRIVATE_ENCRYPTION_KEY: !Sub
             - "{{resolve:secretsmanager:${SecretArn}:SecretString:IPV_PRIVATE_KEY}}"
             - SecretArn: arn:aws:secretsmanager:eu-west-2:816047645251:secret:orch-stubs/ipv/private-key-6LNrBi
+          IPV_PUBLIC_SIGNING_KEY: ""
       Events:
         Get:
           Type: Api
