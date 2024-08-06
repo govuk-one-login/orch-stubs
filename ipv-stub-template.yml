@@ -77,6 +77,7 @@ Resources:
             - "{{resolve:secretsmanager:${SecretArn}:SecretString:IPV_PRIVATE_KEY}}"
             - SecretArn: arn:aws:secretsmanager:eu-west-2:816047645251:secret:orch-stubs/ipv/private-key-6LNrBi
           IPV_PUBLIC_SIGNING_KEY: ""
+          IPV_TOKEN_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESyWJU5s5F4jSovHsh9y133/Ogf5Px78OrfDJqiMMI2p8Warbq0ppcbWvbihK6rAXTH7bPIeOHOeU9cKAEl5NdQ==-----END PUBLIC KEY-----"
       Events:
         Get:
           Type: Api
