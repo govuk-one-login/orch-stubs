@@ -72,20 +72,14 @@ async function post(
   _event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
-  const authCode = AUTH_CODE;
 
   const url = new URL(redirectUri);
-  url.searchParams.append("code", authCode);
+  url.searchParams.append("code", AUTH_CODE);
 
   try {
     await putUserIdentityWithAuthCode("AuthCode", USER_IDENTITY);
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: error,
-      }),
-    };
+    throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
   return Promise.resolve(
