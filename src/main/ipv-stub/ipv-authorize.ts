@@ -53,9 +53,9 @@ async function get(
     return errorResponse(400, "Decrypted JWT is in invalid format");
   }
 
-  let decodedHeader, decodedPayload, decodedSignature;
+  let decodedHeader, decodedPayload, _decodedSignature;
   try {
-    [decodedHeader, decodedPayload, decodedSignature] = parts.map((part) =>
+    [decodedHeader, decodedPayload, _decodedSignature] = parts.map((part) =>
       Buffer.from(part, "base64url").toString("utf8")
     );
   } catch (error) {
@@ -95,7 +95,7 @@ function errorResponse(
   return Promise.resolve(result);
 }
 
-function post(event: APIGatewayProxyEvent): APIGatewayProxyResult {
+function post(_event: APIGatewayProxyEvent): APIGatewayProxyResult {
   logger.info("I'm going to save the form to the database");
 
   const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
