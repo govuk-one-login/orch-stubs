@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Authentication, IPV and SPOT stubs
 
@@ -73,6 +73,7 @@ Resources:
         - arm64
       Environment:
         Variables:
+          ENVIRONMENT: !Sub ${Environment}
           IPV_PRIVATE_ENCRYPTION_KEY: !Sub
             - "{{resolve:secretsmanager:${SecretArn}:SecretString:IPV_PRIVATE_KEY}}"
             - SecretArn: arn:aws:secretsmanager:eu-west-2:816047645251:secret:orch-stubs/ipv/private-key-6LNrBi
