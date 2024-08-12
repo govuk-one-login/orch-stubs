@@ -5,8 +5,8 @@ import {
   Handler,
 } from "aws-lambda";
 import { logger } from "../logger";
-import { renderPage } from "../template";
 import { importPKCS8, compactDecrypt } from "jose";
+import renderIPVAuthorize from "./render-ipv-authorize";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -66,21 +66,9 @@ async function get(
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/html" },
-    body: renderPage(
-      `<h1 class="govuk-heading-l">Hello World from the IPV authorize lambda</h1>
-  <h3 class="govuk-heading-s">Decrypted JAR header:</h3>
-  <p class="govuk-body">${JSON.parse(decodedHeader)}</p>
-  <h3 class="govuk-heading-s">Decrypted JAR payload:</h3>
-  <p class="govuk-body">${JSON.parse(decodedPayload)}</p>
-  <h3 class="govuk-heading-s">Form:</h3>
-  <p class="govuk-body">This page will also contain the form to submit what you want for the IPV response. On submit it will send a POST request to the authorize lambda.</p>
-  <form action="" method="post">
-    <button name="continue" value="continue" class="govuk-button">Continue</button>
-  </form>`
-    ),
+    body: renderIPVAuthorize(decodedHeader, decodedPayload),
   };
 }
-
 function errorResponse(
   statusCode: number,
   message: string
