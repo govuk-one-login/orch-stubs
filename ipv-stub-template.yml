@@ -74,9 +74,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IPV_PRIVATE_ENCRYPTION_KEY: !Sub
-            - "{{resolve:secretsmanager:${SecretArn}:SecretString:IPV_PRIVATE_KEY}}"
-            - SecretArn: arn:aws:secretsmanager:eu-west-2:816047645251:secret:orch-stubs/ipv/private-key-6LNrBi
+          IPV_PRIVATE_ENCRYPTION_KEY: ""
           IPV_PUBLIC_SIGNING_KEY: ""
       Events:
         Get:
