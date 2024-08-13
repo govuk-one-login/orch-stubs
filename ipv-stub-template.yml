@@ -74,8 +74,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IPV_PRIVATE_ENCRYPTION_KEY: ""
-          IPV_PUBLIC_SIGNING_KEY: ""
+          IPV_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
+          IPV_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
       Events:
         Get:
           Type: Api
