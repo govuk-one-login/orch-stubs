@@ -3,7 +3,7 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { exampleUserIdentity } from "./data/example-user-identity";
+import { USER_IDEINTITY } from "./data/ipv-dummy-constants";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -27,7 +27,7 @@ export const handler: Handler = async (
 function get(): APIGatewayProxyResult {
   return {
     statusCode: 200,
-    body: JSON.stringify(exampleUserIdentity),
+    body: JSON.stringify(USER_IDEINTITY),
     headers: {
       "Content-Type": "application/json",
     },
