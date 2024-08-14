@@ -23,6 +23,14 @@ npm run build
 npm run build && npm run start:local
 ```
 
+#### Clean Build
+
+> To clean build the app (try if you encounter issues re-running build)
+
+```shell script
+npm run clean && npm run build
+```
+
 ## Private and public keys
 
 Private and public keys are be needed for decryption and signature validation.
