@@ -34,7 +34,7 @@ async function get(
   }
   const encryptedJwt = bearerToken.split(" ")[1];
 
-  const ipvPrivateKeyPem = process.env.IPV_PRIVATE_ENCRYPTION_KEY;
+  const ipvPrivateKeyPem = process.env.IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY;
   if (!ipvPrivateKeyPem) {
     return errorResponse(500, "Private key not found");
   }

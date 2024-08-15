@@ -11,6 +11,7 @@ Parameters:
   Environment:
     Type: String
     Description: The name of the environment to deploy to
+    Default: none
   CodeSigningConfigArn:
     Type: String
     Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
@@ -23,6 +24,7 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
 
 Globals:
   Function:
@@ -74,8 +76,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IPV_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
-          IPV_PUBLIC_SIGNING_KEY: ""
+          IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
+          IPV_AUTHORIZE_PUBLIC_SIGNING_KEY: ""
       Events:
         Get:
           Type: Api
@@ -114,6 +116,14 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          IPV_TOKEN_PUBLIC_SIGNING_KEY: ""
+          IPV_AUDIENCE: !If
+            - IsNotProduction
+            - !Sub https://identity.${Environment}.account.gov.uk/
+            - https://identity.account.gov.uk/
       Events:
         Get:
           Type: Api
