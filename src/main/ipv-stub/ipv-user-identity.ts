@@ -3,7 +3,7 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { USER_IDEINTITY } from "./data/ipv-dummy-constants";
+import { USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   handleErrors,
   methodNotAllowedError,
@@ -24,5 +24,5 @@ export const handler: Handler = async (
 };
 
 function get(): Promise<APIGatewayProxyResult> {
-  return Promise.resolve(successfulJsonResult(200, USER_IDEINTITY));
+  return Promise.resolve(successfulJsonResult(200, USER_IDENTITY));
 }

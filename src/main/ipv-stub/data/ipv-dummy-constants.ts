@@ -7,7 +7,7 @@ export const ACCESS_TOKEN: IpvTokenResponse = {
   token_type: "Bearer",
   expires_in: 3600,
 };
-export const USER_IDEINTITY: UserIdentity = {
+export const USER_IDENTITY: UserIdentity = {
   sub: "urn:fdc:gov.uk:2022:740e5834-3a29-46b4-9a6f-16142fde533a",
   vot: "P2",
   vtm: "http://localhost/trustmark",
