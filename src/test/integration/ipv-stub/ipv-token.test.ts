@@ -19,7 +19,7 @@ const privateKeyInvalid =
 describe("IPV Token", () => {
   const api = supertest("http://127.0.0.1:3000/");
 
-  it("should return 302 for valid POST request", async () => {
+  it("should return 200 for valid POST request", async () => {
     const response = await api
       .post("/token")
       .send(
@@ -35,7 +35,7 @@ describe("IPV Token", () => {
         )
       )
       .expect("Content-Type", /json/);
-    expect(response.statusCode).toBe(302);
+    expect(response.statusCode).toBe(200);
     const tokenResponse = response.body as IpvTokenResponse;
     expect(typeof tokenResponse.access_token).toBe("string");
     expect(tokenResponse.token_type).toBe("Bearer");
