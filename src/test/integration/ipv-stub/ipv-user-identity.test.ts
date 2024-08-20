@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { expectedUserIdentity } from "./data/expected-user-identity";
 
-describe("IPV User Info", () => {
+describe("IPV User Identity", () => {
   const api = supertest("http://127.0.0.1:3000/");
 
   it("should return 200 for a get request", async () => {

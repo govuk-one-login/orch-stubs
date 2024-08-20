@@ -1,6 +1,13 @@
+import { IpvTokenResponse } from "../interfaces/ipv-token-response-interface";
 import { UserIdentity } from "../interfaces/user-identity-interface";
 
-export const exampleUserIdentity: UserIdentity = {
+export const AUTH_CODE = "12345";
+export const ACCESS_TOKEN: IpvTokenResponse = {
+  access_token: "740e5834-3a29-46b4-9a6f-16142fde533a",
+  token_type: "Bearer",
+  expires_in: 3600,
+};
+export const USER_IDENTITY: UserIdentity = {
   sub: "urn:fdc:gov.uk:2022:740e5834-3a29-46b4-9a6f-16142fde533a",
   vot: "P2",
   vtm: "http://localhost/trustmark",
