@@ -124,7 +124,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IPV_TOKEN_PUBLIC_SIGNING_KEY: ""
+          IPV_TOKEN_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
           IPV_AUDIENCE: !If
             - IsNotProduction
             - !Sub https://identity.${Environment}.account.gov.uk/
