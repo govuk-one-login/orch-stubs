@@ -77,7 +77,7 @@ async function post(
   url.searchParams.append("code", AUTH_CODE);
 
   try {
-    await putUserIdentityWithAuthCode("AuthCode", USER_IDENTITY);
+    await putUserIdentityWithAuthCode(AUTH_CODE, USER_IDENTITY);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
