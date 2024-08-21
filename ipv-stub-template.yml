@@ -65,13 +65,6 @@ Resources:
 
   IPVAuthorizeLambda:
     Type: AWS::Serverless::Function
-    Connectors:
-      DynamoDB:
-        Properties:
-          Destination:
-            Id: DynamoDB
-          Permissions:
-            - Write
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-authorize.handler
@@ -98,6 +91,8 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /authorize
             Method: post
+      Policies:
+        - !Ref UserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -118,14 +113,6 @@ Resources:
 
   IPVTokenLambda:
     Type: AWS::Serverless::Function
-    Connectors:
-      DynamoDB:
-        Properties:
-          Destination:
-            Id: DynamoDB
-          Permissions:
-            - Read
-            - Write
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-token.handler
@@ -155,6 +142,9 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /token
             Method: post
+      Policies:
+        - !Ref UserIdentityTableReadAccessPolicy
+        - !Ref UserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -175,13 +165,6 @@ Resources:
 
   IPVUserIdentityLambda:
     Type: AWS::Serverless::Function
-    Connectors:
-      DynamoDB:
-        Properties:
-          Destination:
-            Id: DynamoDB
-          Permissions:
-            - Read
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-user-identity.handler
@@ -206,6 +189,8 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /user-identity
             Method: post
+      Policies:
+        - !Ref UserIdentityTableReadAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -223,3 +208,28 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-ipv-user-identity-lambda
       RetentionInDays: 30
+
+  UserIdentityTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt DynamoDB.Arn
+
+  UserIdentityTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: !GetAtt DynamoDB.Arn
