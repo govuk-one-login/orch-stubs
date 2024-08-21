@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "OneLoginRepositoryName",
+    "ParameterValue": "orch-stubs"
+  },
+  {
+    "ParameterKey": "IncludePromotion",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "RequireManualApproval",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "SAMStackName",
+    "ParameterValue": "dev-auth-stub-deploy"
+  },
+  {
+    "ParameterKey": "SigningProfileArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:816047645251:/signing-profiles/SigningProfile_1SsceuunzEmO"
+  },
+  {
+    "ParameterKey": "SigningProfileVersionArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:816047645251:/signing-profiles/SigningProfile_1SsceuunzEmO/DPf5VC3w90"
+  }
+]

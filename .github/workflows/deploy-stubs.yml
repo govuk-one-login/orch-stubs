@@ -16,6 +16,8 @@ on:
         required: true
       SIGNING_PROFILE_NAME:
         required: true
+      WORKING_DIRECTORY:
+        required: true
 
 jobs:
   deploy:
@@ -44,7 +46,7 @@ jobs:
         with:
           path: .aws-sam/cache
           key: orch-sam
-      
+
       - name: Install dependencies
         run: npm install
 
@@ -56,4 +58,4 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
-          working-directory: build/ipv
+          working-directory: ${{ secrets.WORKING_DIRECTORY }}

@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "SAMStackName",
-    "ParameterValue": "dev-orch-stubs-deploy"
+    "ParameterValue": "dev-ipv-stub-deploy"
   },
   {
     "ParameterKey": "SigningProfileArn",
