@@ -53,7 +53,7 @@ async function post(
     throw error;
   }
 
-  return successfulJsonResult(302, ACCESS_TOKEN);
+  return successfulJsonResult(200, ACCESS_TOKEN);
 }
 
 function validateHeadersOrThrow(headers: APIGatewayProxyEventHeaders): void {
