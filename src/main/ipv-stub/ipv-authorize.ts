@@ -7,7 +7,7 @@ import {
 import { logger } from "../logger";
 import { importPKCS8, compactDecrypt } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
-import { AUTH_CODE } from "./data/ipv-dummy-constants";
+import { AUTH_CODE, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -15,6 +15,7 @@ import {
   successfulHtmlResult,
   successfulJsonResult,
 } from "./helper/result-helper";
+import { putUserIdentityWithAuthCode } from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -67,14 +68,19 @@ async function get(
   );
 }
 
-function post(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  logger.info("I'm going to save the form to the database");
-
+async function post(
+  _event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
   const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
-  const authCode = AUTH_CODE;
 
   const url = new URL(redirectUri);
-  url.searchParams.append("code", authCode);
+  url.searchParams.append("code", AUTH_CODE);
+
+  try {
+    await putUserIdentityWithAuthCode("AuthCode", USER_IDENTITY);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
 
   return Promise.resolve(
     successfulJsonResult(

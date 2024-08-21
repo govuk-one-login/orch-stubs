@@ -13,6 +13,10 @@ import {
   methodNotAllowedError,
   successfulJsonResult,
 } from "./helper/result-helper";
+import {
+  getUserIdentityWithAuthCode,
+  putUserIdentityWithToken,
+} from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -51,6 +55,14 @@ async function post(
     }
 
     throw error;
+  }
+
+  const authCode = body["code"] as string;
+  try {
+    const userIdentity = await getUserIdentityWithAuthCode(authCode);
+    putUserIdentityWithToken(ACCESS_TOKEN.access_token, userIdentity);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
   return successfulJsonResult(200, ACCESS_TOKEN);

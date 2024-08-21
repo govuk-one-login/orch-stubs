@@ -41,12 +41,12 @@ Resources:
   DynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: FormResponse
+      TableName: !Sub ${Environment}-UserIdentity
       KeySchema:
-        - AttributeName: FormId
+        - AttributeName: UserIdentityId
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: FormId
+        - AttributeName: UserIdentityId
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
@@ -54,7 +54,7 @@ Resources:
         Enabled: true
       Tags:
         - Key: Name
-          Value: FormResponse
+          Value: UserIdentity
 
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -91,12 +91,17 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /authorize
             Method: post
+      Policies:
+        - !Ref UserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
           - src/main/ipv-stub/ipv-authorize.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
@@ -137,12 +142,18 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /token
             Method: post
+      Policies:
+        - !Ref UserIdentityTableReadAccessPolicy
+        - !Ref UserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
           - src/main/ipv-stub/ipv-token.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
@@ -162,6 +173,9 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
       Events:
         Get:
           Type: Api
@@ -175,12 +189,17 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /user-identity
             Method: post
+      Policies:
+        - !Ref UserIdentityTableReadAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
           - src/main/ipv-stub/ipv-user-identity.ts
         Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
         Target: node20
 
@@ -189,3 +208,28 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-ipv-user-identity-lambda
       RetentionInDays: 30
+
+  UserIdentityTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt DynamoDB.Arn
+
+  UserIdentityTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: !GetAtt DynamoDB.Arn
