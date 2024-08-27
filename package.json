@@ -36,7 +36,7 @@
     "@aws-sdk/lib-dynamodb": "^3.637.0",
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.23.1",
-    "jose": "^5.7.0",
+    "jose": "^5.8.0",
     "pino": "^9.3.2"
   },
   "devDependencies": {
