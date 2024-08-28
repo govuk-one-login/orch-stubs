@@ -1,6 +1,5 @@
 import {
   APIGatewayProxyEvent,
-  APIGatewayProxyEventHeaders,
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
@@ -37,13 +36,13 @@ async function get(
 ): Promise<APIGatewayProxyResult> {
   logger.info("IPV Authorize GET endpoint invoked");
 
-  const headers: APIGatewayProxyEventHeaders = event.headers;
-  const bearerToken = headers["Authorization"];
-  if (!bearerToken) {
-    throw new CodedError(400, "Bearer token not found");
+  if (event.queryStringParameters == null) {
+    throw new CodedError(400, "Query string parameters are null");
   }
-  const encryptedJwt = bearerToken.split(" ")[1];
-
+  const encryptedJwt = event.queryStringParameters["request"] as string;
+  if (!encryptedJwt) {
+    throw new CodedError(400, "Request query string parameter not found");
+  }
   const ipvPrivateKeyPem = process.env.IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY;
   if (!ipvPrivateKeyPem) {
     throw new CodedError(500, "Private key not found");
