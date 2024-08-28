@@ -11,6 +11,7 @@ import {
   successfulJsonResult,
 } from "./helper/result-helper";
 import { getUserIdentityWithToken } from "./service/dynamodb-form-response-service";
+import { logger } from "../logger";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -31,7 +32,10 @@ async function get(
   const accessToken = getTokenOrThrow(event.headers);
 
   try {
-    const userIdentity = await getUserIdentityWithToken(accessToken);
+    logger.info(accessToken);
+    const tokenKey = accessToken.replace("Bearer ", "");
+    const userIdentity = await getUserIdentityWithToken(tokenKey);
+    logger.info(userIdentity);
     return Promise.resolve(successfulJsonResult(200, userIdentity));
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);

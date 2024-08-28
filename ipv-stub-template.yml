@@ -110,6 +110,7 @@ Resources:
             Path: /authorize
             Method: post
       Policies:
+        - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild

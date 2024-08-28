@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocument, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface";
 
 const client = new DynamoDBClient({});
@@ -14,7 +14,7 @@ export const getUserIdentityWithAuthCode = async (
     TableName: tableName,
     Key: { UserIdentityId: authCode },
   });
-  return userIdentity.Item as unknown as UserIdentity;
+  return userIdentity.Item?.userIdentity as unknown as UserIdentity;
 };
 
 export const putUserIdentityWithAuthCode = async (
@@ -38,7 +38,7 @@ export const getUserIdentityWithToken = async (
     TableName: tableName,
     Key: { UserIdentityId: token },
   });
-  return userIdentity.Item as unknown as UserIdentity;
+  return userIdentity.Item?.userIdentity as unknown as UserIdentity;
 };
 
 export const putUserIdentityWithToken = async (
@@ -50,6 +50,44 @@ export const putUserIdentityWithToken = async (
     Item: {
       UserIdentityId: token,
       userIdentity,
+      ttl: getOneDayTimestamp(),
+    },
+  });
+};
+
+// export const getStateWithAuthCode = async (
+//   authCode: string
+// ): Promise<string> => {
+//   const state = await dynamo.get({
+//     TableName: tableName,
+//     Key: { UserIdentityId: authCode + "-state" },
+//   });
+//   return state.Item as unknown as string;
+// };
+
+export const getStateWithAuthCode = async (
+  authCode: string
+): Promise<string | null> => {
+  const result = await dynamo.send(
+    new GetCommand({
+      TableName: tableName,
+      Key: { UserIdentityId: authCode + "-state" },
+    })
+  );
+
+  if (result.Item && typeof result.Item.state === "string") {
+    return result.Item.state;
+  }
+
+  return null;
+};
+
+export const putStateWithAuthCode = async (authCode: string, state: string) => {
+  return await dynamo.put({
+    TableName: tableName,
+    Item: {
+      UserIdentityId: authCode + "-state",
+      state,
       ttl: getOneDayTimestamp(),
     },
   });
