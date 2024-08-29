@@ -1,21 +1,44 @@
-name: Deploy stubs dev
+name: Deploy Stubs Dev
 
 permissions:
   id-token: write
   contents: read
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      auth_deploy:
+        type: boolean
+        default: false
+        description: Auth-Stub
+      ipv_deploy:
+        type: boolean
+        default: false
+        description: IPV-Stub
 
 jobs:
   run-checks:
     uses: ./.github/workflows/run-checks.yml
     secrets:
-      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.SAM_APP_VALIDATE_ROLE_ARN }}
+      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.DEV_SAM_APP_VALIDATE_ROLE_ARN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  deploy:
+
+  deploy-auth-stub:
+    if: github.event.inputs.auth_deploy == 'true'
     uses: ./.github/workflows/deploy-stubs.yml
     needs: run-checks
     secrets:
-      GH_ACTIONS_ROLE_ARN: ${{ secrets.GH_ACTIONS_ROLE_ARN }}
-      ARTIFACT_BUCKET_NAME: ${{ secrets.ARTIFACT_BUCKET_NAME }}
-      SIGNING_PROFILE_NAME: ${{ secrets.SIGNING_PROFILE_NAME }}
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_AUTH_STUB_GH_ACTIONS_ROLE_ARN }}
+      ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_AUTH_STUB_ARTIFACT_BUCKET_NAME }}
+      SIGNING_PROFILE_NAME: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
+      WORKING_DIRECTORY: build/auth
+
+  deploy-ipv-stub:
+    if: github.event.inputs.ipv_deploy == 'true'
+    uses: ./.github/workflows/deploy-stubs.yml
+    needs: run-checks
+    secrets:
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_IPV_STUB_GH_ACTIONS_ROLE_ARN }}
+      ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_IPV_STUB_ARTIFACT_BUCKET_NAME }}
+      SIGNING_PROFILE_NAME: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
+      WORKING_DIRECTORY: build/ipv

@@ -1,4 +1,4 @@
-name: Pull request
+name: Pull Request
 
 permissions:
   id-token: write
@@ -17,5 +17,5 @@ jobs:
   run-checks:
     uses: ./.github/workflows/run-checks.yml
     secrets:
-      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.SAM_APP_VALIDATE_ROLE_ARN }}
+      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.DEV_SAM_APP_VALIDATE_ROLE_ARN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

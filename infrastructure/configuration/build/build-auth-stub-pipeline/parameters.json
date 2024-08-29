@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "SAMStackName",
-    "ParameterValue": "build-orch-stubs-deploy"
+    "ParameterValue": "build-auth-stub-deploy"
   },
   {
     "ParameterKey": "SigningProfileArn",
