@@ -32,7 +32,7 @@ function get(event: APIGatewayProxyEvent): APIGatewayProxyResult {
 }
 
 function post(event: APIGatewayProxyEvent): APIGatewayProxyResult {
-  console.log("I'm going to save the form to the database");
+  console.log("I'm going to save the form to the database!");
   return {
     statusCode: 200,
     body: JSON.stringify({
