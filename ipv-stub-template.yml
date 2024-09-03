@@ -21,6 +21,19 @@ Parameters:
     Description: The ARN of the permissions boundary to apply when creating IAM roles
     Default: none
 
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
+    build:
+      ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
+    staging:
+      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
+    integration:
+      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
+    production:
+      ipvStubDomainName: ipvstub.oidc.account.gov.uk
+
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
@@ -233,3 +246,16 @@ Resources:
             Action:
               - dynamodb:PutItem
             Resource: !GetAtt DynamoDB.Arn
+
+  PublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+
+Outputs:
+  IpvHostedZoneId:
+    Value: !GetAtt PublicHostedZone.Id
+    Export:
+      Name: IpvHostedZoneId
