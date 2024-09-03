@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  Linking the root domain to the sub domain account for orchestration stubs.
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
+      ipvStubDomainName: ipvStub.oidc.sandpit.account.gov.uk
+      ipvStubResourceRecords: [
+            ns-1660.awsdns-15.co.uk,
+            ns-550.awsdns-04.net,
+            ns-477.awsdns-59.com,
+            ns-1188.awsdns-20.org
+          ]
+    build:
+      oidcHostedZoneId: Z062899930H8VN1UJ9CDX
+      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+    staging:
+      oidcHostedZoneId: Z013545810R9Q9A5U2JW5
+      ipvStubDomainName: ipvStub.oidc.staging.account.gov.uk
+    integration:
+      oidcHostedZoneId: Z015965529V3Z8WL9WJMF
+      ipvStubDomainName: ipvStub.oidc.integration.account.gov.uk
+    production:
+      oidcHostedZoneId: Z06269462RT1OC3QFCZZE
+      ipvStubDomainName: ipvStub.oidc.account.gov.uk
+
+Resources:
+  IpvStubNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: NS
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      HostedZoneId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcHostedZoneId ]
+      ResourceRecords: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubResourceRecords ]
+      TTL: 172800
