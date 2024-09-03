@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  All the DNS Hosted Zones for the Orchestration Stubs.
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      ipvStubDomainName: ipvStub.oidc.sandpit.account.gov.uk
+    build:
+      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+    staging:
+      ipvStubDomainName: ipvStub.oidc.staging.account.gov.uk
+    integration:
+      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+    production:
+      ipvStubDomainName: ipvStub.oidc.account.gov.uk
+
+Resources:
+  IpvStubCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+          HostedZoneId: !ImportValue IpvHostedZoneId
+      ValidationMethod: DNS
+      CertificateTransparencyLoggingPreference: ENABLED
+
+  IpvStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref IpvStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  IpvStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      RestApiId: !ImportValue IpvApiGatewayId
+      Stage: Live
+    DependsOn:
+      - IpvStubApiDomain
+
+  IpvStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      HostedZoneId: !ImportValue IpvHostedZoneId
+      AliasTarget:
+        DNSName: !GetAtt IpvStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt IpvStubApiDomain.RegionalHostedZoneId
