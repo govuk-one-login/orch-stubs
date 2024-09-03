@@ -259,3 +259,7 @@ Outputs:
     Value: !GetAtt PublicHostedZone.Id
     Export:
       Name: IpvHostedZoneId
+  IpvApiGatewayId:
+    Value: !Ref ApiGateway
+    Export:
+      Name: IpvApiGatewayId
