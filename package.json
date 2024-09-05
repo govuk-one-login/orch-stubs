@@ -32,7 +32,7 @@
     "semi": true
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.635.0",
+    "@aws-sdk/client-dynamodb": "^3.645.0",
     "@aws-sdk/lib-dynamodb": "^3.637.0",
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.23.1",
