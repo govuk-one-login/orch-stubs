@@ -55,6 +55,28 @@ export const putUserIdentityWithToken = async (
   });
 };
 
+export const getStateWithAuthCode = async (
+  authCode: string
+): Promise<string> => {
+  const result = await dynamo.get({
+    TableName: tableName,
+    Key: { UserIdentityId: authCode + "-state" },
+  });
+
+  return result.Item?.state;
+};
+
+export const putStateWithAuthCode = async (authCode: string, state: string) => {
+  return await dynamo.put({
+    TableName: tableName,
+    Item: {
+      UserIdentityId: authCode + "-state",
+      state,
+      ttl: getOneDayTimestamp(),
+    },
+  });
+};
+
 function getOneDayTimestamp() {
   const date = new Date();
   date.setDate(date.getDate() + 1);

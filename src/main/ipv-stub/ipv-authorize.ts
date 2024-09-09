@@ -14,7 +14,11 @@ import {
   successfulHtmlResult,
   successfulJsonResult,
 } from "./helper/result-helper";
-import { putUserIdentityWithAuthCode } from "./service/dynamodb-form-response-service";
+import {
+  getStateWithAuthCode,
+  putStateWithAuthCode,
+  putUserIdentityWithAuthCode,
+} from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -61,6 +65,12 @@ async function get(
     Buffer.from(part, "base64url").toString("utf8")
   );
 
+  try {
+    await putStateWithAuthCode(AUTH_CODE, JSON.parse(decodedPayload)["state"]);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
   return successfulHtmlResult(
     200,
     renderIPVAuthorize(decodedHeader, decodedPayload)
@@ -77,6 +87,18 @@ async function post(
 
   try {
     await putUserIdentityWithAuthCode(AUTH_CODE, USER_IDENTITY);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
+  try {
+    const state = await getStateWithAuthCode(AUTH_CODE);
+    if (state) {
+      logger.info("state: " + state);
+      url.searchParams.append("state", state);
+    } else {
+      console.log("State not found or is not a string.");
+    }
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
