@@ -6,7 +6,7 @@ import {
 import { logger } from "../logger";
 import { importPKCS8, compactDecrypt } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
-import { AUTH_CODE, USER_IDENTITY } from "./data/ipv-dummy-constants";
+import { AUTH_CODE, ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -80,7 +80,7 @@ async function get(
 async function post(
   _event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
+  const redirectUri = `${ROOT_URI}/ipv-callback`;
 
   const url = new URL(redirectUri);
   url.searchParams.append("code", AUTH_CODE);
