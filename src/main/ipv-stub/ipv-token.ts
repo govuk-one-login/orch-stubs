@@ -44,11 +44,7 @@ async function post(
   );
 
   try {
-    await jwtVerify(clientAssertionJwt, publicKey, {
-      audience: process.env.IPV_AUDIENCE,
-      subject: "authOrchestrator",
-      issuer: "authOrchestrator",
-    });
+    await jwtVerify(clientAssertionJwt, publicKey);
   } catch (error) {
     if (error instanceof Error) {
       throw new CodedError(500, "Failed to verify JWT: " + error.message);
