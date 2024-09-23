@@ -1,8 +1,7 @@
 # Manual stacks - Link Hosted Zone
 ## Intro
 
-The SAM template is used to creates an NS Record on the root domain account for the sub domains that live
-in the orchestration account.
+The SAM template is used to creates an NS record on the root domain account for the subdomains that live in the orchestration account.
 
 This Stack is deployed manually once per environment as part of the DNS set up process. The hosted zone and subdomain
 should be created first (this is done in the pipeline) in the orchestraion account and then the associated NS record values copied

@@ -24,20 +24,15 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.sandpit.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
     build:
-      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
     staging:
-      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.staging.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
     integration:
-      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
     production:
-      oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.account.gov.uk
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]

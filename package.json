@@ -32,18 +32,18 @@
     "semi": true
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.635.0",
-    "@aws-sdk/lib-dynamodb": "^3.637.0",
+    "@aws-sdk/client-dynamodb": "^3.650.0",
+    "@aws-sdk/lib-dynamodb": "^3.650.0",
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.23.1",
     "jose": "^5.8.0",
-    "pino": "^9.3.2"
+    "pino": "^9.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
     "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.16.3",
+    "@types/node": "^20.16.5",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.9.1",
     "eslint-plugin-jest": "^28.8.2",
@@ -55,6 +55,6 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.3.0"
+    "typescript-eslint": "^8.5.0"
   }
 }

@@ -1,12 +1,10 @@
 # Manual stacks - DNS
 ## Intro
 
-The SAM template creates a Record and certificate for `ipvStub.oidc.account.gov.uk`
-or `ipvStub.oidc.<environment>.account.gov.uk` if environment is not `production`.
-Where in the case of the `dev` environment it gets mapped to `sandpit`. 
+The SAM template creates a DNS record and certificate for `ipvstub.oidc.<environment>.account.gov.uk` (or `ipvstub.oidc.account.gov.uk` if environment is `production`).
+Note that the `dev` environment gets mapped to `sandpit`. 
 
-This Stack is deployed manually once per environment
-as part of the DNS set up process. 
+This Stack is deployed manually once per environment as part of the DNS set up process. 
 
 
 ## Deployment

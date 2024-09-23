@@ -16,15 +16,15 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      ipvStubDomainName: ipvStub.oidc.sandpit.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
     build:
-      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
     staging:
-      ipvStubDomainName: ipvStub.oidc.staging.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
     integration:
-      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
     production:
-      ipvStubDomainName: ipvStub.oidc.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.account.gov.uk
 
 Resources:
   IpvStubCertificate:

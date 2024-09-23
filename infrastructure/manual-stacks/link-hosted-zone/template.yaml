@@ -17,7 +17,7 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       oidcHostedZoneId: Z04812572XHS4OV4NR9AM
-      ipvStubDomainName: ipvStub.oidc.sandpit.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
       ipvStubResourceRecords: [
             ns-1660.awsdns-15.co.uk,
             ns-550.awsdns-04.net,
@@ -26,16 +26,16 @@ Mappings:
           ]
     build:
       oidcHostedZoneId: Z062899930H8VN1UJ9CDX
-      ipvStubDomainName: ipvStub.oidc.build.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
     staging:
       oidcHostedZoneId: Z013545810R9Q9A5U2JW5
-      ipvStubDomainName: ipvStub.oidc.staging.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
     integration:
       oidcHostedZoneId: Z015965529V3Z8WL9WJMF
-      ipvStubDomainName: ipvStub.oidc.integration.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
     production:
       oidcHostedZoneId: Z06269462RT1OC3QFCZZE
-      ipvStubDomainName: ipvStub.oidc.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.account.gov.uk
 
 Resources:
   IpvStubNSRecord:
