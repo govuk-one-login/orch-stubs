@@ -31,7 +31,8 @@ async function get(
   const accessToken = getTokenOrThrow(event.headers);
 
   try {
-    const userIdentity = await getUserIdentityWithToken(accessToken);
+    const tokenKey = accessToken.replace("Bearer ", "");
+    const userIdentity = await getUserIdentityWithToken(tokenKey);
     return Promise.resolve(successfulJsonResult(200, userIdentity));
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);

@@ -6,7 +6,7 @@ import {
 import { logger } from "../logger";
 import { importPKCS8, compactDecrypt } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
-import { AUTH_CODE, USER_IDENTITY } from "./data/ipv-dummy-constants";
+import { AUTH_CODE, ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -14,7 +14,11 @@ import {
   successfulHtmlResult,
   successfulJsonResult,
 } from "./helper/result-helper";
-import { putUserIdentityWithAuthCode } from "./service/dynamodb-form-response-service";
+import {
+  getStateWithAuthCode,
+  putStateWithAuthCode,
+  putUserIdentityWithAuthCode,
+} from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -61,6 +65,12 @@ async function get(
     Buffer.from(part, "base64url").toString("utf8")
   );
 
+  try {
+    await putStateWithAuthCode(AUTH_CODE, JSON.parse(decodedPayload)["state"]);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
   return successfulHtmlResult(
     200,
     renderIPVAuthorize(decodedHeader, decodedPayload)
@@ -70,13 +80,25 @@ async function get(
 async function post(
   _event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const redirectUri = "https://oidc.sandpit.account.gov.uk/ipv-callback";
+  const redirectUri = `${ROOT_URI}/ipv-callback`;
 
   const url = new URL(redirectUri);
   url.searchParams.append("code", AUTH_CODE);
 
   try {
     await putUserIdentityWithAuthCode(AUTH_CODE, USER_IDENTITY);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
+  try {
+    const state = await getStateWithAuthCode(AUTH_CODE);
+    if (state) {
+      logger.info("state: " + state);
+      url.searchParams.append("state", state);
+    } else {
+      console.log("State not found or is not a string.");
+    }
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }

@@ -10,11 +10,11 @@ const tableName = `${process.env.ENVIRONMENT}-UserIdentity`;
 export const getUserIdentityWithAuthCode = async (
   authCode: string
 ): Promise<UserIdentity> => {
-  const userIdentity = await dynamo.get({
+  const response = await dynamo.get({
     TableName: tableName,
     Key: { UserIdentityId: authCode },
   });
-  return userIdentity.Item as unknown as UserIdentity;
+  return response.Item?.userIdentity as unknown as UserIdentity;
 };
 
 export const putUserIdentityWithAuthCode = async (
@@ -34,11 +34,11 @@ export const putUserIdentityWithAuthCode = async (
 export const getUserIdentityWithToken = async (
   token: string
 ): Promise<UserIdentity> => {
-  const userIdentity = await dynamo.get({
+  const response = await dynamo.get({
     TableName: tableName,
     Key: { UserIdentityId: token },
   });
-  return userIdentity.Item as unknown as UserIdentity;
+  return response.Item?.userIdentity as unknown as UserIdentity;
 };
 
 export const putUserIdentityWithToken = async (
@@ -50,6 +50,28 @@ export const putUserIdentityWithToken = async (
     Item: {
       UserIdentityId: token,
       userIdentity,
+      ttl: getOneDayTimestamp(),
+    },
+  });
+};
+
+export const getStateWithAuthCode = async (
+  authCode: string
+): Promise<string> => {
+  const response = await dynamo.get({
+    TableName: tableName,
+    Key: { UserIdentityId: authCode + "-state" },
+  });
+
+  return response.Item?.state;
+};
+
+export const putStateWithAuthCode = async (authCode: string, state: string) => {
+  return await dynamo.put({
+    TableName: tableName,
+    Item: {
+      UserIdentityId: authCode + "-state",
+      state,
       ttl: getOneDayTimestamp(),
     },
   });
