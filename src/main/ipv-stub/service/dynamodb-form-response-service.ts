@@ -5,7 +5,7 @@ import { UserIdentity } from "../interfaces/user-identity-interface";
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocument.from(client);
 
-const tableName = `${process.env.ENVIRONMENT}-UserIdentity`;
+const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string

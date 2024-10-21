@@ -51,10 +51,10 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
-  DynamoDB:
+  UserIdentityTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Environment}-UserIdentity
+      TableName: !Sub ${Environment}-IpvStub-UserIdentity
       KeySchema:
         - AttributeName: UserIdentityId
           KeyType: HASH
@@ -234,7 +234,7 @@ Resources:
             Action:
               - dynamodb:DescribeTable
               - dynamodb:Get*
-            Resource: !GetAtt DynamoDB.Arn
+            Resource: !GetAtt UserIdentityTable.Arn
 
   UserIdentityTableWriteAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -246,7 +246,7 @@ Resources:
             Effect: Allow
             Action:
               - dynamodb:PutItem
-            Resource: !GetAtt DynamoDB.Arn
+            Resource: !GetAtt UserIdentityTable.Arn
 
   PublicHostedZone:
     Type: AWS::Route53::HostedZone
