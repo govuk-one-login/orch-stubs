@@ -27,6 +27,12 @@ Mappings:
     build:
       oidcHostedZoneId: Z062899930H8VN1UJ9CDX
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
+      ipvStubResourceRecords: [
+            ns-811.awsdns-37.net,
+            ns-1515.awsdns-61.org,
+            ns-1563.awsdns-03.co.uk,
+            ns-300.awsdns-37.com
+          ]
     staging:
       oidcHostedZoneId: Z013545810R9Q9A5U2JW5
       ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
