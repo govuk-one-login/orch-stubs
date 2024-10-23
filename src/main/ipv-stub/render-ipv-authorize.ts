@@ -33,7 +33,7 @@ export default function renderIPVAuthorize(
 
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
-  <form action="/authorize" method="post">
+  <form action="/Live/authorize" method="post">
   <dl class="govuk-summary-list">
 
   <div class="govuk-summary-list__row">
