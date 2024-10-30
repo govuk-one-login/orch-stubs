@@ -3,7 +3,8 @@ import config from "./config/config";
 
 export default function renderIPVAuthorize(
   decodedHeader: string,
-  decodedPayload: string
+  decodedPayload: string,
+  authCode: string
 ) {
   return renderPage(
     `<h1 class="govuk-heading-l">IPV stub</h1>
@@ -34,6 +35,7 @@ export default function renderIPVAuthorize(
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
   <form action="/authorize" method="post">
+   <input type="hidden" name="authCode" value=${authCode}>
   <dl class="govuk-summary-list">
 
   <div class="govuk-summary-list__row">

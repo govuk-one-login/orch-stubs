@@ -4,7 +4,7 @@ import {
   Handler,
 } from "aws-lambda";
 import { logger } from "../logger";
-import { importPKCS8, compactDecrypt } from "jose";
+import { importPKCS8, compactDecrypt, base64url } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
 import { AUTH_CODE, ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
@@ -19,6 +19,7 @@ import {
   putStateWithAuthCode,
   putUserIdentityWithAuthCode,
 } from "./service/dynamodb-form-response-service";
+import { randomBytes } from "crypto";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -65,15 +66,16 @@ async function get(
     Buffer.from(part, "base64url").toString("utf8")
   );
 
+  const authCode = base64url.encode(randomBytes(32));
   try {
-    await putStateWithAuthCode(AUTH_CODE, JSON.parse(decodedPayload)["state"]);
+    await putStateWithAuthCode(authCode, JSON.parse(decodedPayload)["state"]);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
   return successfulHtmlResult(
     200,
-    renderIPVAuthorize(decodedHeader, decodedPayload)
+    renderIPVAuthorize(decodedHeader, decodedPayload, authCode)
   );
 }
 
