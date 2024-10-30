@@ -46,6 +46,14 @@ export const getUserIdentityWithToken = async (
   return null;
 };
 
+export const authCodeIsValid = async (authCode: string): Promise<boolean> => {
+  const response = await dynamo.get({
+    TableName: tableName,
+    Key: { UserIdentityId: authCode },
+  });
+  return !!response.Item;
+};
+
 export const putUserIdentityWithToken = async (
   token: string,
   userIdentity: UserIdentity

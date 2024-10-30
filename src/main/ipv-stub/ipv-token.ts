@@ -14,6 +14,7 @@ import {
   successfulJsonResult,
 } from "./helper/result-helper";
 import {
+  authCodeIsValid,
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
 } from "./service/dynamodb-form-response-service";
@@ -104,7 +105,7 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
   }
 
   const authCode = query["code"];
-  if (authCode != AUTH_CODE) {
+  if (!authCode || Array.isArray(authCode) || !authCodeIsValid(authCode)) {
     throw new CodedError(
       400,
       "Unexpected auth code (" + authCode + ") in query"
