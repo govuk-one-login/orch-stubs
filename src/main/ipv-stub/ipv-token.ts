@@ -5,8 +5,8 @@ import {
   Handler,
 } from "aws-lambda";
 import querystring from "node:querystring";
-import { importSPKI, jwtVerify } from "jose";
-import { ACCESS_TOKEN, AUTH_CODE } from "./data/ipv-dummy-constants";
+import { base64url, importSPKI, jwtVerify } from "jose";
+import { AUTH_CODE } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -17,6 +17,7 @@ import {
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
 } from "./service/dynamodb-form-response-service";
+import { randomBytes } from "crypto";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -53,15 +54,20 @@ async function post(
     throw error;
   }
 
+  const accessToken = base64url.encode(randomBytes(36));
   const authCode = body["code"] as string;
   try {
     const userIdentity = await getUserIdentityWithAuthCode(authCode);
-    putUserIdentityWithToken(ACCESS_TOKEN.access_token, userIdentity);
+    await putUserIdentityWithToken(accessToken, userIdentity);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return successfulJsonResult(200, ACCESS_TOKEN);
+  return successfulJsonResult(200, {
+    access_token: accessToken,
+    token_type: "Bearer",
+    expires_in: 3600,
+  });
 }
 
 function validateHeadersOrThrow(headers: APIGatewayProxyEventHeaders): void {
