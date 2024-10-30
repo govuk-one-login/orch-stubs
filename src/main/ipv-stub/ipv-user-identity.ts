@@ -30,13 +30,17 @@ async function get(
 ): Promise<APIGatewayProxyResult> {
   const accessToken = getTokenOrThrow(event.headers);
 
+  let userIdentity;
   try {
     const tokenKey = accessToken.replace("Bearer ", "");
-    const userIdentity = await getUserIdentityWithToken(tokenKey);
-    return Promise.resolve(successfulJsonResult(200, userIdentity));
+    userIdentity = await getUserIdentityWithToken(tokenKey);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
+  if (userIdentity == null) {
+    throw new CodedError(500, "Access token not found in DB, or is expired");
+  }
+  return Promise.resolve(successfulJsonResult(200, userIdentity));
 }
 
 function getTokenOrThrow(headers: APIGatewayProxyEventHeaders): string {

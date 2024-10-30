@@ -33,12 +33,17 @@ export const putUserIdentityWithAuthCode = async (
 
 export const getUserIdentityWithToken = async (
   token: string
-): Promise<UserIdentity> => {
+): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
     TableName: tableName,
     Key: { UserIdentityId: token },
   });
-  return response.Item?.userIdentity as unknown as UserIdentity;
+  if (response.Item) {
+    if (response.Item.ttl > Math.floor(Date.now() / 1000)) {
+      return response.Item.userIdentity as unknown as UserIdentity;
+    }
+  }
+  return null;
 };
 
 export const putUserIdentityWithToken = async (
