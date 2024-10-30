@@ -6,7 +6,7 @@ import {
 import { logger } from "../logger";
 import { importPKCS8, compactDecrypt, base64url } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
-import { AUTH_CODE, ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
+import { ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -80,21 +80,26 @@ async function get(
 }
 
 async function post(
-  _event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const redirectUri = `${ROOT_URI}/ipv-callback`;
 
+  const parsedBody = event.body
+    ? Object.fromEntries(new URLSearchParams(event.body))
+    : {};
+  const authCode = parsedBody["authCode"];
+
   const url = new URL(redirectUri);
-  url.searchParams.append("code", AUTH_CODE);
+  url.searchParams.append("code", authCode);
 
   try {
-    await putUserIdentityWithAuthCode(AUTH_CODE, USER_IDENTITY);
+    await putUserIdentityWithAuthCode(authCode, USER_IDENTITY);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
   try {
-    const state = await getStateWithAuthCode(AUTH_CODE);
+    const state = await getStateWithAuthCode(authCode);
     if (state) {
       logger.info("state: " + state);
       url.searchParams.append("state", state);
