@@ -6,7 +6,6 @@ import {
 } from "aws-lambda";
 import querystring from "node:querystring";
 import { base64url, importSPKI, jwtVerify } from "jose";
-import { AUTH_CODE } from "./data/ipv-dummy-constants";
 import {
   CodedError,
   handleErrors,
@@ -14,7 +13,6 @@ import {
   successfulJsonResult,
 } from "./helper/result-helper";
 import {
-  authCodeIsValid,
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
 } from "./service/dynamodb-form-response-service";
@@ -57,13 +55,16 @@ async function post(
 
   const accessToken = base64url.encode(randomBytes(36));
   const authCode = body["code"] as string;
+  let userIdentity;
   try {
-    const userIdentity = await getUserIdentityWithAuthCode(authCode);
-    await putUserIdentityWithToken(accessToken, userIdentity);
+    userIdentity = await getUserIdentityWithAuthCode(authCode);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
-
+  if (userIdentity == null) {
+    throw new CodedError(500, "Auth code not found in DB, or is expired");
+  }
+  await putUserIdentityWithToken(accessToken, userIdentity);
   return successfulJsonResult(200, {
     access_token: accessToken,
     token_type: "Bearer",
@@ -105,11 +106,8 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
   }
 
   const authCode = query["code"];
-  if (!authCode || Array.isArray(authCode) || !authCodeIsValid(authCode)) {
-    throw new CodedError(
-      400,
-      "Unexpected auth code (" + authCode + ") in query"
-    );
+  if (!authCode) {
+    throw new CodedError(400, "Auth code query parameter is null or undefined");
   }
 
   const clientAssertion = query["client_assertion"];
