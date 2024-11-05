@@ -9,12 +9,17 @@ const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string
-): Promise<UserIdentity> => {
+): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
     TableName: tableName,
     Key: { UserIdentityId: authCode },
   });
-  return response.Item?.userIdentity as unknown as UserIdentity;
+  if (response.Item) {
+    if (response.Item.ttl > Math.floor(Date.now() / 1000)) {
+      return response.Item.userIdentity as unknown as UserIdentity;
+    }
+  }
+  return null;
 };
 
 export const putUserIdentityWithAuthCode = async (
