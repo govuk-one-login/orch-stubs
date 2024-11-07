@@ -24,6 +24,9 @@
     "fix:prettier": "prettier --write \"**/*.{ts,json}\"",
     "test": "jest --passWithNoTests",
     "test:coverage": "jest --coverage --passWithNoTests",
+    "test:integration": "npm run localstack:up && (jest --config=./jest.config.integration.ts && e=0) || e=1 && npm run localstack:down && exit $e",
+    "localstack:up": "docker compose -f docker-compose.local.yml up -d",
+    "localstack:down": "docker compose -f docker-compose.local.yml down",
     "prepare": "husky"
   },
   "prettier": {
@@ -33,6 +36,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.679.0",
+    "@aws-sdk/client-sqs": "^3.682.0",
     "@aws-sdk/lib-dynamodb": "^3.682.0",
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.24.0",

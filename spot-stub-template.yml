@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SPOT stub
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+  CodeSigningConfigArn:
+    Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:ethmil-test-spot-request-queue"
+      requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/ethmil-test-spot-request-queue"
+      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/8e80ac11-088d-4d80-b89e-32bd011a4e13"
+
+Conditions:
+  UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
+  UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+
+Globals:
+  Function:
+    CodeSigningConfigArn: !If
+      - UseCodeSigning
+      - !Ref CodeSigningConfigArn
+      - !Ref AWS::NoValue
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
+Resources:
+  SpotLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/spot-stub/spot.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Events:
+        Request:
+          Type: SQS
+          Properties:
+            BatchSize: 1
+            Enabled: true
+            Queue: !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              requestQueueArn,
+            ]
+      Policies:
+        - !Ref SpotRequestQueueConsumePolicy
+        - !Ref SpotResponseQueueWritePolicy
+      Environment:
+        Variables:
+          DESTINATION_QUEUE_URL: !GetAtt SpotResponseQueue.QueueUrl
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/spot-stub/spot.ts
+        Minify: true
+        Sourcemap: true
+        Target: node20
+
+  SpotResponseQueueWritePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSpotResponseQueueWriteAccess
+            Effect: Allow
+            Action:
+              - sqs:SendMessage
+              - sqs:ChangeMessageVisibility
+              - sqs:GetQueueAttributes
+            Resource: !GetAtt SpotResponseQueue.Arn
+          - Sid: AllowSpotResponseQueueKms
+            Effect: Allow
+            Action:
+              - kms:GenerateDataKey
+              - kms:Decrypt
+            Resource: !GetAtt SpotResponseQueueKey.Arn
+
+  SpotRequestQueueConsumePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowWriteAccessToSpotQueue
+            Effect: Allow
+            Action:
+              - sqs:ReceiveMessage
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+              - sqs:ChangeMessageVisibility
+            Resource: !FindInMap [
+                      EnvironmentConfiguration,
+                      !Ref Environment,
+                      requestQueueArn,
+                    ]
+
+          - Sid: AllowEncryptionAccessToSpotQueueKey
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                requestQueueKeyArn,
+              ]
+
+  SpotResponseQueueKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "Key used to encrypt stub SPOT response queue"
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyUsage: ENCRYPT_DECRYPT
+      EnableKeyRotation: true
+
+  SpotResponseQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${Environment}-stub-spot-response-queue
+      MaximumMessageSize: 256000
+      MessageRetentionPeriod: 1209600
+      ReceiveMessageWaitTimeSeconds: 10
+      VisibilityTimeout: 60
+      KmsMasterKeyId: !Ref SpotResponseQueueKey
+      KmsDataKeyReusePeriodSeconds: 300
