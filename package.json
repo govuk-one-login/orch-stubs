@@ -6,7 +6,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "sam build --template ipv-stub-template.yml --build-dir build/ipv & sam build --template auth-stub-template.yml --build-dir build/auth",
+    "build": "sam build --template ipv-stub-template.yml --build-dir build/ipv & sam build --template auth-stub-template.yml --build-dir build/auth & sam build --template spot-stub-template.yml --build-dir build/spot",
     "build:auth": "sam build --template auth-stub-template.yml --build-dir build/auth",
     "build:ipv": "sam build --template ipv-stub-template.yml --build-dir build/ipv",
     "clean": "rm -rf build",
