@@ -18,9 +18,9 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:ethmil-test-spot-request-queue"
-      requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/ethmil-test-spot-request-queue"
-      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/8e80ac11-088d-4d80-b89e-32bd011a4e13"
+      requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:dev-stub-spot-request-queue"
+      requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/dev-stub-spot-request-queue"
+      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/963c4abe-69e8-4160-a995-1d2b8c054e50"
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
