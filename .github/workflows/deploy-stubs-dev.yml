@@ -15,6 +15,10 @@ on:
         type: boolean
         default: false
         description: IPV-Stub
+      spot_deploy:
+        type: boolean
+        default: false
+        description: SPOT-Stub
 
 jobs:
   run-checks:
@@ -42,3 +46,13 @@ jobs:
       ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_IPV_STUB_ARTIFACT_BUCKET_NAME }}
       SIGNING_PROFILE_NAME: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
       WORKING_DIRECTORY: build/ipv
+
+  deploy-spot-stub:
+    if: github.event.inputs.spot_deploy == 'true'
+    uses: ./.github/workflows/deploy-stubs.yml
+    needs: run-checks
+    secrets:
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_SPOT_STUB_GH_ACTIONS_ROLE_ARN }}
+      ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_SPOT_STUB_ARTIFACT_BUCKET_NAME }}
+      SIGNING_PROFILE_NAME: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
+      WORKING_DIRECTORY: build/spot

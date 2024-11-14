@@ -58,7 +58,8 @@ Resources:
               !Ref Environment,
               requestQueueArn,
             ]
-            FunctionResponseTypes: ReportBatchItemFailures
+            FunctionResponseTypes:
+             - ReportBatchItemFailures
       Policies:
         - !Ref SpotRequestQueueConsumePolicy
         - !Ref SpotResponseQueueWritePolicy
