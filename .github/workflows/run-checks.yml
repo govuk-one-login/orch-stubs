@@ -78,3 +78,6 @@ jobs:
 
       - name: SAM validate IPV
         run: sam validate -t ipv-stub-template.yml
+
+      - name: SAM validate SPOT
+        run: sam validate -t spot-stub-template.yml

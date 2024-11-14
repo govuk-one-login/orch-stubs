@@ -9,7 +9,7 @@ export AWS_PAGER=""
 ## Provision dependencies
 for dir in configuration/"$AWS_ACCOUNT"/*/; do
   STACK=$(basename "$dir")
-  if [[ $STACK != "$AWS_ACCOUNT-auth-stub-pipeline" && $STACK != "$AWS_ACCOUNT-ipv-stub-pipeline" && -f configuration/$AWS_ACCOUNT/$STACK/parameters.json ]]; then
+  if [[ $STACK != "$AWS_ACCOUNT-auth-stub-pipeline" && $STACK != "$AWS_ACCOUNT-ipv-stub-pipeline" && $STACK != "$AWS_ACCOUNT-spot-stub-pipeline"&& -f configuration/$AWS_ACCOUNT/$STACK/parameters.json ]]; then
     $PROVISION_COMMAND "$AWS_ACCOUNT" "$STACK" "$STACK" LATEST &
   fi
 done
@@ -17,7 +17,7 @@ done
 ## Provision secure pipelines
 for dir in configuration/"$AWS_ACCOUNT"/*/; do
   STACK=$(basename "$dir")
-  if [[ $STACK == "$AWS_ACCOUNT-auth-stub-pipeline" || $STACK == "$AWS_ACCOUNT-ipv-stub-pipeline" ]]; then
+  if [[ $STACK == "$AWS_ACCOUNT-auth-stub-pipeline" || $STACK == "$AWS_ACCOUNT-ipv-stub-pipeline" || $STACK == "$AWS_ACCOUNT-spot-stub-pipeline" ]]; then
     $PROVISION_COMMAND "$AWS_ACCOUNT" "$STACK" sam-deploy-pipeline LATEST
   fi
 done
