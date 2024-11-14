@@ -67,10 +67,10 @@ export const exampleUserIdentity: UserIdentity = {
   ],
   "https://vocab.account.gov.uk/v1/returnCode": [
     {
-      code: "A",
+      code: "EXAMPLE",
     },
     {
-      code: "P",
+      code: "EXAMPLE2",
     },
   ],
 };
