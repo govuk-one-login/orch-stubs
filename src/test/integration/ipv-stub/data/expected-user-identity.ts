@@ -65,10 +65,10 @@ export const expectedUserIdentity = {
   ],
   "https://vocab.account.gov.uk/v1/returnCode": [
     {
-      code: "A",
+      code: "EXAMPLE1",
     },
     {
-      code: "P",
+      code: "EXAMPLE2",
     },
   ],
 };
