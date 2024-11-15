@@ -6,7 +6,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "(trap 'kill 0' SIGINT; npm run build:auth & npm run build:ipv & npm run build:spot & wait)",
+    "build": "(trap 'kill 0' INT; npm run build:auth & npm run build:ipv & npm run build:spot & wait)",
     "build:auth": "sam build --template auth-stub-template.yml --build-dir build/auth",
     "build:ipv": "sam build --template ipv-stub-template.yml --build-dir build/ipv",
     "build:spot": "sam build --template spot-stub-template.yml --build-dir build/spot",
