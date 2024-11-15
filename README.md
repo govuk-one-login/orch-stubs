@@ -61,14 +61,46 @@ npm run fix:prettier; # Fix prettier
 
 ### Test
 
-> To run tests
+The easiest way to run all of the tests is to first stand up the local API with
 
-```shell script
+```shell
+npm run start:local:warm
+```
+then in a separate terminal run
+```shell
+npm run test:ci
+```
+This will spin up localstack and run both unit and integration tests, reporting coverage.
+This is what runs in GitHub actions against PRs.
+
+#### Unit tests
+
+To just run unit tests, you can run
+```shell
 npm run test
 ```
 
-> To run tests with coverage
+#### Integration tests
+You can run just the integration tests with 
 
-```shell script
-npm run test:coverage
+```shell
+npm run test:localstack:integration
+```
+
+To run the integration tests repeatedly, it may be faster to stand up localstack with 
+
+```shell
+npm run localstack:up
+```
+
+then run the tests as many times as needed with 
+
+```shell
+npm run test:integration
+```
+
+and finally tear down localstack with
+
+```shell
+npm run localstack:down
 ```

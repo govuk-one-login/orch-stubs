@@ -25,7 +25,9 @@
     "fix:prettier": "prettier --write \"**/*.{ts,json}\"",
     "test": "jest --passWithNoTests",
     "test:coverage": "jest --coverage --passWithNoTests",
-    "test:integration": "npm run localstack:up && (jest --config=./jest.config.integration.ts && e=0) || e=1 && npm run localstack:down && exit $e",
+    "test:localstack:integration": "npm run localstack:up && (jest --config=./jest.config.integration.ts && e=0) || e=1 && npm run localstack:down && exit $e",
+    "test:integration": "jest --config=./jest.config.integration.ts",
+    "test:ci": "tsc --noEmit && npm run localstack:up && (jest --config=./jest.config.ci.ts && e=0) || e=1 && npm run localstack:down && exit $e",
     "localstack:up": "docker compose -f docker-compose.local.yml up -d",
     "localstack:down": "docker compose -f docker-compose.local.yml down",
     "prepare": "husky"
