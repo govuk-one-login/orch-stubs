@@ -1,4 +1,4 @@
-import { UserIdentity } from "../types";
+import { UserIdentity } from "../interfaces/user-identity-interface";
 
 export const exampleUserIdentity: UserIdentity = {
   sub: "urn:fdc:gov.uk:2022:740e5834-3a29-46b4-9a6f-16142fde533a",
