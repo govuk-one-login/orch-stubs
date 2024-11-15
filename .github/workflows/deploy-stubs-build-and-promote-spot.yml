@@ -10,7 +10,7 @@ on:
       - main
     paths-ignore:
       - "**auth-stub**"
-      - "**spot-stub**"
+      - "**ipv-stub**"
 
 jobs:
   run-checks:
@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/deploy-stubs.yml
     needs: run-checks
     secrets:
-      GH_ACTIONS_ROLE_ARN: ${{ secrets.IPV_STUB_GH_ACTIONS_ROLE_ARN }}
-      ARTIFACT_BUCKET_NAME: ${{ secrets.IPV_STUB_ARTIFACT_BUCKET_NAME }}
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.SPOT_STUB_GH_ACTIONS_ROLE_ARN }}
+      ARTIFACT_BUCKET_NAME: ${{ secrets.SPOT_STUB_ARTIFACT_BUCKET_NAME }}
       SIGNING_PROFILE_NAME: ${{ secrets.ORCH_STUBS_SIGNING_PROFILE_NAME }}
-      WORKING_DIRECTORY: build/ipv
+      WORKING_DIRECTORY: build/spot
