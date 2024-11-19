@@ -10,6 +10,7 @@ on:
       - main
     paths-ignore:
       - "**ipv-stub**"
+      - "**spot-stub**"
 
 jobs:
   run-checks:

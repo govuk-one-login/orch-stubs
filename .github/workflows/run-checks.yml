@@ -43,9 +43,7 @@ jobs:
       - name: Configure Docker for ARM
         run: docker run --privileged --rm tonistiigi/binfmt --install all
       - name: Start and run tests
-        run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test; exit 0)
-      - name: Report coverage
-        run: npm run test:coverage
+        run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test:ci; exit 0)
       - name: SonarCloud Scan
         if: ${{ github.actor != 'dependabot[bot]' }}
         uses: sonarsource/sonarcloud-github-action@master
