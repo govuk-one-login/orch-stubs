@@ -21,6 +21,10 @@ Mappings:
       requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:dev-stub-spot-request-queue"
       requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/dev-stub-spot-request-queue"
       requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/963c4abe-69e8-4160-a995-1d2b8c054e50" # This will need to change when the key is recreated
+    build:
+      requestQueueArn: "arn:aws:sqs:eu-west-2:767397776536:build-stub-spot-request-queue"
+      requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/767397776536/build-stub-spot-request-queue"
+      requestQueueKeyArn: "arn:aws:kms:eu-west-2:767397776536:key/81ba9cec-cdb3-4e77-833a-03b68683dd1a"
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
