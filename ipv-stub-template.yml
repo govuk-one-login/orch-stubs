@@ -38,6 +38,7 @@ Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
   IsNotProduction: !Not [!Equals [!Ref Environment, production]]
+  IsLocalEnv: !Equals [!Ref Environment, local]
 
 Globals:
   Function:
@@ -91,6 +92,8 @@ Resources:
           ENVIRONMENT: !Sub ${Environment}
           IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
           ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
+          # This will always be over-written when running locally in parameters.json
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
@@ -253,7 +256,12 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      Name:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          ipvStubDomainName,
+        ]
 
 Outputs:
   IpvHostedZoneId:
