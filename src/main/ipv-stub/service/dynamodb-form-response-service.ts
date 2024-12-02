@@ -2,8 +2,13 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface";
 
-const client = new DynamoDBClient({});
-const dynamo = DynamoDBDocument.from(client);
+const dynamoClient = new DynamoDBClient({
+  region: "eu-west-2",
+  ...(process.env.LOCALSTACK_ENDPOINT && {
+    endpoint: process.env.LOCALSTACK_ENDPOINT,
+  }),
+});
+const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
 
@@ -16,7 +21,7 @@ export const getUserIdentityWithAuthCode = async (
   });
   if (response.Item) {
     if (response.Item.ttl > Math.floor(Date.now() / 1000)) {
-      return response.Item.userIdentity as unknown as UserIdentity;
+      return response.Item.userIdentity as UserIdentity;
     }
   }
   return null;
