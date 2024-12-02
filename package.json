@@ -30,7 +30,8 @@
     "test:ci": "tsc --noEmit && npm run localstack:up && (jest --config=./jest.config.ci.ts && e=0) || e=1 && npm run localstack:down && exit $e",
     "localstack:up": "docker compose -f docker-compose.local.yml up -d",
     "localstack:down": "docker compose -f docker-compose.local.yml down",
-    "prepare": "husky"
+    "prepare": "husky",
+    "createRequestObject": "node scripts/createIpvRequestObject.mjs"
   },
   "prettier": {
     "trailingComma": "es5",
