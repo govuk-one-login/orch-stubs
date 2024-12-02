@@ -1,9 +1,10 @@
+import { JWTPayload, ProtectedHeaderParameters } from "jose";
 import { renderPage } from "../template";
 import config from "./config/config";
 
 export default function renderIPVAuthorize(
-  decodedHeader: string,
-  decodedPayload: string,
+  decodedHeader: ProtectedHeaderParameters,
+  decodedPayload: JWTPayload,
   authCode: string
 ) {
   return renderPage(
@@ -15,7 +16,7 @@ export default function renderIPVAuthorize(
   Algorithm
   </dt>
   <dd class="govuk-summary-list__value" id="user-info-core-identity-claim-present">
-  ${JSON.parse(decodedHeader).alg}
+  ${decodedHeader.alg}
   </dd>
   </dl>
 
@@ -25,7 +26,7 @@ export default function renderIPVAuthorize(
       Decrypted JAR payload
     </dt>
     <dd class="govuk-summary-list__value" id="user-info-core-identity-claim">
-    <textarea class="govuk-textarea" rows="10" id="identity_claim" name="identity_claim" type="text">${JSON.stringify(JSON.parse(decodedPayload), null, 2)}</textarea>
+    <textarea class="govuk-textarea" rows="10" id="identity_claim" name="identity_claim" type="text">${JSON.stringify(decodedPayload, null, 2)}</textarea>
     </dd>
   </div>
   </dl>
