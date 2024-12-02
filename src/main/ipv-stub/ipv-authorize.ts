@@ -113,7 +113,7 @@ async function post(
       logger.info("state: " + state);
       url.searchParams.append("state", state);
     } else {
-      console.log("State not found or is not a string.");
+      logger.info("State not found or is not a string.");
     }
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
