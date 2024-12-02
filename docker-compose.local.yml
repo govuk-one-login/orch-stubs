@@ -1,12 +1,14 @@
 services:
   localstack:
-    container_name: localstack-sqs
+    container_name: localstack
     image: localstack/localstack
     ports:
       - "127.0.0.1:4566:4566"
     environment:
       - DEBUG=${DEBUG:-0}
-      - SERVICES=sqs
+      - SERVICES=sqs,dynamodb
+      - DEFAULT_REGION="eu-west-2"
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./scripts/init-infra.sh:/etc/localstack/init/ready.d/start-localstack.sh
