@@ -4,7 +4,7 @@ import {
   Handler,
 } from "aws-lambda";
 import { logger } from "../logger";
-import { importPKCS8, compactDecrypt, base64url } from "jose";
+import { compactDecrypt, base64url, jwtVerify } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize";
 import { ROOT_URI, USER_IDENTITY } from "./data/ipv-dummy-constants";
 import {
@@ -21,6 +21,10 @@ import {
 } from "./service/dynamodb-form-response-service";
 import { randomBytes } from "crypto";
 import { UserIdentity } from "./interfaces/user-identity-interface";
+import {
+  getIpvPrivateKey,
+  getOrchPublicSigningKey,
+} from "./helper/key-helpers";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -45,17 +49,16 @@ async function get(
   if (event.queryStringParameters == null) {
     throw new CodedError(400, "Query string parameters are null");
   }
-  const encryptedJwt = event.queryStringParameters["request"] as string;
-  if (!encryptedJwt) {
+  const requestObject = event.queryStringParameters["request"] as string;
+
+  if (!requestObject) {
     throw new CodedError(400, "Request query string parameter not found");
   }
-  const ipvPrivateKeyPem = process.env.IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY;
-  if (!ipvPrivateKeyPem) {
-    throw new CodedError(500, "Private key not found");
-  }
-  const privateKey = await importPKCS8(ipvPrivateKeyPem, "RSA-OAEP-256");
 
-  const { plaintext } = await compactDecrypt(encryptedJwt, privateKey);
+  const orchPublicSigningKey = await getOrchPublicSigningKey();
+  const ipvPrivateKey = await getIpvPrivateKey();
+
+  const { plaintext } = await compactDecrypt(requestObject, ipvPrivateKey);
   const encodedJwt = plaintext.toString();
 
   const parts = encodedJwt.split(".");
@@ -63,20 +66,21 @@ async function get(
     throw new CodedError(400, "Decrypted JWT is in invalid format");
   }
 
-  const [decodedHeader, decodedPayload, _decodedSignature] = parts.map((part) =>
-    Buffer.from(part, "base64url").toString("utf8")
-  );
+  const jwt = await jwtVerify(encodedJwt, orchPublicSigningKey);
+
+  const header = jwt.protectedHeader;
+  const payload = jwt.payload;
 
   const authCode = base64url.encode(randomBytes(32));
   try {
-    await putStateWithAuthCode(authCode, JSON.parse(decodedPayload)["state"]);
+    await putStateWithAuthCode(authCode, payload.state as string);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
   return successfulHtmlResult(
     200,
-    renderIPVAuthorize(decodedHeader, decodedPayload, authCode)
+    renderIPVAuthorize(header, payload, authCode)
   );
 }
 
@@ -109,7 +113,7 @@ async function post(
       logger.info("state: " + state);
       url.searchParams.append("state", state);
     } else {
-      console.log("State not found or is not a string.");
+      logger.info("State not found or is not a string.");
     }
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);

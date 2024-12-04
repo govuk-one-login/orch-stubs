@@ -10,7 +10,7 @@ export default {
     iat: Date.now(),
     exp: expiryDate.valueOf(),
     vot: "P2",
-    vtm: `https://oidc.${process.env.ENVIRONMENT}.account.gov.uk/trustmark`,
+    vtm: `https://oidc.${process.env.ENVIRONMENT === "dev" ? "sandpit" : process.env.ENVIRONMENT}.account.gov.uk/trustmark`,
     vc: {
       type: ["VerifiableCredential", "VerifiableIdentityCredential"],
       credentialSubject: {

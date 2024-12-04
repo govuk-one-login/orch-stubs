@@ -5,7 +5,7 @@ import {
   Handler,
 } from "aws-lambda";
 import querystring from "node:querystring";
-import { base64url, importSPKI, jwtVerify } from "jose";
+import { base64url, jwtVerify } from "jose";
 import {
   CodedError,
   handleErrors,
@@ -17,6 +17,8 @@ import {
   putUserIdentityWithToken,
 } from "./service/dynamodb-form-response-service";
 import { randomBytes } from "crypto";
+import { getOrchPublicSigningKey } from "./helper/key-helpers";
+import { logger } from "../logger";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -38,19 +40,16 @@ async function post(
   const body = getValidBodyOrThrow(event.body);
   const clientAssertionJwt = body["client_assertion"] as string;
 
-  const publicKey = await importSPKI(
-    process.env.IPV_TOKEN_PUBLIC_SIGNING_KEY as string,
-    "ES256"
-  );
+  const publicKey = await getOrchPublicSigningKey();
 
   try {
     await jwtVerify(clientAssertionJwt, publicKey);
   } catch (error) {
-    if (error instanceof Error) {
-      throw new CodedError(500, "Failed to verify JWT: " + error.message);
-    }
+    logger.error(
+      `Failed to verify client_assertion from orchestration: ${(error as Error).message}`
+    );
 
-    throw error;
+    throw new CodedError(500, "Invalid request");
   }
 
   const accessToken = base64url.encode(randomBytes(36));
