@@ -9,7 +9,7 @@ A version of SAM CLI (v1.120.0+) that supports Node.js version 20. See the AWS S
 
 #### Build
 
-> To build the app
+To build the app:
 
 ```shell script
 npm run build
@@ -17,18 +17,24 @@ npm run build
 
 #### Start
 
-> To start the app locally (requires Docker)
+To start the app locally (requires Docker):
 
 ```shell script
 npm run build && npm run start:local
 ```
 
-#### Clean Build
-
-> To clean build the app (try if you encounter issues re-running build)
+Press `CTRL+C` to kill and to clean up any open docker containers run:
 
 ```shell script
-npm run clean && npm run build
+npm run end:local
+```
+
+#### Clean Build
+
+To clean build the app (try if you encounter issues re-running build):
+
+```shell script
+npm npm run build:clean
 ```
 
 ## Private and public keys
@@ -43,7 +49,7 @@ In deployed environments, the private key will be retrieved from AWS Secrets Man
 
 ### Scripts
 
-> To check
+To check:
 
 ```shell script
 npm run check; # Check all
@@ -51,8 +57,8 @@ npm run check:lint; # Check linting
 npm run check:prettier; # Check prettier
 ```
 
-> To fix formatting/linting
-> 
+To fix formatting/linting:
+
 ```shell script
 npm run fix; # Fix all
 npm run fix:lint; # Fix linting
@@ -61,12 +67,14 @@ npm run fix:prettier; # Fix prettier
 
 ### Test
 
-The easiest way to run all of the tests is to first stand up the local API with
+The easiest way to run all of the tests is to first stand up the local API with:
 
 ```shell
-npm run start:local:warm
+npm run build && npm run start:local:warm
 ```
-then in a separate terminal run
+>Note: Tests may timout without a warm start.
+
+then in a separate terminal run:
 ```shell
 npm run test:ci
 ```
@@ -75,31 +83,31 @@ This is what runs in GitHub actions against PRs.
 
 #### Unit tests
 
-To just run unit tests, you can run
+To just run unit tests, you can run:
 ```shell
 npm run test
 ```
 
 #### Integration tests
-You can run just the integration tests with 
+You can run just the integration tests with: 
 
 ```shell
 npm run test:localstack:integration
 ```
 
-To run the integration tests repeatedly, it may be faster to stand up localstack with 
+To run the integration tests repeatedly, it may be faster to stand up localstack with:
 
 ```shell
 npm run localstack:up
 ```
 
-then run the tests as many times as needed with 
+then run the tests as many times as needed with:
 
 ```shell
 npm run test:integration
 ```
 
-and finally tear down localstack with
+and finally tear down localstack with:
 
 ```shell
 npm run localstack:down
