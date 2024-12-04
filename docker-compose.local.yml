@@ -3,11 +3,13 @@ services:
     container_name: localstack
     image: localstack/localstack
     ports:
-      - "127.0.0.1:4566:4566"
+      - "4566:4566"
     environment:
       - DEBUG=${DEBUG:-0}
       - SERVICES=sqs,dynamodb
-      - DEFAULT_REGION="eu-west-2"
+      - DYNAMODB_SHARE_DB=1
+      - DYNAMODB_IN_MEMORY=1
+      - HOSTNAME_EXTERNAL="host.docker.internal"
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
