@@ -12,3 +12,7 @@ services:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - ./scripts/init-infra.sh:/etc/localstack/init/ready.d/start-localstack.sh
+  jest:
+    container_name: orch-stubs-jest
+    build:
+      dockerfile: jest.Dockerfile
