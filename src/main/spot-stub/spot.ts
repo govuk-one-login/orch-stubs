@@ -1,21 +1,13 @@
 import { SQSBatchResponse, SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
 import { SQSBatchItemFailure } from "aws-lambda/trigger/sqs";
 import { ok, fail, Result } from "../types/result";
-import {
-  SendMessageCommand,
-  SQSClient,
-  SQSClientConfig,
-} from "@aws-sdk/client-sqs";
-import * as process from "node:process";
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { logger } from "../logger";
 import { SpotRequest } from "./spot-request";
 import { SpotResponse } from "./spot-response";
+import { getClientConfig, spotDestinationQueueUrl } from "../aws-config";
 
-const sqsConfig: SQSClientConfig = process.env.LOCALSTACK_ENDPOINT
-  ? { endpoint: process.env.LOCALSTACK_ENDPOINT }
-  : {};
-const sqsClient = new SQSClient(sqsConfig);
-const destinationQueueUrl: string = process.env.DESTINATION_QUEUE_URL!;
+const sqsClient = new SQSClient(getClientConfig());
 
 export const handler: SQSHandler = async (
   event: SQSEvent
@@ -47,7 +39,7 @@ async function processRecord(
     },
   };
   const sendMessageCommand = new SendMessageCommand({
-    QueueUrl: destinationQueueUrl,
+    QueueUrl: spotDestinationQueueUrl,
     MessageBody: JSON.stringify(output),
   });
   try {
