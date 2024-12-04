@@ -3,7 +3,7 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface";
 import { getClientConfig, userIdentityTableName } from "../../aws-config";
 
-const client = new DynamoDBClient(getClientConfig());
+const client = new DynamoDBClient(getClientConfig(true));
 const dynamo = DynamoDBDocument.from(client);
 
 export const getUserIdentityWithAuthCode = async (

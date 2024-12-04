@@ -9,12 +9,14 @@ import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants";
 
 const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
 
-beforeAll(createUserIdentityTable);
-beforeEach(setUpUserIdentity);
+beforeEach(async () => {
+  await createUserIdentityTable();
+  await setUpUserIdentity();
+});
 afterEach(resetUserIdentityTable);
 
 describe("IPV User Identity", () => {
-  const api = supertest(getLocalEndpoint(3001));
+  const api = supertest(getLocalEndpoint(false, 3001));
 
   it("should return 200 for a get request", async () => {
     const response = await api

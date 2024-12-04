@@ -6,7 +6,7 @@ import {
   userIdentityTableName,
 } from "../../../../main/aws-config";
 
-const dynamoClient = new DynamoDBClient(getClientConfig());
+const dynamoClient = new DynamoDBClient(getClientConfig(false));
 const dynamoDoc = DynamoDBDocument.from(dynamoClient);
 
 export async function createUserIdentityTable(): Promise<void> {

@@ -5,9 +5,9 @@ import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { logger } from "../logger";
 import { SpotRequest } from "./spot-request";
 import { SpotResponse } from "./spot-response";
-import { getClientConfig, spotDestinationQueueUrl } from "../aws-config";
+import { getClientConfig, getSpotDestinationQueueUrl } from "../aws-config";
 
-const sqsClient = new SQSClient(getClientConfig());
+const sqsClient = new SQSClient(getClientConfig(true));
 
 export const handler: SQSHandler = async (
   event: SQSEvent
@@ -39,7 +39,7 @@ async function processRecord(
     },
   };
   const sendMessageCommand = new SendMessageCommand({
-    QueueUrl: spotDestinationQueueUrl,
+    QueueUrl: getSpotDestinationQueueUrl(true),
     MessageBody: JSON.stringify(output),
   });
   try {

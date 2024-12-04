@@ -16,12 +16,14 @@ import {
 
 const AUTH_CODE = "12345";
 
-beforeAll(createUserIdentityTable);
-beforeEach(setUpUserIdentity);
+beforeEach(async () => {
+  await createUserIdentityTable();
+  await setUpUserIdentity();
+});
 afterEach(resetUserIdentityTable);
 
 describe("IPV Token", () => {
-  const api = supertest(getLocalEndpoint(3001));
+  const api = supertest(getLocalEndpoint(false, 3001));
 
   it("should return 200 for valid POST request and update Dynamo", async () => {
     const response = await api

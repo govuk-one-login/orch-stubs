@@ -13,6 +13,7 @@ import {
   IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY,
   ORCH_PRIVATE_SIGNING_KEY,
 } from "./data/keys";
+import * as console from "node:console";
 
 // we need this to accept self-signed-certificates in nodejs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -21,14 +22,17 @@ process.env.NODE_TLS_ACCEPT_UNTRUSTED_CERTIFICATES_THIS_IS_INSECURE = "1";
 const STATE = "test-state";
 const AUTH_CODE = "test-auth-code";
 
-beforeAll(createUserIdentityTable);
+beforeEach(createUserIdentityTable);
 afterEach(resetUserIdentityTable);
 
 describe("IPV Authorize", () => {
-  const api = supertest(getLocalEndpoint(3001));
+  const api = supertest(getLocalEndpoint(false, 3001));
 
   it("should return 200 for valid GET request and update Dynamo", async () => {
     const response = await api.get(`/authorize?request=${await generateJwe()}`);
+    console.log(
+      `##############\n${JSON.stringify(response.body)}\n#############`
+    );
     expect(response.statusCode).toBe(200);
     const htmlRegex =
       /<input type="hidden" name="authCode" value=(?<authCode>[A-Za-z0-9+/\-_]+)>/;

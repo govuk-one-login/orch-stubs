@@ -8,8 +8,8 @@ import {
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { getClientConfig, spotQueueName } from "../../../main/aws-config";
 
-const sqsClient = new SQSClient(getClientConfig());
-const lambdaClient = new LambdaClient(getClientConfig(3002));
+const sqsClient = new SQSClient(getClientConfig(false));
+const lambdaClient = new LambdaClient(getClientConfig(false, 3002));
 
 beforeAll(createSqsQueue);
 afterEach(purgeQueue);
