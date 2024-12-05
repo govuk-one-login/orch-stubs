@@ -3,8 +3,6 @@ import { UserIdentity } from "../interfaces/user-identity-interface";
 const env =
   process.env.ENVIRONMENT == "dev" ? "sandpit" : process.env.ENVIRONMENT;
 
-export const AUTH_CODE = "12345";
-
 export const ROOT_URI = `https://oidc.${env}.account.gov.uk`;
 
 export const USER_IDENTITY: UserIdentity = {

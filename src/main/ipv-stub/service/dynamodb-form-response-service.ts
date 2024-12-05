@@ -1,23 +1,18 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface";
+import { getClientConfig, userIdentityTableName } from "../../aws-config";
 
-const dynamoClient = new DynamoDBClient({
-  region: "eu-west-2",
-  ...(process.env.LOCALSTACK_ENDPOINT && {
-    endpoint: process.env.LOCALSTACK_ENDPOINT,
-  }),
-});
-const dynamo = DynamoDBDocument.from(dynamoClient);
-
-const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
+const client = new DynamoDBClient(getClientConfig(true));
+const dynamo = DynamoDBDocument.from(client);
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Key: { UserIdentityId: authCode },
+    ConsistentRead: true,
   });
   if (response.Item) {
     if (response.Item.ttl > Math.floor(Date.now() / 1000)) {
@@ -32,7 +27,7 @@ export const putUserIdentityWithAuthCode = async (
   userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Item: {
       UserIdentityId: authCode,
       userIdentity,
@@ -45,8 +40,9 @@ export const getUserIdentityWithToken = async (
   token: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Key: { UserIdentityId: token },
+    ConsistentRead: true,
   });
   if (response.Item) {
     if (response.Item.ttl > Math.floor(Date.now() / 1000)) {
@@ -61,7 +57,7 @@ export const putUserIdentityWithToken = async (
   userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Item: {
       UserIdentityId: token,
       userIdentity,
@@ -74,8 +70,9 @@ export const getStateWithAuthCode = async (
   authCode: string
 ): Promise<string> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Key: { UserIdentityId: authCode + "-state" },
+    ConsistentRead: true,
   });
 
   return response.Item?.state;
@@ -83,7 +80,7 @@ export const getStateWithAuthCode = async (
 
 export const putStateWithAuthCode = async (authCode: string, state: string) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: userIdentityTableName,
     Item: {
       UserIdentityId: authCode + "-state",
       state,

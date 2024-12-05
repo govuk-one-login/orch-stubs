@@ -1,0 +1,24 @@
+export const ORCH_PRIVATE_SIGNING_KEY =
+  "-----BEGIN PRIVATE KEY-----\n" +
+  "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgHVRLWC9WoAw7gCNk\n" +
+  "sQPwTRu+RXF23I+jtmQXNt8ow1mhRANCAAQWheIrD+e2lw+vh5ruDiPo7Z4HxaAz\n" +
+  "wiHExeRtNkI8Z6xDzfqeCxhqZ5PWa2jbjdpbvS+vX3+3Dn0Uwe2sXn4d\n" +
+  "-----END PRIVATE KEY-----";
+
+export const ORCH_PRIVATE_SIGNING_KEY_INVALID =
+  "-----BEGIN PRIVATE KEY-----\n" +
+  "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgnEpemWfQ6m2Fxo6E\n" +
+  "NP13NkocvvrAKHc/IWbC+jSOc/uhRANCAARcsKXyN+lhvtj4KzR1QNYqHE2OWFK8\n" +
+  "W3dap/x1mO/OYN6D6f9KWLXy6+Nrnp11SB5Qj9IMUWPQUBolJLSaxhBI\n" +
+  "-----END PRIVATE KEY-----\n";
+
+export const IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY =
+  "-----BEGIN PUBLIC KEY-----\n" +
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjC1LZJN1T/KF/pWHCKzw\n" +
+  "BqXnMvkCy+8D+IxE+jtgIdUqZB4xmvS2Bibn8ylpUBF130M3v30mERGeU8dSlJfV\n" +
+  "IHTLLFoaxW+1yhtJLDmikEQ8mGWRr0DRpIpjGSJV1c8w2VW1shcpAxr8TBEBLtHw\n" +
+  "WN8n7TDIlGJPHmkE2NUVbNwVdrc/PB/Y2GBlVYb9z5qwSloJbS9J6F2luii+GfA7\n" +
+  "lm2KdA7FpLWpfyWWgdaPx+QOhCDXZmmCbaGcGlusDb16vJYnnda7tAieesBJcKxh\n" +
+  "4fRAScp0tf0FLnqZzZgicTKUJz+vztWK+95Krlix0fR7dTlez3ebFmcS2rkp82px\n" +
+  "uwIDAQAB\n" +
+  "-----END PUBLIC KEY-----";

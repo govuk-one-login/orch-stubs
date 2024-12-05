@@ -109,10 +109,10 @@ export default {
   ],
   returnCode: [
     {
-      code: "B",
+      code: "EXAMPLE1",
     },
     {
-      code: "C",
+      code: "EXAMPLE2",
     },
   ],
   socialSecurityRecord: [

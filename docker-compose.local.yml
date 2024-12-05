@@ -7,8 +7,12 @@ services:
     environment:
       - DEBUG=${DEBUG:-0}
       - SERVICES=sqs,dynamodb
-      - DEFAULT_REGION="eu-west-2"
+      - DYNAMODB_SHARE_DB=1
+      - DYNAMODB_IN_MEMORY=1
+      - HOSTNAME_EXTERNAL="host.docker.internal"
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - ./scripts/init-infra.sh:/etc/localstack/init/ready.d/start-localstack.sh
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
