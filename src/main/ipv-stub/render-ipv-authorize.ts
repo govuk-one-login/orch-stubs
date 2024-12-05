@@ -8,6 +8,7 @@ export default function renderIPVAuthorize(
   authCode: string
 ) {
   return renderPage(
+    "IPV Stub Form",
     `<h1 class="govuk-heading-l">IPV stub</h1>
   <h3 class="govuk-heading-s">Decrypted JAR header:</h3>
   <dl class="govuk-summary-list">
