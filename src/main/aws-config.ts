@@ -4,7 +4,7 @@ const credentials = {
   secretAccessKey: "dummy",
 };
 const localstackPort = 4566;
-const localhost = "http://localhost";
+const localhost = "http://127.0.0.1";
 const dockerLocalhost = "http://host.docker.internal";
 const testQueueName = "local-queue";
 const isTest = process.env.ENVIRONMENT == "local";
@@ -26,7 +26,7 @@ export function getLocalEndpoint(
   useDocker: boolean,
   port: number = localstackPort
 ) {
-  return `${getLocalHost(useDocker)}:${port}/`;
+  return `${getLocalHost(useDocker)}:${port}`;
 }
 
 export function getClientConfig(

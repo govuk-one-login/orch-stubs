@@ -1,11 +1,9 @@
 import supertest from "supertest";
 import {
-  createUserIdentityTable,
   getState,
   getUserIdentity,
   resetUserIdentityTable,
 } from "./helper/dynamo-helper";
-import { getLocalEndpoint } from "../../../main/aws-config";
 import { CompactEncrypt, importPKCS8, importSPKI, SignJWT } from "jose";
 import formConfig from "../../../main/ipv-stub/config/config";
 import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants";
@@ -13,26 +11,22 @@ import {
   IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY,
   ORCH_PRIVATE_SIGNING_KEY,
 } from "./data/keys";
-import * as console from "node:console";
-
-// we need this to accept self-signed-certificates in nodejs
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-process.env.NODE_TLS_ACCEPT_UNTRUSTED_CERTIFICATES_THIS_IS_INSECURE = "1";
 
 const STATE = "test-state";
 const AUTH_CODE = "test-auth-code";
 
-beforeEach(createUserIdentityTable);
+beforeEach(async () => {
+  await resetUserIdentityTable();
+
+  jest.setTimeout(10 * 1000);
+});
 afterEach(resetUserIdentityTable);
 
 describe("IPV Authorize", () => {
-  const api = supertest(getLocalEndpoint(false, 3001));
+  const api = supertest("http://127.0.0.1:3001");
 
   it("should return 200 for valid GET request and update Dynamo", async () => {
     const response = await api.get(`/authorize?request=${await generateJwe()}`);
-    console.log(
-      `##############\n${JSON.stringify(response.body)}\n#############`
-    );
     expect(response.statusCode).toBe(200);
     const htmlRegex =
       /<input type="hidden" name="authCode" value=(?<authCode>[A-Za-z0-9+/\-_]+)>/;

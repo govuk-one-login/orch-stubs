@@ -93,7 +93,8 @@ async function createSqsQueue() {
   const command: CreateQueueCommand = new CreateQueueCommand({
     QueueName: spotQueueName,
   });
-  await sqsClient.send(command);
+  const result = await sqsClient.send(command);
+  console.log(result.$metadata);
 }
 
 async function getQueueItems() {

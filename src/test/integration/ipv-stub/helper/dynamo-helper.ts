@@ -1,4 +1,4 @@
-import { DynamoDBClient, CreateTableCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { StateEntry, TableEntry, UserIdentityEntry } from "./table-entries";
 import {
@@ -8,35 +8,6 @@ import {
 
 const dynamoClient = new DynamoDBClient(getClientConfig(false));
 const dynamoDoc = DynamoDBDocument.from(dynamoClient);
-
-export async function createUserIdentityTable(): Promise<void> {
-  const createTableCommand = new CreateTableCommand({
-    TableName: userIdentityTableName,
-    KeySchema: [
-      {
-        AttributeName: "UserIdentityId",
-        KeyType: "HASH",
-      },
-    ],
-    AttributeDefinitions: [
-      {
-        AttributeName: "UserIdentityId",
-        AttributeType: "S",
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 1,
-      WriteCapacityUnits: 1,
-    },
-  });
-
-  try {
-    await dynamoClient.send(createTableCommand);
-  } catch {
-    // table may already exist - try resetting it
-    await resetUserIdentityTable();
-  }
-}
 
 export async function resetUserIdentityTable() {
   const result = await dynamoDoc.scan({

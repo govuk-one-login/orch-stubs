@@ -2,7 +2,6 @@ import supertest from "supertest";
 import { importPKCS8, SignJWT } from "jose";
 import { IpvTokenResponse } from "../../../main/ipv-stub/interfaces/ipv-token-response-interface";
 import {
-  createUserIdentityTable,
   getUserIdentity,
   putUserIdentity,
   resetUserIdentityTable,
@@ -17,9 +16,9 @@ import {
 const AUTH_CODE = "12345";
 
 beforeEach(async () => {
-  await createUserIdentityTable();
   await setUpUserIdentity();
 });
+
 afterEach(resetUserIdentityTable);
 
 describe("IPV Token", () => {
