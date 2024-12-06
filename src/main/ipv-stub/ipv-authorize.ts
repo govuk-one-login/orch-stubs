@@ -89,12 +89,10 @@ async function post(
 ): Promise<APIGatewayProxyResult> {
   const redirectUri = `${ROOT_URI}/ipv-callback`;
 
-  if (event.body == null) {
+  if (!event.body) {
     throw new CodedError(400, "Missing request body");
   }
-  const parsedBody = event.body
-    ? Object.fromEntries(new URLSearchParams(event.body))
-    : {};
+  const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
   const authCode = parsedBody["authCode"];
   const userIdentity = mapFormToUserIdentity(parsedBody);
 
@@ -119,16 +117,14 @@ async function post(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return Promise.resolve(
-    successfulJsonResult(
-      302,
-      {
-        message: `Redirecting to ${url.toString()}`,
-      },
-      {
-        Location: url.toString(),
-      }
-    )
+  return successfulJsonResult(
+    302,
+    {
+      message: `Redirecting to ${url.toString()}`,
+    },
+    {
+      Location: url.toString(),
+    }
   );
 }
 
