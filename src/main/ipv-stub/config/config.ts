@@ -1,6 +1,9 @@
 const expiryDate = new Date();
 expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
+export const getTrustmarkUri = (): string =>
+  `https://oidc.${process.env.ENVIRONMENT === "dev" ? "sandpit" : process.env.ENVIRONMENT}.account.gov.uk/trustmark`;
+
 export default {
   coreIdentityJWT: {
     sub: "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=",
@@ -10,7 +13,7 @@ export default {
     iat: Date.now(),
     exp: expiryDate.valueOf(),
     vot: "P2",
-    vtm: `https://oidc.${process.env.ENVIRONMENT === "dev" ? "sandpit" : process.env.ENVIRONMENT}.account.gov.uk/trustmark`,
+    vtm: getTrustmarkUri(),
     vc: {
       type: ["VerifiableCredential", "VerifiableIdentityCredential"],
       credentialSubject: {
@@ -109,10 +112,10 @@ export default {
   ],
   returnCode: [
     {
-      code: "B",
+      code: "EXAMPLE1",
     },
     {
-      code: "C",
+      code: "EXAMPLE2",
     },
   ],
   socialSecurityRecord: [

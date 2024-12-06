@@ -1,12 +1,12 @@
 import { govukStyles } from "./style";
 
-export const renderPage = (mainContent: string) => {
+export const renderPage = (title: string, mainContent: string) => {
   return `<!DOCTYPE html>
 <html lang="en" class="govuk-template">
 
 <head>
   <meta charset="utf-8">
-  <title>GOV.UK - The best place to find government services and information</title>
+  <title>${title}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0c0c">
 <!--  <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico">-->

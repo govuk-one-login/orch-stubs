@@ -31,3 +31,11 @@ npm run createRequestObject
 ```
 
 This will use the local keys in the `parameters.json` file to create a valid signed and encrypted request object. You can then run through the stub and be redirected to `https://oidc.local.account.gov.uk/ipv-callback` with an auth code
+
+If you are developing locally with the stub, you can automatically rebuild the stub by running the following command:
+
+```bash
+npm run build:ipv:watch
+```
+
+In a separate terminal, run the command `npm run start:local:ipv` to start the stub. Sam local will automatically reload changes when the `build/` directory is updated, meaning changes are hot reloaded.

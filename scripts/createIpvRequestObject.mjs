@@ -19,6 +19,31 @@ const main = async () => {
     scope: "openid email phone",
     state: randomUUID(),
     jti: randomUUID(),
+    claims: {
+      userinfo: {
+        "https://vocab.account.gov.uk/v1/storageAccessToken": {
+          values: "storageAccessToken",
+        },
+        "https://vocab.account.gov.uk/v1/passport": {
+          essential: true,
+        },
+        "https://vocab.account.gov.uk/v1/socialSecurityRecord": {
+          essential: true,
+        },
+        "https://vocab.account.gov.uk/v1/drivingPermit": {
+          essential: true,
+        },
+        "https://vocab.account.gov.uk/v1/coreIdentityJWT": {
+          essential: true,
+        },
+        "https://vocab.account.gov.uk/v1/address": {
+          essential: true,
+        },
+        "https://vocab.account.gov.uk/v1/returnCode": {
+          essential: true,
+        },
+      },
+    },
   })
     .setProtectedHeader({ alg: "ES256" })
     .sign(privateSigningKey);
