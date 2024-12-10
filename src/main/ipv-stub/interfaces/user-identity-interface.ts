@@ -4,11 +4,11 @@ export interface UserIdentity {
   vtm: string;
   "https://vocab.account.gov.uk/v1/credentialJWT": string[];
   "https://vocab.account.gov.uk/v1/coreIdentity": CoreIdentity;
-  "https://vocab.account.gov.uk/v1/address": Address[];
-  "https://vocab.account.gov.uk/v1/drivingPermit": DrivingPermit[];
-  "https://vocab.account.gov.uk/v1/socialSecurityRecord": SocialSecurityRecord[];
-  "https://vocab.account.gov.uk/v1/passport": Passport[];
-  "https://vocab.account.gov.uk/v1/returnCode": ReturnCode[];
+  "https://vocab.account.gov.uk/v1/address"?: Address[];
+  "https://vocab.account.gov.uk/v1/drivingPermit"?: DrivingPermit[];
+  "https://vocab.account.gov.uk/v1/socialSecurityRecord"?: SocialSecurityRecord[];
+  "https://vocab.account.gov.uk/v1/passport"?: Passport[];
+  "https://vocab.account.gov.uk/v1/returnCode"?: ReturnCode[];
 }
 
 interface CoreIdentity {
