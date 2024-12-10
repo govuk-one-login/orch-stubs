@@ -1,5 +1,5 @@
 import { importPKCS8, importSPKI, KeyLike } from "jose";
-import { logger } from "src/main/logger";
+import { logger } from "../../../main/logger";
 import { getEnv } from "./env-helper";
 import { CodedError } from "./result-helper";
 
