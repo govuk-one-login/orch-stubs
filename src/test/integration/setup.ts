@@ -1,3 +1,11 @@
+import localParams from "./../../../parameters.json";
+
+Object.entries(localParams.Parameters)
+  // Ignore the sam local localstack endpoint
+  //for running the tests
+  .filter(([k]) => k !== "LOCALSTACK_ENDPOINT")
+  .forEach(([k, v]) => (process.env[k] = v));
+
 const queuename = "local-queue";
 process.env.QUEUE_NAME = queuename;
 process.env.LOCALSTACK_ENDPOINT = "http://127.0.0.1:4566";
