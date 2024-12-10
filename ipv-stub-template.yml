@@ -146,6 +146,8 @@ Resources:
             - IsNotProduction
             - !Sub https://identity.${Environment}.account.gov.uk/
             - https://identity.account.gov.uk/
+            # This will always be over-written when running locally in parameters.json
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
@@ -193,6 +195,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          
       Events:
         Get:
           Type: Api
