@@ -2,7 +2,7 @@ export interface UserIdentity {
   sub: string;
   vot: string;
   vtm: string;
-  "https://vocab.account.gov.uk/v1/credentialJWT": string[];
+  "https://vocab.account.gov.uk/v1/credentialJWT"?: string[];
   "https://vocab.account.gov.uk/v1/coreIdentity": CoreIdentity;
   "https://vocab.account.gov.uk/v1/address"?: Address[];
   "https://vocab.account.gov.uk/v1/drivingPermit"?: DrivingPermit[];

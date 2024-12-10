@@ -1,4 +1,4 @@
-import { logger } from "src/main/logger";
+import { logger } from "../../../main/logger";
 import { CodedError } from "./result-helper";
 
 type EnvVar =
