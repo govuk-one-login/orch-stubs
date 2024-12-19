@@ -26,3 +26,16 @@ export const getIpvPrivateKey = async (): Promise<KeyLike> => {
     throw new CodedError(500, "Internal Server Error");
   }
 };
+
+export const getIpvPublicKey = async (): Promise<KeyLike> => {
+  const ipvPublicKeyPem = getEnv("IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY");
+  try {
+    return importSPKI(ipvPublicKeyPem, "RSA-OAEP-256");
+  } catch (error) {
+    logger.error(
+      "Failed to parse IPV authorize public encryption key: " +
+        (error as Error).message
+    );
+    throw new CodedError(500, "Internal Server Error");
+  }
+};
