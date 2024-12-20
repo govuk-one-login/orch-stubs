@@ -220,6 +220,34 @@ Resources:
         Sourcemap: true
         Target: node20
 
+  IPVJwksLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/ipv-stub/ipv-jwks.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-encryption-key}}"
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /.well-known/jwks.json
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/ipv-stub/ipv-jwks.ts
+        Minify: true
+        Sourcemap: true
+        Target: node20
+
   IPVUserIdentityLambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:

@@ -3,6 +3,7 @@ import { CodedError } from "./result-helper";
 
 type EnvVar =
   | "IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"
+  | "IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY"
   | "ORCH_PUBLIC_SIGNING_KEY"
   | "ENVIRONMENT";
 
