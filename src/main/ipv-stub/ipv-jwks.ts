@@ -32,10 +32,14 @@ async function get(): Promise<APIGatewayProxyResult> {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...jwk,
-        kid: jwk.n ? generateKid(jwk.n) : "n/a",
-        use: "enc",
-        alg: "RSA256",
+        keys: [
+          {
+            ...jwk,
+            kid: jwk.n ? generateKid(jwk.n) : "n/a",
+            use: "enc",
+            alg: "RSA256",
+          },
+        ],
       }),
     };
   } catch (error) {
