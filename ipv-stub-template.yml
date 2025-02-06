@@ -25,14 +25,19 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
+      orchJwksUrl: https://oidc.sandpit.account.gov.uk/.well-known/ipv-jwks.json
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
+      orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/ipv-jwks.json
     staging:
       ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
+      orchJwksUrl: https://oidc.staging.account.gov.uk/.well-known/ipv-jwks.json
     integration:
       ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
+      orchJwksUrl: https://oidc.integration.account.gov.uk/.well-known/ipv-jwks.json
     production:
       ipvStubDomainName: ipvstub.oidc.account.gov.uk
+      orchJwksUrl: https://oidc.account.gov.uk/.well-known/ipv-jwks.json
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
@@ -92,6 +97,8 @@ Resources:
           ENVIRONMENT: !Sub ${Environment}
           IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
           ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
+          ORCH_PUBLIC_SIGNING_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           # This will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
@@ -142,6 +149,8 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
+          ORCH_PUBLIC_SIGNING_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !If
             - IsNotProduction
             - !Sub https://identity.${Environment}.account.gov.uk/

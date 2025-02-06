@@ -1,8 +1,33 @@
-import { importPKCS8, importSPKI, KeyLike } from "jose";
+import {
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  FlattenedJWSInput,
+  importPKCS8,
+  importSPKI,
+  JWSHeaderParameters,
+  KeyLike,
+} from "jose";
 import { logger } from "../../../main/logger";
 import { getEnv } from "./env-helper";
 import { CodedError } from "./result-helper";
 
+type JWKSVerifier = (
+  protectedHeader?: JWSHeaderParameters,
+  token?: FlattenedJWSInput
+) => Promise<KeyLike>;
+export const getOrchJwks = (): JWKSVerifier => {
+  const localJwks = getEnv("DUMMY_ORCH_JWKS", false);
+  if (localJwks) {
+    logger.info(
+      "Found DUMMY_ORCH_JWKS env variable. Using value as JWKS source"
+    );
+    return createLocalJWKSet(JSON.parse(localJwks));
+  } else {
+    const urlString = getEnv("ORCH_PUBLIC_SIGNING_JWKS_URL");
+    logger.info("Fetching JWKS from URL " + urlString);
+    return createRemoteJWKSet(new URL(urlString));
+  }
+};
 export const getOrchPublicSigningKey = async (): Promise<KeyLike> => {
   const orchKeyPem = getEnv("ORCH_PUBLIC_SIGNING_KEY");
   try {

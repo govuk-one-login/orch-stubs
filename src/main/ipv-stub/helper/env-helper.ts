@@ -5,6 +5,8 @@ type EnvVar =
   | "IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"
   | "IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY"
   | "ORCH_PUBLIC_SIGNING_KEY"
+  | "ORCH_PUBLIC_SIGNING_JWKS_URL"
+  | "DUMMY_ORCH_JWKS"
   | "ENVIRONMENT";
 
 export const getEnv = (key: EnvVar, throwIfMissing = true): string => {
