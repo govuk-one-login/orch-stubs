@@ -28,17 +28,6 @@ export const getOrchJwks = (): JWKSVerifier => {
     return createRemoteJWKSet(new URL(urlString));
   }
 };
-export const getOrchPublicSigningKey = async (): Promise<KeyLike> => {
-  const orchKeyPem = getEnv("ORCH_PUBLIC_SIGNING_KEY");
-  try {
-    return importSPKI(orchKeyPem, "ES256");
-  } catch (error) {
-    logger.error(
-      "Failed to parse Orch signing key: " + (error as Error).message
-    );
-    throw new CodedError(500, "Internal Server Error");
-  }
-};
 
 export const getIpvPrivateKey = async (): Promise<KeyLike> => {
   const ipvPrivateKeyPem = getEnv("IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY");

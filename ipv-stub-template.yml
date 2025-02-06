@@ -96,7 +96,6 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
-          ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
           ORCH_PUBLIC_SIGNING_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           # These will always be over-written when running locally in parameters.json
@@ -149,7 +148,6 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
           ORCH_PUBLIC_SIGNING_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !If

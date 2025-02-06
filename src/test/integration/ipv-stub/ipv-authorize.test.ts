@@ -109,7 +109,7 @@ describe("IPV Authorize", () => {
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body).message).toEqual(
-      "Encountered an unhandled exception: signature verification failed"
+      "Signature verification failed"
     );
   });
 });
@@ -154,7 +154,7 @@ async function generateJwt(): Promise<string> {
       },
     },
   })
-    .setProtectedHeader({ alg: "ES256" })
+    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
     .sign(key);
 }
 
