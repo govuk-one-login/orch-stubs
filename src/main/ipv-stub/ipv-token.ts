@@ -17,9 +17,8 @@ import {
   putUserIdentityWithToken,
 } from "./service/dynamodb-form-response-service";
 import { randomBytes } from "crypto";
-import { getOrchPublicSigningKey } from "./helper/key-helpers";
 import { logger } from "../logger";
-
+import { getOrchJwks } from "./helper/key-helpers";
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -39,16 +38,12 @@ async function post(
   validateHeadersOrThrow(event.headers);
   const body = getValidBodyOrThrow(event.body);
   const clientAssertionJwt = body["client_assertion"] as string;
-
-  const publicKey = await getOrchPublicSigningKey();
-
   try {
-    await jwtVerify(clientAssertionJwt, publicKey);
+    await jwtVerify(clientAssertionJwt, getOrchJwks());
   } catch (error) {
     logger.error(
       `Failed to verify client_assertion from orchestration: ${(error as Error).message}`
     );
-
     throw new CodedError(500, "Invalid request");
   }
 

@@ -99,8 +99,9 @@ Resources:
           ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
           ORCH_PUBLIC_SIGNING_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
-          # This will always be over-written when running locally in parameters.json
+          # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DUMMY_ORCH_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
