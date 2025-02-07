@@ -20,6 +20,9 @@ Parameters:
     Type: String
     Description: The ARN of the permissions boundary to apply when creating IAM roles
     Default: none
+  VpcStackName:
+    Type: String
+    Description: The name of the stack used to create the VPC
 
 Mappings:
   EnvironmentConfiguration:
@@ -117,6 +120,15 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
+      Timeout: 10
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+          - !Ref HttpsEgressSecurityGroup
+        SubnetIds:
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdA
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdB
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdC
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -170,6 +182,15 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
+      Timeout: 10
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+          - !Ref HttpsEgressSecurityGroup
+        SubnetIds:
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdA
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdB
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdC
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -298,6 +319,43 @@ Resources:
           !Ref Environment,
           ipvStubDomainName,
         ]
+
+  HttpsEgressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow egress to external services
+      VpcId:
+        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outgoing HTTPS requests from security group
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Lambda Security Group permissions ruleset
+      VpcId:
+        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
+      SecurityGroupEgress:
+        - DestinationSecurityGroupId:
+            Fn::ImportValue: !Sub ${VpcStackName}-AWSServicesEndpointSecurityGroupId
+          Description: Allow outbound traffic to vpc endpoints
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIp: 10.0.0.0/16
+          Description: Allow outbound traffic to vpc endpoints
+          IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+        - DestinationPrefixListId: pl-b3a742da
+          Description: Allow traffic to dynamoDb
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
 
 Outputs:
   IpvHostedZoneId:
