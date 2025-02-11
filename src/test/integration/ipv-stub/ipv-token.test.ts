@@ -222,7 +222,7 @@ async function generateQuery(
 ): Promise<string> {
   const key = await importPKCS8(privateKey, "ES256");
   const jwt = await new SignJWT({})
-    .setProtectedHeader({ alg: "ES256" })
+    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
     .sign(key);
   return [
     `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,

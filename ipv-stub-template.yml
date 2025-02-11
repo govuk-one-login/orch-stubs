@@ -20,19 +20,27 @@ Parameters:
     Type: String
     Description: The ARN of the permissions boundary to apply when creating IAM roles
     Default: none
+  VpcStackName:
+    Type: String
+    Description: The name of the stack used to create the VPC
 
 Mappings:
   EnvironmentConfiguration:
     dev:
       ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
+      orchJwksUrl: https://oidc.sandpit.account.gov.uk/.well-known/ipv-jwks.json
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
+      orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/ipv-jwks.json
     staging:
       ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
+      orchJwksUrl: https://oidc.staging.account.gov.uk/.well-known/ipv-jwks.json
     integration:
       ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
+      orchJwksUrl: https://oidc.integration.account.gov.uk/.well-known/ipv-jwks.json
     production:
       ipvStubDomainName: ipvstub.oidc.account.gov.uk
+      orchJwksUrl: https://oidc.account.gov.uk/.well-known/ipv-jwks.json
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
@@ -91,9 +99,11 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
-          ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
-          # This will always be over-written when running locally in parameters.json
+          ORCH_PUBLIC_SIGNING_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
+          # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DUMMY_ORCH_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
@@ -110,6 +120,15 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
+      Timeout: 10
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+          - !Ref HttpsEgressSecurityGroup
+        SubnetIds:
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdA
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdB
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdC
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -141,7 +160,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_PUBLIC_SIGNING_KEY: "{{resolve:ssm:/orch-stubs/ipv-public-signing-key}}"
+          ORCH_PUBLIC_SIGNING_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !If
             - IsNotProduction
             - !Sub https://identity.${Environment}.account.gov.uk/
@@ -162,6 +182,15 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
+      Timeout: 10
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+          - !Ref HttpsEgressSecurityGroup
+        SubnetIds:
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdA
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdB
+          - Fn::ImportValue: !Sub ${VpcStackName}-ProtectedSubnetIdC
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -290,6 +319,43 @@ Resources:
           !Ref Environment,
           ipvStubDomainName,
         ]
+
+  HttpsEgressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow egress to external services
+      VpcId:
+        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outgoing HTTPS requests from security group
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Lambda Security Group permissions ruleset
+      VpcId:
+        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
+      SecurityGroupEgress:
+        - DestinationSecurityGroupId:
+            Fn::ImportValue: !Sub ${VpcStackName}-AWSServicesEndpointSecurityGroupId
+          Description: Allow outbound traffic to vpc endpoints
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIp: 10.0.0.0/16
+          Description: Allow outbound traffic to vpc endpoints
+          IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+        - DestinationPrefixListId: pl-b3a742da
+          Description: Allow traffic to dynamoDb
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
 
 Outputs:
   IpvHostedZoneId:

@@ -26,5 +26,9 @@
   {
     "ParameterKey": "SigningProfileVersionArn",
     "ParameterValue": "arn:aws:signer:eu-west-2:816047645251:/signing-profiles/SigningProfile_1SsceuunzEmO/DPf5VC3w90"
+  },
+  {
+    "ParameterKey": "VpcStackName",
+    "ParameterValue": "vpc"
   }
 ]

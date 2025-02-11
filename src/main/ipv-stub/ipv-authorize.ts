@@ -21,10 +21,7 @@ import {
 } from "./service/dynamodb-form-response-service";
 import { randomBytes } from "crypto";
 import { UserIdentity } from "./interfaces/user-identity-interface";
-import {
-  getIpvPrivateKey,
-  getOrchPublicSigningKey,
-} from "./helper/key-helpers";
+import { getIpvPrivateKey, getOrchJwks } from "./helper/key-helpers";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -55,7 +52,7 @@ async function get(
     throw new CodedError(400, "Request query string parameter not found");
   }
 
-  const orchPublicSigningKey = await getOrchPublicSigningKey();
+  const orchJwks = getOrchJwks();
   const ipvPrivateKey = await getIpvPrivateKey();
 
   const { plaintext } = await compactDecrypt(requestObject, ipvPrivateKey);
@@ -66,7 +63,15 @@ async function get(
     throw new CodedError(400, "Decrypted JWT is in invalid format");
   }
 
-  const jwt = await jwtVerify(encodedJwt, orchPublicSigningKey);
+  let jwt;
+  try {
+    jwt = await jwtVerify(encodedJwt, orchJwks);
+  } catch (error) {
+    logger.error(
+      `Failed to verify client_assertion from orchestration: ${(error as Error).message}`
+    );
+    throw new CodedError(500, "Signature verification failed");
+  }
 
   const header = jwt.protectedHeader;
   const payload = jwt.payload;
