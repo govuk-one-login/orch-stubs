@@ -37,7 +37,7 @@ async function get(): Promise<APIGatewayProxyResult> {
             ...jwk,
             kid: jwk.n ? generateKid(jwk.n) : "n/a",
             use: "enc",
-            alg: "RSA256",
+            alg: "RS256",
           },
         ],
       }),
