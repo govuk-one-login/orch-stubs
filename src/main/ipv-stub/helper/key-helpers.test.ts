@@ -21,7 +21,10 @@ describe("Key helpers tests", () => {
         "http://test.example.com/.well-known/jwks.json";
       getOrchJwks();
       expect(remoteJwkSetSpy).toHaveBeenCalledWith(
-        new URL("http://test.example.com/.well-known/jwks.json")
+        new URL("http://test.example.com/.well-known/jwks.json"),
+        {
+          timeoutDuration: 9 * 1000,
+        }
       );
     });
   });
