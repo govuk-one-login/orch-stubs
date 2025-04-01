@@ -220,3 +220,16 @@ Resources:
             Action:
               - dynamodb:PutItem
             Resource: !GetAtt TokenTable.Arn
+  
+  AuthEncryptionKeyAlias:
+    Type: "AWS::KMS::Alias"
+    Properties:
+      AliasName: !Sub "alias/${Environment}-auth-stub-authentication-encryption-key"
+      TargetKeyId: !Ref AuthEncryptionKey
+  AuthEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Auth Stub KMS encryption key for decrypting requests from Orchestration
+      PendingWindowInDays: 30
+      KeyUsage: ENCRYPT_DECRYPT
+      KeySpec: RSA_2048
