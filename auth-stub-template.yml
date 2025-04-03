@@ -170,3 +170,28 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+
+  AuthCodeTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubAuthCodeTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt AuthCodeTable.Arn
+
+  AuthCodeTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubAuthCodeTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: !GetAtt AuthCodeTable.Arn
