@@ -195,3 +195,28 @@ Resources:
             Action:
               - dynamodb:PutItem
             Resource: !GetAtt AuthCodeTable.Arn
+
+  TokenTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubTokenTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt TokenTable.Arn
+
+  TokenTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubTokenTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: !GetAtt TokenTable.Arn
