@@ -8,6 +8,10 @@ Description: Authentication, IPV and SPOT stubs
 #        Owner: di-orchestration@digital.cabinet-office.gov.uk
 
 Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+    Default: none
   CodeSigningConfigArn:
     Type: String
     Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
@@ -33,6 +37,24 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
+  AuthCodeTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Environment}AuthStubAuthCode
+      KeySchema:
+        - AttributeName: AuthCode
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: AuthCode
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      Tags:
+        - Key: Name
+          Value: AuthCode
+
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
