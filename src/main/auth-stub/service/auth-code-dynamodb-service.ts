@@ -1,6 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
-import { AuthCodeStore } from "../interfaces/auth-code-store-interface";
+import {
+  AuthCodeStore,
+  AuthCodeStoreInput,
+} from "../interfaces/auth-code-store-interface";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
@@ -17,23 +20,23 @@ export const getAuthCodeStore = async (
 ): Promise<AuthCodeStore> => {
   const response = await dynamo.get({
     TableName: tableName,
-    Key: { AuthCode: authCode },
+    Key: { authCode: authCode },
   });
   return response.Item as AuthCodeStore;
 };
 
-export const addAuthCodeStore = async (authCodeStore: AuthCodeStore) => {
+export const addAuthCodeStore = async (authCodeStore: AuthCodeStoreInput) => {
   return await dynamo.put({
     TableName: tableName,
     Item: {
-      AuthCode: authCodeStore.authCode,
-      SubjectId: authCodeStore.subjectId,
-      Claims: authCodeStore.claims,
-      SectorIdentifier: authCodeStore.sectorIdentifier,
-      IsNewAccount: authCodeStore.isNewAccount,
-      PasswordResetTime: authCodeStore.passwordResetTime,
-      Ttl: fiveMintuesFromNow(),
-      HasBeenUsed: authCodeStore.hasBeenUsed,
+      authCode: authCodeStore.authCode,
+      subjectId: authCodeStore.subjectId,
+      claims: authCodeStore.claims,
+      sectorIdentifier: authCodeStore.sectorIdentifier,
+      isNewAccount: authCodeStore.isNewAccount,
+      passwordResetTime: authCodeStore.passwordResetTime,
+      ttl: fiveMintuesFromNow(),
+      hasBeenUsed: authCodeStore.hasBeenUsed,
     },
   });
 };
@@ -44,10 +47,10 @@ export const updateHasBeenUsedAuthCodeStore = async (
 ) => {
   return await dynamo.update({
     TableName: tableName,
-    Key: { AuthCode: authCode },
-    UpdateExpression: "SET HasBeenUsed = :HasBeenUsed",
+    Key: { authCode: authCode },
+    UpdateExpression: "SET hasBeenUsed = :hasBeenUsed",
     ExpressionAttributeValues: {
-      ":HasBeenUsed": hasBeenUsed,
+      ":hasBeenUsed": hasBeenUsed,
     },
   });
 };
