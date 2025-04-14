@@ -89,6 +89,9 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
       Events:
         Get:
           Type: Api
@@ -119,6 +122,9 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
       Events:
         Get:
           Type: Api
@@ -149,6 +155,9 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
       Events:
         Get:
           Type: Api
@@ -193,6 +202,7 @@ Resources:
           - Sid: AllowAuthStubAuthCodeTableWriteAccess
             Effect: Allow
             Action:
+              - dynamodb:UpdateItem
               - dynamodb:PutItem
             Resource: !GetAtt AuthCodeTable.Arn
 
@@ -218,6 +228,7 @@ Resources:
           - Sid: AllowAuthStubTokenTableWriteAccess
             Effect: Allow
             Action:
+              - dynamodb:UpdateItem
               - dynamodb:PutItem
             Resource: !GetAtt TokenTable.Arn
   
