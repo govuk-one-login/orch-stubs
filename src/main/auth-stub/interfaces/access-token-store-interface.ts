@@ -1,8 +1,8 @@
-export interface TokenStore extends TokenStoreInput {
+export interface AccessTokenStore extends AccessTokenStoreInput {
   ttl: number;
 }
 
-export interface TokenStoreInput {
+export interface AccessTokenStoreInput {
   token: string;
   subjectId: string;
   claims: string[];
