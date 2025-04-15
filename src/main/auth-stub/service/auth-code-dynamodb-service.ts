@@ -13,7 +13,7 @@ const dynamoClient = new DynamoDBClient({
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
-const tableName = `${process.env.ENVIRONMENT}AuthStubAuthCode`;
+const tableName = `${process.env.ENVIRONMENT}-AuthStub-AuthCode`;
 
 export const getAuthCodeStore = async (
   authCode: string

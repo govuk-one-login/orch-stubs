@@ -40,12 +40,12 @@ Resources:
   AuthCodeTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Environment}AuthStubAuthCode
+      TableName: !Sub ${Environment}-AuthStub-AuthCode
       KeySchema:
-        - AttributeName: AuthCode
+        - AttributeName: authCode
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: AuthCode
+        - AttributeName: authCode
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
@@ -53,7 +53,7 @@ Resources:
         Enabled: true
       Tags:
         - Key: Name
-          Value: AuthCode
+          Value: authCode
 
   AccessTokenTable:
     Type: AWS::DynamoDB::Table
