@@ -40,12 +40,12 @@ Resources:
   AuthCodeTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Environment}AuthStubAuthCode
+      TableName: !Sub ${Environment}-AuthStub-AuthCode
       KeySchema:
-        - AttributeName: AuthCode
+        - AttributeName: authCode
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: AuthCode
+        - AttributeName: authCode
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
@@ -53,17 +53,17 @@ Resources:
         Enabled: true
       Tags:
         - Key: Name
-          Value: AuthCode
+          Value: authCode
 
-  TokenTable:
+  AccessTokenTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${Environment}AuthStubToken
+      TableName: !Sub ${Environment}-AuthStub-AccessToken
       KeySchema:
-        - AttributeName: Token
+        - AttributeName: accessToken
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: Token
+        - AttributeName: accessToken
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
@@ -71,7 +71,7 @@ Resources:
         Enabled: true
       Tags:
         - Key: Name
-          Value: Token
+          Value: accessToken
 
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -206,31 +206,31 @@ Resources:
               - dynamodb:PutItem
             Resource: !GetAtt AuthCodeTable.Arn
 
-  TokenTableReadAccessPolicy:
+  AccessTokenTableReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Sid: AllowAuthStubTokenTableReadAccess
+          - Sid: AllowAuthStubAccessTokenTableReadAccess
             Effect: Allow
             Action:
               - dynamodb:DescribeTable
               - dynamodb:Get*
-            Resource: !GetAtt TokenTable.Arn
+            Resource: !GetAtt AccessTokenTable.Arn
 
-  TokenTableWriteAccessPolicy:
+  AccessTokenTableWriteAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Sid: AllowAuthStubTokenTableWriteAccess
+          - Sid: AllowAuthStubAccessTokenTableWriteAccess
             Effect: Allow
             Action:
               - dynamodb:UpdateItem
               - dynamodb:PutItem
-            Resource: !GetAtt TokenTable.Arn
+            Resource: !GetAtt AccessTokenTable.Arn
   
   AuthEncryptionKeyAlias:
     Type: "AWS::KMS::Alias"
