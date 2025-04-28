@@ -9,7 +9,7 @@ import {
 } from "jose";
 import { logger } from "../../../main/logger";
 import { getEnv } from "./env-helper";
-import { CodedError } from "./result-helper";
+import { CodedError } from "../../helper/result-helper";
 
 type JWKSVerifier = (
   protectedHeader?: JWSHeaderParameters,

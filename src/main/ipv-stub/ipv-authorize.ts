@@ -13,7 +13,7 @@ import {
   methodNotAllowedError,
   successfulHtmlResult,
   successfulJsonResult,
-} from "./helper/result-helper";
+} from "../helper/result-helper";
 import {
   getStateWithAuthCode,
   putStateWithAuthCode,

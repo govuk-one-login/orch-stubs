@@ -9,7 +9,7 @@ import {
   handleErrors,
   methodNotAllowedError,
   successfulJsonResult,
-} from "./helper/result-helper";
+} from "../helper/result-helper";
 import { getUserIdentityWithToken } from "./service/dynamodb-form-response-service";
 
 export const handler: Handler = async (
