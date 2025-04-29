@@ -5,7 +5,7 @@ import { getAuthPublicKey } from "./key-helpers";
 
 const publicKey = getAuthPublicKey();
 
-export const getPayloadWithValidation = async (jwt: string): Promise<void> => {
+export const validateClaims = async (jwt: string): Promise<void> => {
   let claims: jose.JWTPayload;
 
   try {

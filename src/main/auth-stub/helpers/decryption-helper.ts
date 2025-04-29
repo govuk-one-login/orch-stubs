@@ -15,7 +15,7 @@ const kmsClient = new KMS({
 const encryptionAlgorithm = EncryptionAlgorithmSpec.RSAES_OAEP_SHA_256;
 const kmsKeyId = getKmsKeyId();
 
-export const decrypt = async (encryptedJwe: string): Promise<string> => {
+export const decrypt = async (encryptedJwe?: string): Promise<string> => {
   if (!encryptedJwe) {
     throw new DecryptionError("Invalid JWE input: JWE must be defined");
   }

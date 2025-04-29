@@ -14,6 +14,7 @@ import { getUserProfile } from "./services/user-profile-dynamodb-service";
 import { getOrchToAuthExpectedClientId } from "./helpers/config";
 import { decrypt } from "./helpers/decryption-helper";
 import { validateClaims } from "./helpers/jwt-helper";
+import { generateAuthCode } from "./helpers/auth-code-generator";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -104,7 +105,7 @@ async function post(
   }
 
   const authCodeResult: AuthCodeStoreInput = {
-    authCode: "", //something generated
+    authCode: generateAuthCode(),
     subjectId: user.SubjectID,
     claims: Array.from(claimsSet),
     sectorIdentifier: parsedBody.sectorIdentifier as string,
