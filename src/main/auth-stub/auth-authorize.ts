@@ -12,6 +12,8 @@ import {
 } from "./helpers/errors";
 import { getUserProfile } from "./services/user-profile-dynamodb-service";
 import { getOrchToAuthExpectedClientId } from "./helpers/config";
+import { decrypt } from "./helpers/decryption-helper";
+import { validateClaims } from "./helpers/jwt-helper";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -51,15 +53,12 @@ async function post(
   const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
   const clientId = parsedBody["client_id"];
   const responseType = parsedBody["response_type"];
-  //let claims: Claims;
 
   try {
     validateQueryParams(clientId, responseType);
-    /*const encryptedAuthRequestJWE = parsedBody["request"];
-      const authRequestJweDecryptedAsJwt = await decrypt(
-        encryptedAuthRequestJWE
-      );
-      claims = await getPayloadWithValidation(authRequestJweDecryptedAsJwt);*/
+    const encryptedAuthRequestJWE = parsedBody["request"];
+    const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
+    await validateClaims(authRequestJweDecryptedAsJwt);
   } catch (error) {
     throw new BadRequestError(
       error instanceof Error ? error.message : "Unknown error."
@@ -68,7 +67,7 @@ async function post(
 
   const user = await getUserProfile("dummy.email@email.com");
 
-  const identityRequired = true;
+  const identityRequired = true; // TODO: get all from config page
   const amScopePresent = true;
   const govukAccountScopePresent = true;
   const phoneScopePresent = true;

@@ -1,13 +1,11 @@
 import * as jose from "jose";
-import { Claims, getKnownClaims, requiredClaimsKeys } from "./config";
+import { getKnownClaims, requiredClaimsKeys } from "./config";
 import { JwtClaimsValueError, JwtValidationError } from "./errors";
 import { getAuthPublicKey } from "./key-helpers";
 
 const publicKey = getAuthPublicKey();
 
-export const getPayloadWithValidation = async (
-  jwt: string
-): Promise<Claims> => {
+export const getPayloadWithValidation = async (jwt: string): Promise<void> => {
   let claims: jose.JWTPayload;
 
   try {
@@ -22,7 +20,7 @@ export const getPayloadWithValidation = async (
     validateClaimObject(claims["claim"] as string);
   }
 
-  return validateCustomClaims(claims);
+  validateCustomClaims(claims);
 };
 
 const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
@@ -37,7 +35,7 @@ const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const validateCustomClaims = (claims: any): Claims => {
+const validateCustomClaims = (claims: any): void => {
   const requiredClaims = getKnownClaims();
 
   Object.keys(requiredClaims).forEach((claim) => {
@@ -45,7 +43,6 @@ const validateCustomClaims = (claims: any): Claims => {
       throw new JwtClaimsValueError(`${claim} has incorrect value`);
     }
   });
-  return claims;
 };
 
 const validateClaimObject = (claim: string): string => {
