@@ -1,5 +1,5 @@
 import { logger } from "../../../main/logger";
-import { CodedError } from "./result-helper";
+import { CodedError } from "../../helper/result-helper";
 
 type EnvVar =
   | "IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"

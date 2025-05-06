@@ -9,7 +9,7 @@ import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-} from "./helper/result-helper";
+} from "../helper/result-helper";
 import { createHash } from "node:crypto";
 
 export const handler: Handler = async (

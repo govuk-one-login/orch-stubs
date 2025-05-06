@@ -11,7 +11,7 @@ import {
   handleErrors,
   methodNotAllowedError,
   successfulJsonResult,
-} from "./helper/result-helper";
+} from "../helper/result-helper";
 import {
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
