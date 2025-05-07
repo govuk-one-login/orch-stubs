@@ -171,6 +171,9 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /userinfo
             Method: post
+      Policies:
+        - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref AccessTokenTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
