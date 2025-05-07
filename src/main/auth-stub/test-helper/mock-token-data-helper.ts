@@ -12,10 +12,10 @@ const MOCK_HAS_BEEN_USED = false;
 const MOCK_TTL = 3600;
 
 export const createAccessTokenStoreInput = (
-  token: string
+  accessToken: string
 ): AccessTokenStoreInput => {
   return {
-    token: token,
+    accessToken: accessToken,
     subjectId: MOCK_SUBJECT_ID,
     claims: MOCK_CLAIMS,
     sectorIdentifier: MOCK_SECTOR_IDENTIFIER,
@@ -25,9 +25,11 @@ export const createAccessTokenStoreInput = (
   };
 };
 
-export const createAcessTokenStore = (token: string): AccessTokenStore => {
+export const createAcessTokenStore = (
+  accessToken: string
+): AccessTokenStore => {
   return {
-    token: token,
+    accessToken: accessToken,
     subjectId: MOCK_SUBJECT_ID,
     claims: MOCK_CLAIMS,
     sectorIdentifier: MOCK_SECTOR_IDENTIFIER,
