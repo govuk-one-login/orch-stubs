@@ -31,7 +31,7 @@ export const addAccessTokenStore = async (
   return await dynamo.put({
     TableName: tableName,
     Item: {
-      accessToken: accessTokenStore.token,
+      accessToken: accessTokenStore.accessToken,
       subjectId: accessTokenStore.subjectId,
       claims: accessTokenStore.claims,
       sectorIdentifier: accessTokenStore.sectorIdentifier,

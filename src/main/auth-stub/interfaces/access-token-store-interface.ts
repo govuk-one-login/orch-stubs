@@ -3,7 +3,7 @@ export interface AccessTokenStore extends AccessTokenStoreInput {
 }
 
 export interface AccessTokenStoreInput {
-  token: string;
+  accessToken: string;
   subjectId: string;
   claims: string[];
   sectorIdentifier: string;
