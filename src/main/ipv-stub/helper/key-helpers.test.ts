@@ -23,7 +23,7 @@ describe("Key helpers tests", () => {
       expect(remoteJwkSetSpy).toHaveBeenCalledWith(
         new URL("http://test.example.com/.well-known/jwks.json"),
         {
-          timeoutDuration: 9 * 1000,
+          timeoutDuration: 10 * 1000,
         }
       );
     });
