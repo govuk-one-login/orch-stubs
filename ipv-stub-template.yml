@@ -120,7 +120,7 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
-      Timeout: 10
+      Timeout: 11
       VpcConfig:
         SecurityGroupIds:
           - !Ref LambdaSecurityGroup
@@ -182,7 +182,7 @@ Resources:
       Policies:
         - !Ref UserIdentityTableReadAccessPolicy
         - !Ref UserIdentityTableWriteAccessPolicy
-      Timeout: 10
+      Timeout: 11
       VpcConfig:
         SecurityGroupIds:
           - !Ref LambdaSecurityGroup
