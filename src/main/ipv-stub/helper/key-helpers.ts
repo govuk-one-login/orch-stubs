@@ -26,7 +26,7 @@ export const getOrchJwks = (): JWKSVerifier => {
     const urlString = getEnv("ORCH_PUBLIC_SIGNING_JWKS_URL");
     logger.info("Fetching JWKS from URL " + urlString);
     return createRemoteJWKSet(new URL(urlString), {
-      timeoutDuration: 9 * 1000, //9 seconds
+      timeoutDuration: 10 * 1000, //10 seconds
     });
   }
 };
