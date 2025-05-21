@@ -92,6 +92,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
+          ENCRYPTION_KEY_ID: "{{resolve:secretsmanager:/orch-stubs/authentication-encryption-key-id:SecretString}}"
+          ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
+          ORCH_TO_AUTH_AUDIENCE: "https://signin.sandpit.account.gov.uk/"
       Events:
         Get:
           Type: Api
@@ -105,6 +108,8 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /authorize
             Method: post
+      Policies:
+        - !Ref AuthCodeTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
