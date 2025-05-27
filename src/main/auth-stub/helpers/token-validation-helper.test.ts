@@ -5,9 +5,13 @@ import {
 } from "../test-helper/mock-auth-code-data-helper";
 import {
   validateAuthCode,
+  ensureClientAssertionType,
   validatePlainTextParameters,
+  verifyClientAssertion,
 } from "./token-validation-helper";
 import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service";
+import { generateKeyPairSync, KeyPairKeyObjectResult } from "crypto";
+import { SignJWT } from "jose";
 
 describe("Token Validation Helper", () => {
   describe("validate and extract auth-code", () => {
@@ -132,6 +136,100 @@ describe("Token Validation Helper", () => {
       expect(action).toThrow(
         "Request client_id is not the permitted client_id"
       );
+    });
+  });
+
+  describe("ensure client assertion type", () => {
+    it("should error when the client-assertion-type does not exist", () => {
+      const action = () => ensureClientAssertionType({});
+
+      expect(action).toThrow("Missing client_assertion_type parameter");
+    });
+
+    it("should error when the client-id is not valid", () => {
+      const action = () =>
+        ensureClientAssertionType({
+          client_assertion_type: "incorrect_client_assertion_type",
+        });
+
+      expect(action).toThrow(
+        "Invalid client_assertion_type parameter, must be urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+      );
+    });
+  });
+
+  describe("verify client assertion", () => {
+    const clientId = "testClientId";
+    const payload = { sub: clientId };
+
+    let ecKeyPair: KeyPairKeyObjectResult;
+    let signPayload: string;
+
+    beforeEach(async () => {
+      ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+      signPayload = await new SignJWT(payload)
+        .setProtectedHeader({
+          alg: "ES256",
+        })
+        .sign(ecKeyPair.privateKey);
+    });
+
+    it("should error when the client-assertion does not exist", async () => {
+      const action = async () => verifyClientAssertion({}, ecKeyPair.publicKey);
+
+      await expect(action).rejects.toThrow(
+        "Missing client_assertion parameter"
+      );
+    });
+
+    it("should error when the jwt parts are invalid", async () => {
+      const action = async () =>
+        verifyClientAssertion(
+          { client_assertion: "invalid.jwt" },
+          ecKeyPair.publicKey
+        );
+
+      await expect(action).rejects.toThrow(
+        "Unexpected number of Base64URL parts, must be three"
+      );
+    });
+
+    it("should error when the client-id does not exist in the request", async () => {
+      const action = async () =>
+        verifyClientAssertion(
+          { client_assertion: signPayload },
+          ecKeyPair.publicKey
+        );
+
+      await expect(action).rejects.toThrow(
+        "Invalid private key JWT authentication: The client identifier doesn't match the client assertion subject"
+      );
+    });
+
+    it("should error when the client-identifiers do not match", async () => {
+      const action = async () =>
+        verifyClientAssertion(
+          { client_assertion: signPayload, client_id: "incorrectClientId" },
+          ecKeyPair.publicKey
+        );
+
+      await expect(action).rejects.toThrow(
+        "Invalid private key JWT authentication: The client identifier doesn't match the client assertion subject"
+      );
+    });
+
+    it("should error when the jwt fails verification from an incorrect signature", async () => {
+      const incorrectPublicKey = generateKeyPairSync("ec", {
+        namedCurve: "P-256",
+      }).publicKey;
+
+      const action = async () =>
+        verifyClientAssertion(
+          { client_assertion: signPayload, client_id: clientId },
+          incorrectPublicKey
+        );
+
+      await expect(action).rejects.toThrow("JWT verificaiton failed");
     });
   });
 });
