@@ -2,11 +2,13 @@ import { Context } from "aws-lambda";
 import { handler } from "./auth-token";
 import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service";
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
+import * as tokenValidationHelper from "./helpers/token-validation-helper";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 
 describe("Auth Token", () => {
   let addAccessTokenStoreSpy: jest.SpyInstance;
   let updateHasBeenUsedAuthCodeStoreSpy: jest.SpyInstance;
+  let validateAuthCodeSpy: jest.SpyInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(() => {
@@ -17,6 +19,9 @@ describe("Auth Token", () => {
     updateHasBeenUsedAuthCodeStoreSpy = jest
       .spyOn(authCodeDynamoDbService, "updateHasBeenUsedAuthCodeStore")
       .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+    validateAuthCodeSpy = jest
+      .spyOn(tokenValidationHelper, "validateAuthCode")
+      .mockResolvedValue(undefined);
   });
 
   it("should return an access token when given an auth code", async () => {
@@ -30,24 +35,22 @@ describe("Auth Token", () => {
     expect(JSON.parse(response.body)).toHaveProperty("access_token");
   });
 
-  it("should return a 400 error when body is not given", async () => {
-    const response = await handler(
-      createTokenRequestWithoutBody(),
-      {} as Context,
-      () => {}
-    );
+  describe("validation of request parameters", () => {
+    it("should error if auth-code validation fails", async () => {
+      const authCodeValidationFailureMessage = "Auth Code validation failed";
+      validateAuthCodeSpy = jest
+        .spyOn(tokenValidationHelper, "validateAuthCode")
+        .mockRejectedValueOnce(new Error(authCodeValidationFailureMessage));
 
-    expect(response.statusCode).toBe(400);
-  });
+      const response = await handler(
+        createTokenRequest(),
+        {} as Context,
+        () => {}
+      );
 
-  it("should return a 400 error when authCode is not given", async () => {
-    const response = await handler(
-      createTokenRequestWithoutAuthCode(),
-      {} as Context,
-      () => {}
-    );
-
-    expect(response.statusCode).toBe(400);
+      expect(validateAuthCodeSpy).toHaveBeenCalledTimes(1);
+      expect(response.statusCode).toBe(400);
+    });
   });
 
   describe("accessing dynamoDb", () => {
@@ -102,19 +105,6 @@ describe("Auth Token", () => {
       body: {
         code: "testAuthCode",
       },
-    };
-  }
-
-  function createTokenRequestWithoutBody() {
-    return {
-      httpMethod: "POST",
-    };
-  }
-
-  function createTokenRequestWithoutAuthCode() {
-    return {
-      httpMethod: "POST",
-      body: {},
     };
   }
 });

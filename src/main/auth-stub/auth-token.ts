@@ -9,6 +9,7 @@ import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-se
 import { createBearerAccessToken } from "./helpers/create-token-helper";
 import { CodedError, handleErrors } from "../helper/result-helper";
 import { logger } from "../logger";
+import { validateAuthCode } from "./helpers/token-validation-helper";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -32,7 +33,17 @@ async function post(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const body = getBody(event);
-  const authCode = getAuthCode(body);
+  const authCode = body["code"];
+
+  try {
+    await validateAuthCode(authCode);
+  } catch (error) {
+    throw new CodedError(
+      400,
+      error instanceof Error ? error.message : "Unknown error."
+    );
+  }
+
   const accessToken = createBearerAccessToken();
 
   try {
@@ -56,13 +67,4 @@ function getBody(event: APIGatewayProxyEvent) {
     throw new CodedError(400, "Missing request body");
   }
   return Object.fromEntries(new URLSearchParams(event.body));
-}
-
-function getAuthCode(body: { [k: string]: string }) {
-  const authCode = body["code"];
-  if (!authCode) {
-    logger.error(`Missing Auth Code`);
-    throw new CodedError(400, "Missing Auth Code");
-  }
-  return authCode;
 }
