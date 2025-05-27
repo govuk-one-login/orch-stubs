@@ -1,6 +1,7 @@
 import { logger } from "../../logger";
 import { CodedError } from "../../helper/result-helper";
 import { getAuthCodeStore } from "../services/auth-code-dynamodb-service";
+import { decodeJwt, jwtVerify, KeyLike } from "jose";
 
 export const validateAuthCode = async (authCode: string | undefined) => {
   if (!authCode) {
@@ -58,5 +59,55 @@ export const validatePlainTextParameters = (
       400,
       "Request client_id is not the permitted client_id"
     );
+  }
+};
+
+export const ensureClientAssertionType = (body: { [k: string]: string }) => {
+  const clientAssertionType = body["client_assertion_type"];
+  const expectedClientAssertionType =
+    "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+
+  if (!clientAssertionType) {
+    throw new CodedError(400, "Missing client_assertion_type parameter");
+  } else if (clientAssertionType !== expectedClientAssertionType) {
+    throw new CodedError(
+      400,
+      `Invalid client_assertion_type parameter, must be ${expectedClientAssertionType}`
+    );
+  }
+};
+
+export const verifyClientAssertion = async (
+  body: {
+    [k: string]: string;
+  },
+  signingKey: KeyLike
+) => {
+  const clientAssertion = body["client_assertion"];
+  if (!clientAssertion) {
+    throw new CodedError(400, "Missing client_assertion parameter");
+  }
+
+  const jwtParts = clientAssertion.split(".");
+  if (jwtParts.length !== 3) {
+    throw new CodedError(
+      400,
+      "Unexpected number of Base64URL parts, must be three"
+    );
+  }
+
+  const jwtClientId = decodeJwt(clientAssertion).sub;
+  const tokenRequestClientId = body["client_id"];
+  if (!tokenRequestClientId || tokenRequestClientId !== jwtClientId) {
+    throw new CodedError(
+      400,
+      "Invalid private key JWT authentication: The client identifier doesn't match the client assertion subject"
+    );
+  }
+
+  try {
+    await jwtVerify(clientAssertion, signingKey);
+  } catch {
+    throw new CodedError(400, "JWT verificaiton failed");
   }
 };
