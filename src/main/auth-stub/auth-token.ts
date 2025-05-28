@@ -9,7 +9,11 @@ import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-se
 import { createBearerAccessToken } from "./helpers/create-token-helper";
 import { CodedError, handleErrors } from "../helper/result-helper";
 import { logger } from "../logger";
-import { validateAuthCode } from "./helpers/token-validation-helper";
+import {
+  validateAuthCode,
+  validatePlainTextParameters,
+} from "./helpers/token-validation-helper";
+import { getOrchToAuthExpectedClientId } from "./helpers/config";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -37,6 +41,7 @@ async function post(
 
   try {
     await validateAuthCode(authCode);
+    validatePlainTextParameters("", getOrchToAuthExpectedClientId(), body);
   } catch (error) {
     throw new CodedError(
       400,
