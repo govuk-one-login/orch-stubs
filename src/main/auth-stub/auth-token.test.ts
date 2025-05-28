@@ -11,6 +11,8 @@ describe("Auth Token", () => {
   let updateHasBeenUsedAuthCodeStoreSpy: jest.SpyInstance;
   let validateAuthCodeSpy: jest.SpyInstance;
   let validatePlainTextParametersSpy: jest.SpyInstance;
+  let ensureClientAssertionTypeSpy: jest.SpyInstance;
+  let verifyClientAssertionSpy: jest.SpyInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(() => {
@@ -27,6 +29,12 @@ describe("Auth Token", () => {
     validatePlainTextParametersSpy = jest
       .spyOn(tokenValidationHelper, "validatePlainTextParameters")
       .mockReturnValue(undefined);
+    ensureClientAssertionTypeSpy = jest
+      .spyOn(tokenValidationHelper, "ensureClientAssertionType")
+      .mockReturnValue(undefined);
+    verifyClientAssertionSpy = jest
+      .spyOn(tokenValidationHelper, "verifyClientAssertion")
+      .mockResolvedValue(undefined);
     mockEnvVariableSetup();
   });
 
@@ -74,6 +82,44 @@ describe("Auth Token", () => {
       );
 
       expect(validatePlainTextParametersSpy).toHaveBeenCalledTimes(1);
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should error if ensure-client-assertion-type validation fails", async () => {
+      const ensureClientAssertionFailureMessage =
+        "Plain text parameters validation failed";
+      ensureClientAssertionTypeSpy = jest
+        .spyOn(tokenValidationHelper, "ensureClientAssertionType")
+        .mockImplementation(() => {
+          throw new Error(ensureClientAssertionFailureMessage);
+        });
+
+      const response = await handler(
+        createTokenRequest(),
+        {} as Context,
+        () => {}
+      );
+
+      expect(ensureClientAssertionTypeSpy).toHaveBeenCalledTimes(1);
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should error if verify-client-assertion validation fails", async () => {
+      const verifyClientAssertionFailureMessage =
+        "Plain text parameters validation failed";
+      verifyClientAssertionSpy = jest
+        .spyOn(tokenValidationHelper, "verifyClientAssertion")
+        .mockImplementation(() => {
+          throw new Error(verifyClientAssertionFailureMessage);
+        });
+
+      const response = await handler(
+        createTokenRequest(),
+        {} as Context,
+        () => {}
+      );
+
+      expect(verifyClientAssertionSpy).toHaveBeenCalledTimes(1);
       expect(response.statusCode).toBe(400);
     });
   });
