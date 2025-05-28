@@ -10,10 +10,15 @@ import { createBearerAccessToken } from "./helpers/create-token-helper";
 import { CodedError, handleErrors } from "../helper/result-helper";
 import { logger } from "../logger";
 import {
+  ensureClientAssertionType,
   validateAuthCode,
   validatePlainTextParameters,
+  verifyClientAssertion,
 } from "./helpers/token-validation-helper";
-import { getOrchToAuthExpectedClientId } from "./helpers/config";
+import {
+  getOrchToAuthExpectedClientId,
+  getOrchToAuthSigningPublicKey,
+} from "./helpers/config";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -42,6 +47,8 @@ async function post(
   try {
     await validateAuthCode(authCode);
     validatePlainTextParameters("", getOrchToAuthExpectedClientId(), body);
+    ensureClientAssertionType(body);
+    verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
   } catch (error) {
     throw new CodedError(
       400,
