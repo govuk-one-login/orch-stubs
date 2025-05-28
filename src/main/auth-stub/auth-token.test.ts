@@ -4,11 +4,13 @@ import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-se
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
 import * as tokenValidationHelper from "./helpers/token-validation-helper";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { mockEnvVariableSetup } from "./test-helper/test-setup";
 
 describe("Auth Token", () => {
   let addAccessTokenStoreSpy: jest.SpyInstance;
   let updateHasBeenUsedAuthCodeStoreSpy: jest.SpyInstance;
   let validateAuthCodeSpy: jest.SpyInstance;
+  let validatePlainTextParametersSpy: jest.SpyInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(() => {
@@ -22,6 +24,10 @@ describe("Auth Token", () => {
     validateAuthCodeSpy = jest
       .spyOn(tokenValidationHelper, "validateAuthCode")
       .mockResolvedValue(undefined);
+    validatePlainTextParametersSpy = jest
+      .spyOn(tokenValidationHelper, "validatePlainTextParameters")
+      .mockReturnValue(undefined);
+    mockEnvVariableSetup();
   });
 
   it("should return an access token when given an auth code", async () => {
@@ -49,6 +55,25 @@ describe("Auth Token", () => {
       );
 
       expect(validateAuthCodeSpy).toHaveBeenCalledTimes(1);
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should error if plain-text-parameters validation fails", async () => {
+      const plainTextParamsValidationFailureMessage =
+        "Plain text parameters validation failed";
+      validatePlainTextParametersSpy = jest
+        .spyOn(tokenValidationHelper, "validatePlainTextParameters")
+        .mockImplementation(() => {
+          throw new Error(plainTextParamsValidationFailureMessage);
+        });
+
+      const response = await handler(
+        createTokenRequest(),
+        {} as Context,
+        () => {}
+      );
+
+      expect(validatePlainTextParametersSpy).toHaveBeenCalledTimes(1);
       expect(response.statusCode).toBe(400);
     });
   });
