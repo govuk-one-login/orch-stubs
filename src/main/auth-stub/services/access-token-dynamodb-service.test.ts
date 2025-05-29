@@ -5,7 +5,7 @@ import {
 } from "./access-token-dynamodb-service";
 import {
   createAccessTokenStoreInput,
-  createAcessTokenStore,
+  createAccessTokenStore,
 } from "../test-helper/mock-token-data-helper";
 
 const TEST_ACCESS_TOKEN = "testAccessToken";
@@ -16,7 +16,7 @@ jest.mock("@aws-sdk/lib-dynamodb", () => {
       from: jest.fn().mockImplementation(() => {
         return {
           get: jest.fn(() =>
-            Promise.resolve({ Item: createAcessTokenStore(TEST_ACCESS_TOKEN) })
+            Promise.resolve({ Item: createAccessTokenStore(TEST_ACCESS_TOKEN) })
           ),
           put: jest.fn(() => Promise.resolve("SUCCESS")),
           update: jest.fn(() => Promise.resolve("SUCCESS")),
@@ -34,7 +34,7 @@ describe("Access Token DynamoDb Service", () => {
   it("should return an access-token-store object when given a token to get access-token-store", async () => {
     const accessTokenStore = await getAccessTokenStore(TEST_ACCESS_TOKEN);
 
-    expect(accessTokenStore).toEqual(createAcessTokenStore(TEST_ACCESS_TOKEN));
+    expect(accessTokenStore).toEqual(createAccessTokenStore(TEST_ACCESS_TOKEN));
   });
 
   it("should return a success response when given an access-token-store object to add to the access-token-store", async () => {
