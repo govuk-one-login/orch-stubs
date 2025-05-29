@@ -5,7 +5,7 @@ import {
 } from "aws-lambda";
 import { AuthCodeStoreInput } from "./interfaces/auth-code-store-interface";
 import { addAuthCodeStore } from "./services/auth-code-dynamodb-service";
-import { getUserProfile } from "./services/user-profile-dynamodb-service";
+import { getUserProfileByEmail } from "./services/user-profile-dynamodb-service";
 import { getOrchToAuthExpectedClientId } from "./helpers/config";
 import { decrypt } from "./helpers/decryption-helper";
 import { validateClaims } from "./helpers/jwt-helper";
@@ -79,7 +79,7 @@ async function post(
     );
   }
 
-  const user = await getUserProfile(email);
+  const user = await getUserProfileByEmail(email);
   const claimsList = claims.claim ? JSON.parse(claims.claim) : [];
   const authCode = generateAuthCode();
 
