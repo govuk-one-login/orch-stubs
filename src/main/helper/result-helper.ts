@@ -2,7 +2,7 @@ import { APIGatewayProxyResult } from "aws-lambda";
 import { logger } from "../logger";
 
 type SuccessCode = 200 | 302;
-type ErrorCode = 400 | 405 | 500;
+type ErrorCode = 400 | 401 | 405 | 500;
 type JsonEntity =
   | string
   | number
