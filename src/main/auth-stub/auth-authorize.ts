@@ -61,8 +61,8 @@ async function post(
   const clientId = parsedBody.client_id;
   const responseType = parsedBody.response_type;
   const email = parsedBody.email ?? "dummy.email@mail.com";
-  const passwordResetTime = parsedBody.passwordResetTime
-    ? Number(parsedBody.passwordResetTime)
+  const passwordResetTime = parsedBody.password_reset_time
+    ? Number(parsedBody.password_reset_time)
     : 10;
 
   let claims: Claims;
