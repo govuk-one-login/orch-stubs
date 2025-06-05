@@ -3,6 +3,7 @@ import { logger } from "../../logger";
 
 type EnvVar =
   | "ENCRYPTION_KEY_ID"
+  | "ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY"
   | "AWS_REGION"
   | "ORCH_TO_AUTH_AUDIENCE"
   | "ORCH_TO_AUTH_CLIENT_ID"
