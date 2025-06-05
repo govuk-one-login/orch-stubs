@@ -73,6 +73,33 @@ Resources:
         - Key: Name
           Value: accessToken
 
+  UserProfileTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Environment}-AuthStub-UserProfile
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: subjectId
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: SubjectIdIndex
+          KeySchema:
+            - AttributeName: subjectId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      Tags:
+        - Key: Name
+          Value: userProfile
+
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
@@ -239,6 +266,32 @@ Resources:
               - dynamodb:UpdateItem
               - dynamodb:PutItem
             Resource: !GetAtt AccessTokenTable.Arn
+
+  UserProfileTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubUserProfileTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt UserProfileTable.Arn
+
+  UserProfileTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubUserProfileTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:UpdateItem
+              - dynamodb:PutItem
+            Resource: !GetAtt UserProfileTable.Arn
   
   AuthEncryptionKeyAlias:
     Type: "AWS::KMS::Alias"
