@@ -85,7 +85,7 @@ async function post(
 
   const authCodeResult: AuthCodeStoreInput = {
     authCode,
-    subjectId: user.SubjectID,
+    subjectId: user.subjectID,
     claims: claimsList,
     sectorIdentifier: parsedBody.sectorIdentifier,
     isNewAccount: parsedBody.isNewAccount === "true",

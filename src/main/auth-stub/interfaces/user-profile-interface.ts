@@ -1,14 +1,14 @@
 export interface UserProfile {
-  SubjectID: string;
-  Email: string;
-  EmailVerified: boolean;
-  PhoneNumber: string;
-  PhoneNumberVerified: boolean;
-  Created: string;
-  Updated: string;
+  subjectID: string;
+  email: string;
+  emailVerified: boolean;
+  phoneNumber: string;
+  phoneNumberVerified: boolean;
+  created: string;
+  updated: string;
   termsAndConditions: TermsAndConditions;
-  PublicSubjectID: string;
-  LegacySubjectID: string;
+  publicSubjectID: string;
+  legacySubjectID: string;
   salt: string;
   accountVerified: number;
   testUser: number;
