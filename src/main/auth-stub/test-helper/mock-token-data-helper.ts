@@ -2,9 +2,8 @@ import {
   AccessTokenStore,
   AccessTokenStoreInput,
 } from "../interfaces/access-token-store-interface";
-import { DUMMY_SUBJECT_ID } from "../services/user-profile-dynamodb-service";
 
-const MOCK_SUBJECT_ID = DUMMY_SUBJECT_ID;
+const MOCK_SUBJECT_ID = "testSubjectId";
 const MOCK_CLAIMS = ["claim1"];
 const MOCK_SECTOR_IDENTIFIER = "9876543";
 const MOCK_IS_NEW_ACCOUNT = false;

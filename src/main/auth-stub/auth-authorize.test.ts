@@ -1,11 +1,13 @@
 import { Context } from "aws-lambda";
 import { handler } from "./auth-authorize";
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
 import * as decryptionHelper from "./helpers/decryption-helper";
 import * as jwtHelper from "./helpers/jwt-helper";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { createMockClaims } from "./test-helper/test-data";
 import { mockEnvVariableSetup } from "./test-helper/test-setup";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
 
 describe("Auth Authorize", () => {
   let addAuthCodeStoreSpy: jest.SpyInstance;
@@ -16,6 +18,11 @@ describe("Auth Authorize", () => {
     addAuthCodeStoreSpy = jest
       .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
       .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+    jest
+      .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
+      .mockReturnValue(
+        Promise.resolve(createUserProfile("testEmail", "testSubjectId"))
+      );
     jest
       .spyOn(decryptionHelper, "decrypt")
       .mockReturnValue(
