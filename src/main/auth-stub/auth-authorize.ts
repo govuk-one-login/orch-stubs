@@ -79,21 +79,23 @@ async function post(
     );
   }
 
-  const user = await getUserProfileByEmail(email);
-  const claimsList = claims.claim ? JSON.parse(claims.claim) : [];
-  const authCode = generateAuthCode();
-
-  const authCodeResult: AuthCodeStoreInput = {
-    authCode,
-    subjectId: user.subjectId,
-    claims: claimsList,
-    sectorIdentifier: parsedBody.sectorIdentifier,
-    isNewAccount: parsedBody.isNewAccount === "true",
-    passwordResetTime,
-    hasBeenUsed: false,
-  };
+  let authCode: string;
 
   try {
+    const user = await getUserProfileByEmail(email);
+    const claimsList = claims.claim ? JSON.parse(claims.claim) : [];
+    authCode = generateAuthCode();
+
+    const authCodeResult: AuthCodeStoreInput = {
+      authCode,
+      subjectId: user.subjectId,
+      claims: claimsList,
+      sectorIdentifier: parsedBody.sectorIdentifier,
+      isNewAccount: parsedBody.isNewAccount === "true",
+      passwordResetTime,
+      hasBeenUsed: false,
+    };
+
     await addAuthCodeStore(authCodeResult);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
