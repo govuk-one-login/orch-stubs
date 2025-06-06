@@ -72,13 +72,14 @@ async function get(
     };
   }
 
+  let userInfoClaims: UserInfoClaims;
+
   try {
     await updateHasBeenUsedAccessTokenStore(accessToken, true);
+    userInfoClaims = await populateUserInfo(accessTokenStore);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
-
-  const userInfoClaims = await populateUserInfo(accessTokenStore);
 
   return {
     statusCode: 200,
