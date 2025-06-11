@@ -7,7 +7,10 @@ import {
   resetAccessTokenStore,
   resetAuthCodeStore,
 } from "./helpers/dynamo-helper";
-import { createAuthCodeStoreInput } from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper";
+import {
+  createAuthCodeStoreInput,
+  createAuthCodeStoreThatHasBeenUsed,
+} from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper";
 import { SignJWT } from "jose";
 import { generateKeyPairSync, KeyObject, KeyPairKeyObjectResult } from "crypto";
 import {
@@ -67,6 +70,108 @@ describe("Auth Token", () => {
     ).toBeTruthy();
     const authCodeStore = await getAuthCodeStore(AUTH_CODE);
     expect(authCodeStore.hasBeenUsed).toBeTruthy();
+  });
+
+  it("should return a 400 error for invalid auth-code", async () => {
+    const invalidAuthCode = "543212345";
+    await addAuthCodeStore(createAuthCodeStoreThatHasBeenUsed(invalidAuthCode));
+
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        await generateQuery(
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+          invalidAuthCode,
+          "authorization_code",
+          orchToAuthExpectedClientId,
+          ecKeyPair.privateKey
+        ),
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body).message).toBe(
+      "Invalid Auth Code: already in use"
+    );
+  });
+
+  it("should return a 400 error for invalid text-parameters", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        `code=${AUTH_CODE}`,
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body).message).toBe(
+      "Request is missing grant_type parameter"
+    );
+  });
+
+  it("should return a 400 error for invalid client-assertion-type", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        await generateQuery(
+          "invalidClientAssertionType",
+          AUTH_CODE,
+          "authorization_code",
+          orchToAuthExpectedClientId,
+          ecKeyPair.privateKey
+        ),
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body).message).toBe(
+      "Invalid client_assertion_type parameter, must be urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    );
+  });
+
+  it("should return a 400 error for invalid client-assertion", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        [
+          `client_assertion_type=${encodeURIComponent("urn:ietf:params:oauth:client-assertion-type:jwt-bearer")}`,
+          `code=${AUTH_CODE}`,
+          `grant_type=${"authorization_code"}`,
+          `client_assertion=${"notValid.ClientAssertion"}`,
+          `client_id=${orchToAuthExpectedClientId}`,
+          `redirect_uri=""`,
+        ].join("&"),
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body).message).toBe(
+      "Unexpected number of Base64URL parts, must be three"
+    );
   });
 });
 

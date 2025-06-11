@@ -51,7 +51,7 @@ async function post(
     // Since its in Auth's code we have replicated the validation in the stub as well.
     validatePlainTextParameters(`""`, getOrchToAuthExpectedClientId(), body);
     ensureClientAssertionType(body);
-    verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
+    await verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
   } catch (error) {
     throw new CodedError(
       400,
