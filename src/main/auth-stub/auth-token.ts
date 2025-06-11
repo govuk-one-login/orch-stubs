@@ -49,7 +49,7 @@ async function post(
     // The redirect between orch and auth is never used and is in auths code
     // just as part of Oauth2 formalities so left empty.
     // Since its in Auth's code we have replicated the validation in the stub as well.
-    validatePlainTextParameters("", getOrchToAuthExpectedClientId(), body);
+    validatePlainTextParameters(`""`, getOrchToAuthExpectedClientId(), body);
     ensureClientAssertionType(body);
     verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
   } catch (error) {

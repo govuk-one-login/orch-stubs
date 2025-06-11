@@ -8,6 +8,13 @@ import {
   resetAuthCodeStore,
 } from "./helpers/dynamo-helper";
 import { createAuthCodeStoreInput } from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper";
+import { SignJWT } from "jose";
+import { generateKeyPairSync, KeyObject, KeyPairKeyObjectResult } from "crypto";
+import {
+  mockEnvVariableSetup,
+  mockSigningKeyEnv,
+  orchToAuthExpectedClientId,
+} from "./helpers/test-setup";
 
 interface AuthTokenResponse {
   access_token: string;
@@ -16,18 +23,32 @@ interface AuthTokenResponse {
 
 const AUTH_CODE = "12345";
 
-beforeEach(setUpAuthCode);
-afterEach(() => {
-  resetAccessTokenStore();
-  resetAuthCodeStore();
-});
-
 describe("Auth Token", () => {
+  let ecKeyPair: KeyPairKeyObjectResult;
+
+  beforeEach(async () => {
+    mockEnvVariableSetup();
+    await setUpAuthCode();
+    ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+    mockSigningKeyEnv(ecKeyPair.publicKey);
+  });
+
+  afterEach(async () => {
+    await resetAccessTokenStore();
+    await resetAuthCodeStore();
+  });
+
   it("should return 200 for valid POST request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "POST",
-        `code=${AUTH_CODE}`,
+        await generateQuery(
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+          AUTH_CODE,
+          "authorization_code",
+          orchToAuthExpectedClientId,
+          ecKeyPair.privateKey
+        ),
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
@@ -51,4 +72,25 @@ describe("Auth Token", () => {
 
 async function setUpAuthCode(): Promise<void> {
   await addAuthCodeStore(createAuthCodeStoreInput(AUTH_CODE));
+}
+
+async function generateQuery(
+  clientAssertionType: string,
+  authCode: string,
+  grantType: string,
+  clientId: string,
+  privateKey: KeyObject
+): Promise<string> {
+  const jwt = await new SignJWT()
+    .setSubject(clientId)
+    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
+    .sign(privateKey);
+  return [
+    `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
+    `code=${authCode}`,
+    `grant_type=${grantType}`,
+    `client_assertion=${jwt}`,
+    `client_id=${clientId}`,
+    `redirect_uri=""`,
+  ].join("&");
 }
