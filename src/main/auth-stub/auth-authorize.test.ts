@@ -1,14 +1,17 @@
 import { Context } from "aws-lambda";
 import { handler } from "./auth-authorize";
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
 import * as decryptionHelper from "./helpers/decryption-helper";
 import * as jwtHelper from "./helpers/jwt-helper";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { createMockClaims } from "./test-helper/test-data";
 import { mockEnvVariableSetup } from "./test-helper/test-setup";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
 
 describe("Auth Authorize", () => {
   let addAuthCodeStoreSpy: jest.SpyInstance;
+  let getUserProfileByEmailSpy: jest.SpyInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(() => {
@@ -16,6 +19,11 @@ describe("Auth Authorize", () => {
     addAuthCodeStoreSpy = jest
       .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
       .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+    getUserProfileByEmailSpy = jest
+      .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
+      .mockReturnValue(
+        Promise.resolve(createUserProfile("testEmail", "testSubjectId"))
+      );
     jest
       .spyOn(decryptionHelper, "decrypt")
       .mockReturnValue(
@@ -117,6 +125,24 @@ describe("Auth Authorize", () => {
   });
 
   describe("accessing dynamoDb", () => {
+    it("should return a 500 when failing to get user-profile", async () => {
+      getUserProfileByEmailSpy = jest
+        .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
+        .mockImplementation(() => {
+          throw new Error();
+        });
+
+      const response = await handler(
+        createValidAuthorizeRequest(),
+        {} as Context,
+        () => {}
+      );
+
+      expect(getUserProfileByEmailSpy).toHaveBeenCalledTimes(1);
+      expect(response.statusCode).toBe(500);
+      expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
+    });
+
     it("should try to add an auth code store to dynamoDb", async () => {
       await handler(createValidAuthorizeRequest(), {} as Context, () => {});
 
