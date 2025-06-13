@@ -9,6 +9,16 @@ import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-se
 import { createBearerAccessToken } from "./helpers/create-token-helper";
 import { CodedError, handleErrors } from "../helper/result-helper";
 import { logger } from "../logger";
+import {
+  ensureClientAssertionType,
+  validateAuthCode,
+  validatePlainTextParameters,
+  verifyClientAssertion,
+} from "./helpers/token-validation-helper";
+import {
+  getOrchToAuthExpectedClientId,
+  getOrchToAuthSigningPublicKey,
+} from "./helpers/config";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -32,7 +42,23 @@ async function post(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const body = getBody(event);
-  const authCode = getAuthCode(body);
+  const authCode = body["code"];
+
+  try {
+    await validateAuthCode(authCode);
+    // The redirect between orch and auth is never used and is in auths code
+    // just as part of Oauth2 formalities so left empty.
+    // Since its in Auth's code we have replicated the validation in the stub as well.
+    validatePlainTextParameters(`""`, getOrchToAuthExpectedClientId(), body);
+    ensureClientAssertionType(body);
+    await verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
+  } catch (error) {
+    throw new CodedError(
+      400,
+      error instanceof Error ? error.message : "Unknown error."
+    );
+  }
+
   const accessToken = createBearerAccessToken();
 
   try {
@@ -56,13 +82,4 @@ function getBody(event: APIGatewayProxyEvent) {
     throw new CodedError(400, "Missing request body");
   }
   return Object.fromEntries(new URLSearchParams(event.body));
-}
-
-function getAuthCode(body: { [k: string]: string }) {
-  const authCode = body["code"];
-  if (!authCode) {
-    logger.error(`Missing Auth Code`);
-    throw new CodedError(400, "Missing Auth Code");
-  }
-  return authCode;
 }

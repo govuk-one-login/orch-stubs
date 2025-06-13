@@ -24,6 +24,22 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  UseSubEnvironment:
+    Fn::And:
+      - Fn::Equals:
+          - !Ref Environment
+          - dev
+      - Fn::Not:
+          - Fn::Equals:
+              - !Ref SubEnvironment
+              - none
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHzG8IFx1jE1+Ul44jQk96efPknCXVxWS4PqLrKfR/31UQovFQLfyxA46uiMOvr7+0hRwFX1fQhagsIK+dfB5PA==
+    build:
+      orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==
 
 Globals:
   Function:
@@ -157,6 +173,12 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
+          ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY: !If
+            - !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                orchToAuthSigningPublicKey,
+              ]
       Events:
         Get:
           Type: Api

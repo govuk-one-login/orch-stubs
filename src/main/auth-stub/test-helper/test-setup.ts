@@ -1,7 +1,12 @@
+import { generateKeyPairSync } from "crypto";
 import * as config from "../helpers/config";
 import * as keyHelper from "../helpers/key-helpers";
 
 export const mockEnvVariableSetup = () => {
+  const ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+  jest
+    .spyOn(config, "getOrchToAuthSigningPublicKey")
+    .mockReturnValue(ecKeyPair.publicKey);
   jest
     .spyOn(config, "getOrchToAuthExpectedAudience")
     .mockReturnValue("testURL");

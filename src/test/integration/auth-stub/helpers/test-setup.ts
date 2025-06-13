@@ -1,5 +1,8 @@
+import { KeyObject } from "crypto";
 import * as config from "../../../../main/auth-stub/helpers/config";
 import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers";
+
+export const orchToAuthExpectedClientId = "orchestrationAuth";
 
 export const mockEnvVariableSetup = () => {
   jest
@@ -7,7 +10,7 @@ export const mockEnvVariableSetup = () => {
     .mockReturnValue("testURL");
   jest
     .spyOn(config, "getOrchToAuthExpectedClientId")
-    .mockReturnValue("orchestrationAuth");
+    .mockReturnValue(orchToAuthExpectedClientId);
   jest
     .spyOn(keyHelper, "getAuthPublicKey")
     .mockReturnValue(
@@ -22,4 +25,10 @@ export const mockEnvVariableSetup = () => {
         )
       )
     );
+};
+
+export const mockSigningKeyEnv = (publickKey: KeyObject) => {
+  jest
+    .spyOn(config, "getOrchToAuthSigningPublicKey")
+    .mockReturnValue(publickKey);
 };
