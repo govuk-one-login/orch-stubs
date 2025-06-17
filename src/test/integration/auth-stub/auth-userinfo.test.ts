@@ -1,8 +1,10 @@
 import { createApiGatewayEvent } from "../util";
 import { handler } from "../../../main/auth-stub/auth-userinfo";
 import {
+  addUserProfile,
   getAccessTokenStore,
   resetAccessTokenStore,
+  resetUserProfile,
 } from "./helpers/dynamo-helper";
 import {
   addAccessTokenStore,
@@ -12,16 +14,29 @@ import {
   AccessTokenStoreOptions,
   createAccessTokenStoreInput,
   createCustomAccessTokenStore,
+  createUserPofile,
 } from "../../../main/auth-stub/test-helper/mock-token-data-helper";
-
-const ACCESS_TOKEN = "12345";
-
-beforeEach(setUpAccessToken);
-afterEach(() => {
-  resetAccessTokenStore();
-});
+import { UserProfile } from "../../../main/auth-stub/interfaces/user-profile-interface";
+import { UserInfoClaims } from "src/main/auth-stub/interfaces/user-info-claim-interface";
 
 describe("Auth User Info", () => {
+  const EMAIL = "dummy_user_info@mail.com";
+  const SUBJECT_ID = "authUserInfoSubjectId";
+  const ACCESS_TOKEN = "12345";
+
+  let userProfileMock: UserProfile;
+
+  beforeEach(async () => {
+    userProfileMock = createUserPofile(EMAIL, SUBJECT_ID);
+    await setUpAccessToken();
+    await addUserProfile(userProfileMock);
+  });
+
+  afterEach(async () => {
+    await resetAccessTokenStore();
+    await resetUserProfile();
+  });
+
   it("should return 200 for valid GET request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
@@ -38,6 +53,11 @@ describe("Auth User Info", () => {
     );
 
     expect(response.statusCode).toBe(200);
+    const authUserInfoResponse: UserInfoClaims = JSON.parse(response.body);
+    expect(authUserInfoResponse.claims.email).toBe(userProfileMock.email);
+    expect(authUserInfoResponse.claims.local_account_id).toBe(
+      userProfileMock.subjectId
+    );
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
     expect(accessTokenStore.hasBeenUsed).toBeTruthy();
   });
@@ -159,16 +179,18 @@ describe("Auth User Info", () => {
       `Bearer error="invalid_token", error_description="TypeError: Cannot read properties of undefined (reading 'hasBeenUsed')"`,
     ]);
   });
+
+  async function setUpAccessToken(): Promise<void> {
+    await addAccessTokenStore(
+      createAccessTokenStoreInput(ACCESS_TOKEN, SUBJECT_ID)
+    );
+  }
+
+  async function setUpCustomAccessToken(
+    accessTokenStoreOptions: AccessTokenStoreOptions
+  ): Promise<void> {
+    await addCustomAccessTokenStore(
+      createCustomAccessTokenStore(accessTokenStoreOptions)
+    );
+  }
 });
-
-async function setUpAccessToken(): Promise<void> {
-  await addAccessTokenStore(createAccessTokenStoreInput(ACCESS_TOKEN));
-}
-
-async function setUpCustomAccessToken(
-  accessTokenStoreOptions: AccessTokenStoreOptions
-): Promise<void> {
-  await addCustomAccessTokenStore(
-    createCustomAccessTokenStore(accessTokenStoreOptions)
-  );
-}

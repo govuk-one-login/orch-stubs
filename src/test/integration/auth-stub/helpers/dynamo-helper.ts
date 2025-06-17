@@ -5,6 +5,7 @@ import {
   AuthCodeStore,
   AuthCodeStoreInput,
 } from "src/main/auth-stub/interfaces/auth-code-store-interface";
+import { UserProfile } from "src/main/auth-stub/interfaces/user-profile-interface";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
@@ -14,6 +15,7 @@ const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const authCodeTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-AuthCode`;
 const accessTokenTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-AccessToken`;
+const userProfileTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-UserProfile`;
 
 export async function resetAuthCodeStore() {
   const result = await dynamo.scan({
@@ -45,6 +47,24 @@ export async function resetAccessTokenStore() {
         TableName: accessTokenTableName,
         Key: {
           accessToken: item.accessToken,
+        },
+      });
+    }
+  }
+}
+
+export async function resetUserProfile() {
+  const result = await dynamo.scan({
+    TableName: userProfileTableName,
+    ConsistentRead: true,
+  });
+
+  if (result.Items) {
+    for (const item of result.Items) {
+      await dynamo.delete({
+        TableName: userProfileTableName,
+        Key: {
+          email: item.email,
         },
       });
     }
@@ -87,6 +107,27 @@ export const addAuthCodeStore = async (authCodeStore: AuthCodeStoreInput) => {
       passwordResetTime: authCodeStore.passwordResetTime,
       ttl: oneHourFromNow(),
       hasBeenUsed: authCodeStore.hasBeenUsed,
+    },
+  });
+};
+
+export const addUserProfile = async (userProfile: UserProfile) => {
+  return await dynamo.put({
+    TableName: userProfileTableName,
+    Item: {
+      subjectId: userProfile.subjectId,
+      email: userProfile.email,
+      emailVerified: userProfile.emailVerified,
+      phoneNumber: userProfile.phoneNumber,
+      phoneNumberVerified: userProfile.phoneNumberVerified,
+      created: userProfile.created,
+      updated: userProfile,
+      termsAndConditions: userProfile.termsAndConditions,
+      publicSubjectID: userProfile.publicSubjectId,
+      legacySubjectID: userProfile.legacySubjectId,
+      salt: userProfile.salt,
+      accountVerified: userProfile.accountVerified,
+      testUser: userProfile.testUser,
     },
   });
 };
