@@ -48,7 +48,7 @@
     "@aws-sdk/client-sqs": "^3.682.0",
     "@aws-sdk/lib-dynamodb": "^3.830.0",
     "@types/node-jose": "^1.1.13",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.5",
     "jose": "^5.9.6",
     "pino": "^9.5.0"
   },
