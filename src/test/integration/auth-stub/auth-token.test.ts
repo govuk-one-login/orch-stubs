@@ -24,9 +24,9 @@ interface AuthTokenResponse {
   token_type: string;
 }
 
-const AUTH_CODE = "12345";
-
 describe("Auth Token", () => {
+  const AUTH_CODE = "12345";
+
   let ecKeyPair: KeyPairKeyObjectResult;
 
   beforeEach(async () => {
@@ -173,29 +173,29 @@ describe("Auth Token", () => {
       "Unexpected number of Base64URL parts, must be three"
     );
   });
+
+  async function setUpAuthCode(): Promise<void> {
+    await addAuthCodeStore(createAuthCodeStoreInput(AUTH_CODE));
+  }
+
+  async function generateQuery(
+    clientAssertionType: string,
+    authCode: string,
+    grantType: string,
+    clientId: string,
+    privateKey: KeyObject
+  ): Promise<string> {
+    const jwt = await new SignJWT()
+      .setSubject(clientId)
+      .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
+      .sign(privateKey);
+    return [
+      `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
+      `code=${authCode}`,
+      `grant_type=${grantType}`,
+      `client_assertion=${jwt}`,
+      `client_id=${clientId}`,
+      `redirect_uri=""`,
+    ].join("&");
+  }
 });
-
-async function setUpAuthCode(): Promise<void> {
-  await addAuthCodeStore(createAuthCodeStoreInput(AUTH_CODE));
-}
-
-async function generateQuery(
-  clientAssertionType: string,
-  authCode: string,
-  grantType: string,
-  clientId: string,
-  privateKey: KeyObject
-): Promise<string> {
-  const jwt = await new SignJWT()
-    .setSubject(clientId)
-    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
-    .sign(privateKey);
-  return [
-    `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
-    `code=${authCode}`,
-    `grant_type=${grantType}`,
-    `client_assertion=${jwt}`,
-    `client_id=${clientId}`,
-    `redirect_uri=""`,
-  ].join("&");
-}

@@ -1,34 +1,45 @@
+import { createUserProfile } from "../test-helper/mock-user-profile-data-helper";
 import {
-  DUMMY_EMAIL,
-  DUMMY_SUBJECT_ID,
   getUserProfileByEmail,
   getUserProfileBySubjectId,
 } from "./user-profile-dynamodb-service";
 
-it("should return the dummy UserProfile if the right email is given", async () => {
-  const userProfile = await getUserProfileByEmail(DUMMY_EMAIL);
+const EMAIL = "testEmail@gov.uk";
+const SUBJECT_ID = "testSubjectId";
 
-  expect(userProfile.Email).toBe(DUMMY_EMAIL);
-  expect(userProfile.SubjectID).toBe(DUMMY_SUBJECT_ID);
+jest.mock("@aws-sdk/lib-dynamodb", () => {
+  return {
+    DynamoDBDocument: {
+      from: jest.fn().mockImplementation(() => {
+        return {
+          get: jest.fn(() =>
+            Promise.resolve({ Item: createUserProfile(EMAIL, SUBJECT_ID) })
+          ),
+          query: jest.fn(() =>
+            Promise.resolve({ Items: [createUserProfile(EMAIL, SUBJECT_ID)] })
+          ),
+        };
+      }),
+    },
+  };
 });
 
-it("should fail if an invalid email is given", async () => {
-  const action = async () =>
-    await getUserProfileByEmail("invalid.email@mail.com");
+describe("User Profile DynamoDb Service", () => {
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
 
-  await expect(action).rejects.toThrow(new Error("invalid email"));
-});
+  it("should return the dummy UserProfile if the right email is given", async () => {
+    const userProfile = await getUserProfileByEmail(EMAIL);
 
-it("should return the dummy UserProfile if the right subject ID is given", async () => {
-  const userProfile = await getUserProfileBySubjectId(DUMMY_SUBJECT_ID);
+    expect(userProfile.email).toBe(EMAIL);
+    expect(userProfile.subjectId).toBe(SUBJECT_ID);
+  });
 
-  expect(userProfile.SubjectID).toBe(DUMMY_SUBJECT_ID);
-  expect(userProfile.Email).toBe(DUMMY_EMAIL);
-});
+  it("should return the dummy UserProfile if the right subject ID is given", async () => {
+    const userProfile = await getUserProfileBySubjectId(SUBJECT_ID);
 
-it("should fail if an invalid subject ID is given", async () => {
-  const action = async () =>
-    await getUserProfileBySubjectId("invalid-subject-id");
-
-  await expect(action).rejects.toThrow(new Error("invalid subject ID"));
+    expect(userProfile.subjectId).toBe(SUBJECT_ID);
+    expect(userProfile.email).toBe(EMAIL);
+  });
 });

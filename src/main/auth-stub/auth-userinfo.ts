@@ -72,13 +72,14 @@ async function get(
     };
   }
 
+  let userInfoClaims: UserInfoClaims;
+
   try {
     await updateHasBeenUsedAccessTokenStore(accessToken, true);
+    userInfoClaims = await populateUserInfo(accessTokenStore);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
-
-  const userInfoClaims = await populateUserInfo(accessTokenStore);
 
   return {
     statusCode: 200,
@@ -109,13 +110,13 @@ const populateUserInfo = async (
       rp_pairwise_id: "",
       new_account: accessTokenStore.isNewAccount,
       password_reset_time: accessTokenStore.passwordResetTime,
-      legacy_subject_id: userProfile.LegacySubjectID,
-      public_subject_id: userProfile.PublicSubjectID,
-      local_account_id: userProfile.SubjectID,
-      email: userProfile.Email,
-      email_verified: userProfile.EmailVerified,
-      phone_number: userProfile.PhoneNumber,
-      phone_number_verified: userProfile.PhoneNumberVerified,
+      legacy_subject_id: userProfile.legacySubjectId,
+      public_subject_id: userProfile.publicSubjectId,
+      local_account_id: userProfile.subjectId,
+      email: userProfile.email,
+      email_verified: userProfile.emailVerified,
+      phone_number: userProfile.phoneNumber,
+      phone_number_verified: userProfile.phoneNumberVerified,
       salt: "",
       verified_mfa_method_type: "",
       uplift_required: "",

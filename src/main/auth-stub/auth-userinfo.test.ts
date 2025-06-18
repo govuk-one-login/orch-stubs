@@ -2,17 +2,17 @@ import { Context } from "aws-lambda";
 import { handler } from "./auth-userinfo";
 import * as requestHeaderHelper from "./helpers/request-header-helper";
 import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { AccessTokenStore } from "./interfaces/access-token-store-interface";
-import { DUMMY_SUBJECT_ID } from "./services/user-profile-dynamodb-service";
 import { CodedError } from "../helper/result-helper";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
 
 describe("Auth User Info", () => {
-  let getAccessTokenStoreSpy: jest.SpyInstance;
-  let updateHasBeenUsedAccessTokenStoreSpy: jest.SpyInstance;
-  let mockDynamoDbReponse: PutCommandOutput;
+  const mockEmail = "testEmail";
+  const mockSubjectId = "testSubjectId";
   const mockAccessTokenStore: AccessTokenStore = {
-    accessToken: DUMMY_SUBJECT_ID,
+    accessToken: mockSubjectId,
     subjectId: "dummy-subject-id",
     claims: ["test-claims"],
     sectorIdentifier: "test-sector-identifier",
@@ -22,17 +22,25 @@ describe("Auth User Info", () => {
     ttl: Math.floor(Date.now() / 1000) + 180,
   };
 
+  let getAccessTokenStoreSpy: jest.SpyInstance;
+  let updateHasBeenUsedAccessTokenStoreSpy: jest.SpyInstance;
+  let getUserProfileBySubjectId: jest.SpyInstance;
+  let mockDynamoDbReponse: PutCommandOutput;
+
   beforeEach(() => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
     jest
       .spyOn(requestHeaderHelper, "getAccessTokenFromAuthorizationHeader")
-      .mockReturnValue(DUMMY_SUBJECT_ID);
+      .mockReturnValue(mockSubjectId);
     getAccessTokenStoreSpy = jest
       .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-      .mockReturnValue(Promise.resolve(mockAccessTokenStore));
+      .mockResolvedValue(mockAccessTokenStore);
     updateHasBeenUsedAccessTokenStoreSpy = jest
       .spyOn(accessTokenDynamoDbService, "updateHasBeenUsedAccessTokenStore")
-      .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+      .mockResolvedValue(mockDynamoDbReponse);
+    getUserProfileBySubjectId = jest
+      .spyOn(userProfileDynamoDbService, "getUserProfileBySubjectId")
+      .mockResolvedValue(createUserProfile(mockEmail, mockSubjectId));
   });
 
   it("should return a 200 with valid request", async () => {
@@ -44,7 +52,7 @@ describe("Auth User Info", () => {
 
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body).claims.local_account_id).toBe(
-      DUMMY_SUBJECT_ID
+      mockSubjectId
     );
   });
 
@@ -148,7 +156,7 @@ describe("Auth User Info", () => {
       ]);
     });
 
-    it("should return a 500 error when dynamo errors", async () => {
+    it("should return a 500 error when failing to update access-token-store", async () => {
       jest
         .spyOn(accessTokenDynamoDbService, "updateHasBeenUsedAccessTokenStore")
         .mockImplementation(() => {
@@ -161,6 +169,24 @@ describe("Auth User Info", () => {
         () => {}
       );
 
+      expect(response.statusCode).toBe(500);
+      expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
+    });
+
+    it("should return a 500 error when failing to get user-profile", async () => {
+      getUserProfileBySubjectId = jest
+        .spyOn(userProfileDynamoDbService, "getUserProfileBySubjectId")
+        .mockImplementation(() => {
+          throw new Error();
+        });
+
+      const response = await handler(
+        createValidUserInfoRequest(),
+        {} as Context,
+        () => {}
+      );
+
+      expect(getUserProfileBySubjectId).toHaveBeenCalledTimes(1);
       expect(response.statusCode).toBe(500);
       expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
     });
