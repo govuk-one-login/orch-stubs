@@ -5,7 +5,10 @@ import {
 } from "aws-lambda";
 import { AuthCodeStoreInput } from "./interfaces/auth-code-store-interface";
 import { addAuthCodeStore } from "./services/auth-code-dynamodb-service";
-import { getUserProfileByEmail } from "./services/user-profile-dynamodb-service";
+import {
+  addUserProfile,
+  getUserProfileByEmail,
+} from "./services/user-profile-dynamodb-service";
 import { getOrchToAuthExpectedClientId } from "./helpers/config";
 import { decrypt } from "./helpers/decryption-helper";
 import { validateClaims } from "./helpers/jwt-helper";
@@ -17,6 +20,7 @@ import {
   successfulJsonResult,
 } from "../helper/result-helper";
 import { ROOT_URI } from "./data/auth-dummy-constants";
+import { createUserPofile } from "./helpers/mock-token-data-helper";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -38,7 +42,14 @@ export const handler: Handler = async (
   });
 };
 
-function get(event: APIGatewayProxyEvent): APIGatewayProxyResult {
+async function get(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    await addUserProfile(createUserPofile("dummy.email@mail.com"));
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
   return {
     statusCode: 200,
     body: JSON.stringify({
