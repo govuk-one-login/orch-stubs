@@ -11,12 +11,17 @@ import { generateKeyPairSync } from "crypto";
 import { handler } from "../../../main/ipv-stub/ipv-token";
 import { createApiGatewayEvent } from "../util";
 
-const AUTH_CODE = "12345";
-
-beforeEach(setUpUserIdentity);
-afterEach(resetUserIdentityTable);
-
 describe("IPV Token", () => {
+  const AUTH_CODE = "12345";
+
+  beforeEach(async () => {
+    await setUpUserIdentity();
+  });
+
+  afterEach(async () => {
+    await resetUserIdentityTable();
+  });
+
   it("should return 200 for valid POST request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
@@ -211,28 +216,28 @@ describe("IPV Token", () => {
       message: "Invalid request",
     });
   });
+
+  async function generateQuery(
+    clientAssertionType: string,
+    authCode: string,
+    grantType: string,
+    clientId: string,
+    privateKey: string
+  ): Promise<string> {
+    const key = await importPKCS8(privateKey, "ES256");
+    const jwt = await new SignJWT({})
+      .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
+      .sign(key);
+    return [
+      `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
+      `code=${authCode}`,
+      `grant_type=${grantType}`,
+      `client_assertion=${jwt}`,
+      `client_id=${clientId}`,
+    ].join("&");
+  }
+
+  async function setUpUserIdentity(): Promise<void> {
+    await putUserIdentity(AUTH_CODE, USER_IDENTITY);
+  }
 });
-
-async function generateQuery(
-  clientAssertionType: string,
-  authCode: string,
-  grantType: string,
-  clientId: string,
-  privateKey: string
-): Promise<string> {
-  const key = await importPKCS8(privateKey, "ES256");
-  const jwt = await new SignJWT({})
-    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
-    .sign(key);
-  return [
-    `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
-    `code=${authCode}`,
-    `grant_type=${grantType}`,
-    `client_assertion=${jwt}`,
-    `client_id=${clientId}`,
-  ].join("&");
-}
-
-async function setUpUserIdentity(): Promise<void> {
-  await putUserIdentity(AUTH_CODE, USER_IDENTITY);
-}
