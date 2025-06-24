@@ -93,9 +93,7 @@ describe("Auth User Info", () => {
   it("should return a 401 error when access token has been used", async () => {
     jest
       .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-      .mockReturnValueOnce(
-        Promise.resolve({ ...mockAccessTokenStore, hasBeenUsed: true })
-      );
+      .mockResolvedValueOnce({ ...mockAccessTokenStore, hasBeenUsed: true });
 
     const response = await handler(
       createValidUserInfoRequest(),
@@ -112,12 +110,10 @@ describe("Auth User Info", () => {
   it("should return a 401 error when access token has expired", async () => {
     jest
       .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-      .mockReturnValueOnce(
-        Promise.resolve({
-          ...mockAccessTokenStore,
-          ttl: Math.floor(Date.now() / 1000) - 180,
-        })
-      );
+      .mockResolvedValueOnce({
+        ...mockAccessTokenStore,
+        ttl: Math.floor(Date.now() / 1000) - 180,
+      });
 
     const response = await handler(
       createValidUserInfoRequest(),

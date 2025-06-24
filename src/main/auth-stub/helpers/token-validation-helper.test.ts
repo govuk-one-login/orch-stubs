@@ -30,7 +30,7 @@ describe("Token Validation Helper", () => {
       authCodeStore = createAuthCodeStoreThatHasBeenUsed(AUTH_CODE);
       jest
         .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockReturnValue(Promise.resolve(authCodeStore));
+        .mockResolvedValue(authCodeStore);
 
       const action = async () => validateAuthCode(AUTH_CODE);
 
@@ -41,7 +41,7 @@ describe("Token Validation Helper", () => {
       authCodeStore = createAuthCodeStoreThatHasExpired(AUTH_CODE);
       jest
         .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockReturnValue(Promise.resolve(authCodeStore));
+        .mockResolvedValue(authCodeStore);
 
       const action = async () => validateAuthCode(AUTH_CODE);
 
@@ -52,7 +52,7 @@ describe("Token Validation Helper", () => {
       authCodeStore = createAuthCodeStore(AUTH_CODE);
       jest
         .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockReturnValue(Promise.resolve(authCodeStore));
+        .mockResolvedValue(authCodeStore);
 
       const action = async () => validateAuthCode(AUTH_CODE);
 

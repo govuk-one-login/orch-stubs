@@ -18,9 +18,7 @@ describe("Auth Authorize", () => {
     const privateKey = await getPrivateKey();
     const jwt = await createJwt(createMockClaims(), privateKey);
     mockEnvVariableSetup();
-    jest
-      .spyOn(decryptionHelper, "decrypt")
-      .mockReturnValue(Promise.resolve(jwt));
+    jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
     await addUserProfile(createUserPofile(EMAIL));
   });
 
@@ -115,9 +113,7 @@ describe("Auth Authorize", () => {
     const wrongPrivateKey = await getWrongPrivateKey();
     const jwt = await createJwt(createMockClaims(), wrongPrivateKey);
 
-    jest
-      .spyOn(decryptionHelper, "decrypt")
-      .mockReturnValue(Promise.resolve(jwt));
+    jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
 
     const response = await handler(
       createApiGatewayEvent(
