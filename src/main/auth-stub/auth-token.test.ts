@@ -19,10 +19,10 @@ describe("Auth Token", () => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 200 } };
     addAccessTokenStoreSpy = jest
       .spyOn(accessTokenDynamoDbService, "addAccessTokenStore")
-      .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+      .mockResolvedValue(mockDynamoDbReponse);
     updateHasBeenUsedAuthCodeStoreSpy = jest
       .spyOn(authCodeDynamoDbService, "updateHasBeenUsedAuthCodeStore")
-      .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+      .mockResolvedValue(mockDynamoDbReponse);
     validateAuthCodeSpy = jest
       .spyOn(tokenValidationHelper, "validateAuthCode")
       .mockResolvedValue(undefined);

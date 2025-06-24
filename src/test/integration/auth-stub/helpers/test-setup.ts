@@ -18,11 +18,9 @@ export const mockEnvVariableSetup = () => {
     );
   jest
     .spyOn(keyHelper, "getContentEncryptionKey")
-    .mockReturnValue(
-      Promise.resolve(
-        JSON.parse(
-          "[142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214, 179, 219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54, 32, 219, 115, 38]"
-        )
+    .mockResolvedValue(
+      JSON.parse(
+        "[142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214, 179, 219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54, 32, 219, 115, 38]"
       )
     );
 };
