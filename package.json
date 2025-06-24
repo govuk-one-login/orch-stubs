@@ -24,7 +24,7 @@
     "fix": "npm run fix:lint && npm run fix:prettier",
     "fix:lint": "eslint . --fix",
     "fix:prettier": "prettier --write \"**/*.{ts,json}\"",
-    "test": "jest --passWithNoTests",
+    "test:unit": "jest --passWithNoTests ./src/main",
     "test:unit:auth": "jest --passWithNoTests ./src/main/auth-stub",
     "test:unit:ipv": "jest --passWithNoTests ./src/main/ipv-stub",
     "test:unit:spot": "jest --passWithNoTests ./src/main/spot-stub",
