@@ -1,6 +1,6 @@
 import { govukStyles } from "./style";
 
-export const renderPage = (title: string, mainContent: string) => {
+export const renderPage = (title: string, mainContent: string, script = "") => {
   return `<!DOCTYPE html>
 <html lang="en" class="govuk-template">
 
@@ -16,6 +16,10 @@ export const renderPage = (title: string, mainContent: string) => {
 <!--  <link rel="manifest" href="/assets/manifest.json">-->
 <style>
 ${govukStyles}
+
+.hidden {
+  display: none;
+}
 </style>
 </head>
 
@@ -83,6 +87,7 @@ ${govukStyles}
       </div>
     </div>
   </footer>
+  <script>${script}</script>
 </body>
 
 </html>`;
