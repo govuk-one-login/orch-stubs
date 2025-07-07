@@ -26,7 +26,13 @@ export default function renderIPVAuthorize(
   return renderPage(
     "IPV Stub Form",
     `<h1 class="govuk-heading-l">IPV stub</h1>
-  <h3 class="govuk-heading-s">Decrypted JAR header:</h3>
+    <details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      Decrypted JAR claims
+    </span>
+  </summary>
+  <h3 class="govuk-heading-s">Header:</h3>
   <dl class="govuk-summary-list">
   <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">
@@ -36,7 +42,7 @@ export default function renderIPVAuthorize(
   ${decodedHeader.alg}
   </dd>
   </dl>
-  <h3 class="govuk-heading-s">Decrypted JAR Claims:</h3>
+  <h3 class="govuk-heading-s">Claims:</h3>
   <dl class="govuk-summary-list">
   ${payloadWithoutClaims
     .map(
@@ -67,6 +73,8 @@ export default function renderIPVAuthorize(
     </dd>
   </div>
   </dl>
+  
+</details>
   
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
