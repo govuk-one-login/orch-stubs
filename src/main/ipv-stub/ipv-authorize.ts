@@ -99,16 +99,7 @@ async function post(
   }
   const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
   const authCode = parsedBody["authCode"];
-  const userIdentity = mapFormToUserIdentity(parsedBody);
-
   const url = new URL(redirectUri);
-  url.searchParams.append("code", authCode);
-
-  try {
-    await putUserIdentityWithAuthCode(authCode, userIdentity);
-  } catch (error) {
-    throw new CodedError(500, `dynamoDb error: ${error}`);
-  }
 
   try {
     const state = await getStateWithAuthCode(authCode);
@@ -118,6 +109,33 @@ async function post(
     } else {
       logger.info("State not found or is not a string.");
     }
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
+  if (parsedBody.oAuthError) {
+    url.searchParams.append("error", parsedBody.oAuthError);
+    url.searchParams.append(
+      "error_description",
+      parsedBody.oAuthErrorDescription
+    );
+    return successfulJsonResult(
+      302,
+      {
+        message: `Redirecting to ${url.toString()}`,
+      },
+      {
+        Location: url.toString(),
+      }
+    );
+  }
+
+  const userIdentity = mapFormToUserIdentity(parsedBody);
+
+  url.searchParams.append("code", authCode);
+
+  try {
+    await putUserIdentityWithAuthCode(authCode, userIdentity);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
