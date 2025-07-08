@@ -47,6 +47,7 @@ describe("IPV Authorize", () => {
       createApiGatewayEvent(
         "POST",
         new URLSearchParams({
+          "oAuth-error-yes": "yes",
           oAuthError: "session_invalidated",
           oAuthErrorDescription: "access denied",
         }).toString(),

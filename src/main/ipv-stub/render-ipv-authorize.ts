@@ -79,19 +79,24 @@ export default function renderIPVAuthorize(
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
 
-  <div class="govuk-form-group">
-  <label class="govuk-label" for="form-success">
-    oAuth Error
-  </label>
-  <select class="govuk-select" id="form-success" name="form-success">
-    <option selected="selected" value="none">None</option>
-    <option value="oAuthError">Error</option>
-  </select>
-</div>
   <form action="/authorize" method="post">
    <input type="hidden" name="authCode" value=${authCode}>
 
   <dl class="govuk-summary-list">
+
+<div class="govuk-summary-list__row" id="oAuth-error-checkbox">
+<dt class="govuk-summary-list__key">
+Return an oAuth error
+</dt>
+<dd class="govuk-summary-list__value" id="oAuthError">
+<div class="govuk-checkboxes__item">
+<input class="govuk-checkboxes__input" id="oAuth-error-yes" name="oAuth-error-yes" type="checkbox" value="yes">
+<label class="govuk-label govuk-checkboxes__label" for="oAuth-error-yes">
+  Yes
+</label>
+</div>
+</dd>
+</div>
 
   <div class="govuk-summary-list__row" id="sub-claim-row">
   <dt class="govuk-summary-list__key">
@@ -195,7 +200,7 @@ Trustmark claim (vtm)
         oAuth Error
     </dt>
     <dd class="govuk-summary-list__value" id="oAuthError">
-    <textarea class="govuk-textarea" rows="2" id="oAuthError" name="oAuthError" type="text"></textarea>
+    <textarea class="govuk-textarea" rows="2" id="oAuthErrorCode" name="oAuthError" type="text"></textarea>
     </dd>
       </div>
 
@@ -210,7 +215,7 @@ Trustmark claim (vtm)
     <button name="continue" value="continue" class="govuk-button">Continue</button>
   </form>`,
     `
-  const dropdown = document.getElementById("form-success")
+  const dropdown = document.getElementById("oAuth-error-yes")
   const oAuthErrorInput = document.getElementById("oAuthErrorRow")
   const oAuthErrorDesc = document.getElementById("oAuthErrorDescriptionRow")
   const claim_values= ["sub-claim-row",
@@ -228,18 +233,8 @@ Trustmark claim (vtm)
     oAuthErrorDesc.classList.add("hidden")
 
 
-  dropdown.addEventListener("change", () => {
-    const val = dropdown.value
-    if(val === "none"){
-      oAuthErrorInput.classList.add("hidden")
-      oAuthErrorDesc.classList.add("hidden")
-
-      claim_values.forEach(claimField => {
-        const claimElement = document.getElementById(claimField)
-        claimElement?.classList?.remove("hidden")
-      })
-
-    } else if (val === "oAuthError"){
+  dropdown.addEventListener("change", (event) => {
+     if (event.currentTarget.checked){
       claim_values.forEach(claimField => {
         const claimElement = document.getElementById(claimField)
         claimElement?.classList?.add("hidden")
@@ -247,6 +242,16 @@ Trustmark claim (vtm)
 
       oAuthErrorInput.classList.remove("hidden")
       oAuthErrorDesc.classList.remove("hidden")
+
+      document.getElementById("oAuthErrorCode").value = "";
+      document.getElementById("oAuthErrorDescription").value  = "";
+    } else {
+      oAuthErrorInput.classList.add("hidden")
+      oAuthErrorDesc.classList.add("hidden")
+      claim_values.forEach(claimField => {
+        const claimElement = document.getElementById(claimField)
+        claimElement?.classList?.remove("hidden")
+      })
     }
   })`
   );
