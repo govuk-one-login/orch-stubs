@@ -113,7 +113,7 @@ async function post(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  if (parsedBody.oAuthError) {
+  if (parsedBody["oAuth-error-yes"] === "yes") {
     url.searchParams.append("error", parsedBody.oAuthError);
     url.searchParams.append(
       "error_description",
