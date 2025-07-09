@@ -24,21 +24,14 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
-  UseSubEnvironment:
-    Fn::And:
-      - Fn::Equals:
-          - !Ref Environment
-          - dev
-      - Fn::Not:
-          - Fn::Equals:
-              - !Ref SubEnvironment
-              - none
 
 Mappings:
   EnvironmentConfiguration:
     dev:
+      authStubDomainName: authstub.oidc.sandpit.account.gov.uk
       orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHzG8IFx1jE1+Ul44jQk96efPknCXVxWS4PqLrKfR/31UQovFQLfyxA46uiMOvr7+0hRwFX1fQhagsIK+dfB5PA==
     build:
+      authStubDomainName: authstub.oidc.build.account.gov.uk
       orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==
 
 Globals:
@@ -327,3 +320,25 @@ Resources:
       PendingWindowInDays: 30
       KeyUsage: ENCRYPT_DECRYPT
       KeySpec: RSA_2048
+
+  PublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          authStubDomainName,
+        ]
+
+Outputs:
+  AuthHostedZoneId:
+    Value: !GetAtt PublicHostedZone.Id
+    Export:
+      Name: AuthHostedZoneId
+  AuthApiGatewayId:
+    Value: !Ref ApiGateway
+    Export:
+      Name: AuthApiGatewayId
