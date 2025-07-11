@@ -20,7 +20,6 @@ const userProfileTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-Use
 export async function resetAuthCodeStore() {
   const result = await dynamo.scan({
     TableName: authCodeTableName,
-    ConsistentRead: true,
   });
 
   if (result.Items) {
@@ -38,7 +37,6 @@ export async function resetAuthCodeStore() {
 export async function resetAccessTokenStore() {
   const result = await dynamo.scan({
     TableName: accessTokenTableName,
-    ConsistentRead: true,
   });
 
   if (result.Items) {
@@ -56,7 +54,6 @@ export async function resetAccessTokenStore() {
 export async function resetUserProfile() {
   const result = await dynamo.scan({
     TableName: userProfileTableName,
-    ConsistentRead: true,
   });
 
   if (result.Items) {
@@ -77,7 +74,6 @@ export async function getAuthCodeStore(
   const response = await dynamo.get({
     TableName: authCodeTableName,
     Key: { authCode: authCode },
-    ConsistentRead: true,
   });
 
   return response.Item as AuthCodeStore;
@@ -89,7 +85,6 @@ export async function getAccessTokenStore(
   const response = await dynamo.get({
     TableName: accessTokenTableName,
     Key: { accessToken: accessToken },
-    ConsistentRead: true,
   });
 
   return response.Item as AccessTokenStore;
