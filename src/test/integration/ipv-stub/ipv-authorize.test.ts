@@ -14,9 +14,11 @@ import { Context } from "aws-lambda";
 const STATE = "test-state";
 const AUTH_CODE = "test-auth-code";
 
-beforeEach(resetUserIdentityTable);
-
 describe("IPV Authorize", () => {
+  beforeEach(async () => {
+    await resetUserIdentityTable();
+  });
+
   it("should return 200 for valid GET request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
