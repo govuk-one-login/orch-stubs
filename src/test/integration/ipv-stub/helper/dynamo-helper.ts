@@ -13,7 +13,6 @@ const dynamoDoc = DynamoDBDocument.from(dynamoClient);
 export async function resetUserIdentityTable() {
   const result = await dynamoDoc.scan({
     TableName: getUserIdentityTableName,
-    ConsistentRead: true,
   });
 
   if (result.Items) {
@@ -49,7 +48,6 @@ export async function getUserIdentity(
   const result = await dynamoDoc.get({
     TableName: getUserIdentityTableName,
     Key: { UserIdentityId: userIdentityId },
-    ConsistentRead: true,
   });
 
   const { userIdentity } = result.Item as Record<
@@ -64,7 +62,6 @@ export async function getState(userIdentityId: string): Promise<string> {
   const result = await dynamoDoc.get({
     TableName: getUserIdentityTableName,
     Key: { UserIdentityId: `${userIdentityId}-state` },
-    ConsistentRead: true,
   });
 
   const { state } = result.Item as { state: string };
