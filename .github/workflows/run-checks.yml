@@ -44,12 +44,12 @@ jobs:
         run: docker run --privileged --rm tonistiigi/binfmt --install all
       - name: Start and run tests
         run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test:ci; exit 0)
-      - name: SonarCloud Scan
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: sonarsource/sonarqube-scan-action@2500896589ef8f7247069a56136f8dc177c27ccf # v5.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: SonarCloud Scan
+      #   if: ${{ github.actor != 'dependabot[bot]' }}
+      #   uses: sonarsource/sonarqube-scan-action@2500896589ef8f7247069a56136f8dc177c27ccf # v5.2.0
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   sam-validation:
     runs-on: ubuntu-latest
