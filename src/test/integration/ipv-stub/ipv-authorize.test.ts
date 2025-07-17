@@ -42,6 +42,30 @@ describe("IPV Authorize", () => {
     expect(state).toBe(STATE);
   });
 
+  it("should return a 302 with the specified oauth error and not update dynamo", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        new URLSearchParams({
+          "oAuth-error-yes": "yes",
+          oAuthError: "session_invalidated",
+          oAuthErrorDescription: "access denied",
+        }).toString(),
+        {},
+        {}
+      ),
+      {} as Context,
+      () => {}
+    );
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.Location).toBe(
+      `https://oidc.local.account.gov.uk/ipv-callback?${new URLSearchParams({
+        error: "session_invalidated",
+        error_description: "access denied",
+      }).toString()}`
+    );
+  });
+
   it("should return 302 for valid POST request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent("POST", generateFormBody(), {}, {}),

@@ -26,7 +26,13 @@ export default function renderIPVAuthorize(
   return renderPage(
     "IPV Stub Form",
     `<h1 class="govuk-heading-l">IPV stub</h1>
-  <h3 class="govuk-heading-s">Decrypted JAR header:</h3>
+    <details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      Decrypted JAR claims
+    </span>
+  </summary>
+  <h3 class="govuk-heading-s">Header:</h3>
   <dl class="govuk-summary-list">
   <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">
@@ -36,7 +42,7 @@ export default function renderIPVAuthorize(
   ${decodedHeader.alg}
   </dd>
   </dl>
-  <h3 class="govuk-heading-s">Decrypted JAR Claims:</h3>
+  <h3 class="govuk-heading-s">Claims:</h3>
   <dl class="govuk-summary-list">
   ${payloadWithoutClaims
     .map(
@@ -68,14 +74,31 @@ export default function renderIPVAuthorize(
   </div>
   </dl>
   
+</details>
+  
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
+
   <form action="/authorize" method="post">
    <input type="hidden" name="authCode" value=${authCode}>
 
   <dl class="govuk-summary-list">
 
-  <div class="govuk-summary-list__row">
+<div class="govuk-summary-list__row" id="oAuth-error-checkbox">
+<dt class="govuk-summary-list__key">
+Return an oAuth error
+</dt>
+<dd class="govuk-summary-list__value" id="oAuthError">
+<div class="govuk-checkboxes__item">
+<input class="govuk-checkboxes__input" id="oAuth-error-yes" name="oAuth-error-yes" type="checkbox" value="yes">
+<label class="govuk-label govuk-checkboxes__label" for="oAuth-error-yes">
+  Yes
+</label>
+</div>
+</dd>
+</div>
+
+  <div class="govuk-summary-list__row" id="sub-claim-row">
   <dt class="govuk-summary-list__key">
       Subject Claim (sub)
   </dt>
@@ -84,7 +107,7 @@ export default function renderIPVAuthorize(
   </dd>
 </div>
 
-<div class="govuk-summary-list__row">
+<div class="govuk-summary-list__row" id="vtr-claim-row">
 <dt class="govuk-summary-list__key">
 Vector of trust claim (vot)
 </dt>
@@ -93,7 +116,7 @@ Vector of trust claim (vot)
 </dd>
 </div>
 
-<div class="govuk-summary-list__row">
+<div class="govuk-summary-list__row" id="vtm-claim-row">
 <dt class="govuk-summary-list__key">
 Trustmark claim (vtm)
 </dt>
@@ -102,7 +125,7 @@ Trustmark claim (vtm)
 </dd>
 </div>
 
-  <div class="govuk-summary-list__row">
+  <div class="govuk-summary-list__row" id="identity-claim-row">
     <dt class="govuk-summary-list__key">
         CoreIdentity Claim
     </dt>
@@ -113,7 +136,7 @@ Trustmark claim (vtm)
 
   ${
     claimKeys.includes("https://vocab.account.gov.uk/v1/address")
-      ? `<div class="govuk-summary-list__row">
+      ? `<div class="govuk-summary-list__row" id="address-claim-row">
   <dt class="govuk-summary-list__key">
       Address Claim
   </dt>
@@ -126,7 +149,7 @@ Trustmark claim (vtm)
 
   ${
     claimKeys.includes("https://vocab.account.gov.uk/v1/passport")
-      ? `<div class="govuk-summary-list__row">
+      ? `<div class="govuk-summary-list__row" id="passport-claim-row">
       <dt class="govuk-summary-list__key">
           Passport Claim
       </dt>
@@ -139,7 +162,7 @@ Trustmark claim (vtm)
 
   ${
     claimKeys.includes("https://vocab.account.gov.uk/v1/drivingPermit")
-      ? ` <div class="govuk-summary-list__row">
+      ? ` <div class="govuk-summary-list__row" id="driving-permit-record-row">
       <dt class="govuk-summary-list__key">
           Driving Permit Claim
       </dt>
@@ -152,7 +175,7 @@ Trustmark claim (vtm)
   
   ${
     claimKeys.includes("https://vocab.account.gov.uk/v1/socialSecurityRecord")
-      ? ` <div class="govuk-summary-list__row">
+      ? ` <div class="govuk-summary-list__row" id="social-security-record-row">
       <dt class="govuk-summary-list__key">
           Social Security Record Claim
       </dt>
@@ -163,15 +186,73 @@ Trustmark claim (vtm)
       : ""
   }
  
-  <div class="govuk-summary-list__row">
+  <div class="govuk-summary-list__row" id="return-code-row">
     <dt class="govuk-summary-list__key">
         Return Code Claim
     </dt>
     <dd class="govuk-summary-list__value" id="user-info-return-code-claim-present">
     <textarea class="govuk-textarea" rows="8" id="return_code_claim" name="return_code_claim" type="text">${JSON.stringify(config.returnCode, null, 2)}</textarea>
     </dd>
+    </div>
+
+    <div class="govuk-summary-list__row" id="oAuthErrorRow">
+    <dt class="govuk-summary-list__key">
+        oAuth Error
+    </dt>
+    <dd class="govuk-summary-list__value" id="oAuthError">
+    <textarea class="govuk-textarea" rows="2" id="oAuthErrorCode" name="oAuthError" type="text"></textarea>
+    </dd>
+      </div>
+
+    <div class="govuk-summary-list__row" id="oAuthErrorDescriptionRow">
+    <dt class="govuk-summary-list__key">
+        oAuth Error Description
+    </dt>
+    <dd class="govuk-summary-list__value" id="oAuthErrorDescriptionId">
+    <textarea class="govuk-textarea" rows="2" id="oAuthErrorDescription" name="oAuthErrorDescription" type="text"></textarea>
+    </dd>
   </div>
     <button name="continue" value="continue" class="govuk-button">Continue</button>
-  </form>`
+  </form>`,
+    `
+  const dropdown = document.getElementById("oAuth-error-yes")
+  const oAuthErrorInput = document.getElementById("oAuthErrorRow")
+  const oAuthErrorDesc = document.getElementById("oAuthErrorDescriptionRow")
+  const claim_values= ["sub-claim-row",
+  "vtr-claim-row",
+  "vtm-claim-row", 
+  "identity-claim-row", 
+  "passport-claim-row", 
+  "address-claim-row",
+  "driving-permit-record-row",
+  "social-security-record-row",
+  "return-code-row"
+   ]
+
+    oAuthErrorInput.classList.add("hidden")
+    oAuthErrorDesc.classList.add("hidden")
+
+
+  dropdown.addEventListener("change", (event) => {
+     if (event.currentTarget.checked){
+      claim_values.forEach(claimField => {
+        const claimElement = document.getElementById(claimField)
+        claimElement?.classList?.add("hidden")
+      })
+
+      oAuthErrorInput.classList.remove("hidden")
+      oAuthErrorDesc.classList.remove("hidden")
+
+      document.getElementById("oAuthErrorCode").value = "";
+      document.getElementById("oAuthErrorDescription").value  = "";
+    } else {
+      oAuthErrorInput.classList.add("hidden")
+      oAuthErrorDesc.classList.add("hidden")
+      claim_values.forEach(claimField => {
+        const claimElement = document.getElementById(claimField)
+        claimElement?.classList?.remove("hidden")
+      })
+    }
+  })`
   );
 }
