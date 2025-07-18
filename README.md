@@ -1,7 +1,12 @@
 # Performance and scaling stubs
 These stubs are owned by Orchestration for performance and scaling testing purposes.
 
-There will be three stubs - one for Authentication, one for IPV, and one for SPOT. This will allow Orchestration to exercise different journeys, write Orchestration specific acceptance tests, execute Orchestration performance tests, and test IPV in lower environments.
+There are three stubs:
+ - [Authentication](src/main//auth-stub/)
+ - [IPV](src/main/ipv-stub/)
+ - [Spot](src/main/spot-stub/) 
+
+This will allow Orchestration to exercise different journeys, write Orchestration specific acceptance tests, execute Orchestration performance tests, and test IPV in lower environments.
 
 #### Prerequisites
 
@@ -9,7 +14,7 @@ A version of SAM CLI (v1.120.0+) that supports Node.js version 20. See the AWS S
 
 #### Build
 
-> To build the app
+> To build all the stubs
 
 ```shell script
 npm run build
@@ -17,11 +22,13 @@ npm run build
 
 #### Start
 
-> To start the app locally (requires Docker)
+> To start all the stubs locally (requires Docker) 
 
 ```shell script
 npm run build && npm run start:local
 ```
+
+There may be requirements for each stub to run so check the README for each stub.
 
 #### Clean Build
 
@@ -35,9 +42,9 @@ npm run clean && npm run build
 
 Private and public keys are be needed for decryption and signature validation.
 
-The local private key (in _parameters.json_) has been commited deliberately. The key pair was generated fresh and should only be used for testing, both locally and as part of the pre-merge GitHub workflow.
+In deployed environments, keys are stored in KMS , secrets manager and parameter store.
 
-In deployed environments, the private key will be retrieved from AWS Secrets Manager, and the public key from AWS Parameter Store. This key pair is different from the one which has been commited here.
+For testing and local development there are some keys generated and commited to code in `parameters.json`
 
 ## Formatting and Linting
 
@@ -75,9 +82,15 @@ This is what runs in GitHub actions against PRs.
 
 #### Unit tests
 
-To just run unit tests, you can run
+Unit test live in each of stub folders. Run all unit tests with
+
 ```shell
-npm run test
+npm run test:unit
+```
+or specify with stub's unit test you want to run with
+
+```shell
+npm run test:unit:{stub}
 ```
 
 #### Integration tests
