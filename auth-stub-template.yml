@@ -24,15 +24,6 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
-  UseSubEnvironment:
-    Fn::And:
-      - Fn::Equals:
-          - !Ref Environment
-          - dev
-      - Fn::Not:
-          - Fn::Equals:
-              - !Ref SubEnvironment
-              - none
 
 Mappings:
   EnvironmentConfiguration:
