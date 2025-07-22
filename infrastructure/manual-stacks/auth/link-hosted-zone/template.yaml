@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  Linking the root domain to the sub domain account for orchestration stubs.
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      oidcHostedZoneId: Z092159727B0APSLCJ6S7
+      authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
+      authStubResourceRecords: [
+            ns-652.awsdns-17.net,
+            ns-246.awsdns-30.com,
+            ns-1046.awsdns-02.org,
+            ns-1899.awsdns-45.co.uk
+          ]
+    build:
+      oidcHostedZoneId: Z062899930H8VN1UJ9CDX
+      authStubDomainName: authstub.oidc.build.account.gov.uk
+      authStubResourceRecords: [
+            ns-120.awsdns-15.com,
+            ns-575.awsdns-07.net,
+            ns-1961.awsdns-53.co.uk,
+            ns-1311.awsdns-35.org
+          ]
+    staging:
+      oidcHostedZoneId: Z013545810R9Q9A5U2JW5
+      authStubDomainName: authstub.oidc.staging.account.gov.uk
+    integration:
+      oidcHostedZoneId: Z015965529V3Z8WL9WJMF
+      authStubDomainName: authstub.oidc.integration.account.gov.uk
+    production:
+      oidcHostedZoneId: Z06269462RT1OC3QFCZZE
+      authStubDomainName: authstub.oidc.account.gov.uk
+
+Resources:
+  AuthStubNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: NS
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      HostedZoneId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcHostedZoneId ]
+      ResourceRecords: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubResourceRecords ]
+      TTL: 172800
