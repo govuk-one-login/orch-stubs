@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  The Auth DNS Hosted Zones for the Orchestration Stubs.
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
+    build:
+      authStubDomainName: authstub.oidc.build.account.gov.uk
+    staging:
+      authStubDomainName: authstub.oidc.staging.account.gov.uk
+    integration:
+      authStubDomainName: authstub.oidc.integration.account.gov.uk
+    production:
+      authStubDomainName: authstub.oidc.account.gov.uk
+
+Resources:
+  AuthStubCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+          HostedZoneId: !ImportValue AuthHostedZoneId
+      ValidationMethod: DNS
+      CertificateTransparencyLoggingPreference: ENABLED
+
+  AuthStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref AuthStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  AuthStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      RestApiId: !ImportValue AuthApiGatewayId
+      Stage: Live
+    DependsOn:
+      - AuthStubApiDomain
+
+  AuthStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      HostedZoneId: !ImportValue AuthHostedZoneId
+      AliasTarget:
+        DNSName: !GetAtt AuthStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt AuthStubApiDomain.RegionalHostedZoneId
