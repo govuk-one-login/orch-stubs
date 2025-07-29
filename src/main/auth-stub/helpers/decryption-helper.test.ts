@@ -8,14 +8,12 @@ describe("KMS decryption service", () => {
   it("should return a jwt", async () => {
     jest
       .spyOn(keyHelper, "getContentEncryptionKey")
-      .mockReturnValueOnce(
-        Promise.resolve(
-          new Uint8Array([
-            142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214,
-            179, 219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54,
-            32, 219, 115, 38,
-          ])
-        )
+      .mockResolvedValueOnce(
+        new Uint8Array([
+          142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214, 179,
+          219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54, 32,
+          219, 115, 38,
+        ])
       );
     const result = await decrypt(jwe);
 
@@ -51,14 +49,12 @@ describe("KMS decryption service", () => {
   it("should throw a CodedError with error details when an invalid encryption key is used", async () => {
     jest
       .spyOn(keyHelper, "getContentEncryptionKey")
-      .mockReturnValueOnce(
-        Promise.resolve(
-          new Uint8Array([
-            142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214,
-            179, 219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54,
-            32, 219, 115, 39,
-          ])
-        )
+      .mockResolvedValueOnce(
+        new Uint8Array([
+          142, 95, 23, 226, 246, 50, 142, 180, 28, 234, 156, 229, 103, 214, 179,
+          219, 246, 139, 213, 206, 155, 126, 217, 196, 129, 23, 198, 54, 32,
+          219, 115, 39,
+        ])
       );
     const action = async () => await decrypt(jwe);
 

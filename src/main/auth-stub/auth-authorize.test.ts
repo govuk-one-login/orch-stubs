@@ -18,7 +18,7 @@ describe("Auth Authorize", () => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
       addUserProfileSpy = jest
         .spyOn(userProfileDynamoDbService, "addUserProfile")
-        .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+        .mockResolvedValue(mockDynamoDbReponse);
     });
 
     it("should try add a user-profile", async () => {
@@ -62,22 +62,18 @@ describe("Auth Authorize", () => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
       addAuthCodeStoreSpy = jest
         .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
-        .mockReturnValue(Promise.resolve(mockDynamoDbReponse));
+        .mockResolvedValue(mockDynamoDbReponse);
       getUserProfileByEmailSpy = jest
         .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
-        .mockReturnValue(
-          Promise.resolve(createUserProfile("testEmail", "testSubjectId"))
-        );
+        .mockResolvedValue(createUserProfile("testEmail", "testSubjectId"));
       jest
         .spyOn(decryptionHelper, "decrypt")
-        .mockReturnValue(
-          Promise.resolve(
-            "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
-          )
+        .mockResolvedValue(
+          "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
         );
       jest
         .spyOn(jwtHelper, "validateClaims")
-        .mockReturnValue(Promise.resolve(createMockClaims()));
+        .mockResolvedValue(createMockClaims());
       mockEnvVariableSetup();
     });
 
