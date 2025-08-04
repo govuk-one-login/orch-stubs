@@ -17,10 +17,12 @@ import { Claims } from "./helpers/claims-config";
 import {
   CodedError,
   handleErrors,
+  successfulHtmlResult,
   successfulJsonResult,
 } from "../helper/result-helper";
 import { ROOT_URI } from "./data/auth-dummy-constants";
 import { createUserPofile } from "./helpers/mock-token-data-helper";
+import renderAuthAuthorize from "./render-auth-authorize";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -43,6 +45,7 @@ export const handler: Handler = async (
 };
 
 async function get(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -50,12 +53,8 @@ async function get(
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: `Reached the ${event.httpMethod} endpoint`,
-    }),
-  };
+
+  return successfulHtmlResult(200, renderAuthAuthorize());
 }
 
 async function post(
