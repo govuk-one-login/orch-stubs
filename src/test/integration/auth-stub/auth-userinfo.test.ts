@@ -1,5 +1,3 @@
-// TODO: REMOVE THIS WHEN FIXING TESTS
-/* eslint jest/no-disabled-tests: 0 */ // --> OFF
 import { createApiGatewayEvent } from "../util";
 import { handler } from "../../../main/auth-stub/auth-userinfo";
 import {
@@ -39,7 +37,7 @@ describe("Auth User Info", () => {
     await resetUserProfile();
   });
 
-  it.skip("should return 200 for valid GET request and update Dynamo", async () => {
+  it("should return 200 for valid GET request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "GET",
@@ -60,11 +58,11 @@ describe("Auth User Info", () => {
     expect(authUserInfoResponse.claims.local_account_id).toBe(
       userProfileMock.subjectId
     );
-    const _accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
-    // expect(accessTokenStore.hasBeenUsed).toBeTruthy();
+    const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
+    expect(accessTokenStore.hasBeenUsed).toBeTruthy();
   });
 
-  it.skip("should return a 401 error when headers is not given", async () => {
+  it("should return a 401 error when headers is not given", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "GET",
@@ -84,7 +82,7 @@ describe("Auth User Info", () => {
     ]);
   });
 
-  it.skip("should return a 401 error when getAccessTokenFromAuthorizationHeader fails", async () => {
+  it("should return a 401 error when getAccessTokenFromAuthorizationHeader fails", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "GET",
@@ -105,7 +103,7 @@ describe("Auth User Info", () => {
     ]);
   });
 
-  it.skip("should return a 401 error when access token has been used", async () => {
+  it("should return a 401 error when access token has been used", async () => {
     await resetAccessTokenStore();
     await setUpCustomAccessToken({
       accessToken: ACCESS_TOKEN,
@@ -132,7 +130,7 @@ describe("Auth User Info", () => {
     ]);
   });
 
-  it.skip("should return a 401 error when access token has expired", async () => {
+  it("should return a 401 error when access token has expired", async () => {
     await resetAccessTokenStore();
     await setUpCustomAccessToken({
       accessToken: ACCESS_TOKEN,
@@ -159,7 +157,7 @@ describe("Auth User Info", () => {
     ]);
   });
 
-  it.skip("should return a 401 error when access token dynamo errors", async () => {
+  it("should return a 401 error when access token dynamo errors", async () => {
     await resetAccessTokenStore();
 
     const response = await handler(
