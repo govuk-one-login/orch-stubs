@@ -29,6 +29,8 @@ Mappings:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
+  IsLocalEnv: !Equals [!Ref Environment, local]
 
 Globals:
   Function:
@@ -70,6 +72,8 @@ Resources:
       Environment:
         Variables:
           DESTINATION_QUEUE_URL: !GetAtt SpotResponseQueue.QueueUrl
+          # These will always be over-written when running locally in parameters.json
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
