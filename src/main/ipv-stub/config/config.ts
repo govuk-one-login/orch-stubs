@@ -2,7 +2,7 @@ const expiryDate = new Date();
 expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
 export const getTrustmarkUri = (): string =>
-  `https://oidc.${process.env.ENVIRONMENT === "dev" ? "authdev3.dev" : process.env.ENVIRONMENT}.account.gov.uk/trustmark`;
+  `https://oidc.${process.env.ENVIRONMENT === "dev" ? "sandpit" : process.env.ENVIRONMENT}.account.gov.uk/trustmark`;
 
 export default {
   coreIdentityJWT: {

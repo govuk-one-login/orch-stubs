@@ -28,7 +28,7 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
-      orchJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/ipv-jwks.json
+      orchJwksUrl: https://oidc.sandpit.account.gov.uk/.well-known/ipv-jwks.json
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
       orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/ipv-jwks.json
