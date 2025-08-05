@@ -24,6 +24,8 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
+  IsLocalEnv: !Equals [!Ref Environment, local]
 
 Mappings:
   EnvironmentConfiguration:
@@ -131,6 +133,9 @@ Resources:
           ENCRYPTION_KEY_ID: "{{resolve:secretsmanager:/orch-stubs/authentication-encryption-key-id:SecretString}}"
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: "https://signin.sandpit.account.gov.uk/"
+          # These will always be over-written when running locally in parameters.json
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DUMMY_ENCRYPTION_PUBLIC_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
