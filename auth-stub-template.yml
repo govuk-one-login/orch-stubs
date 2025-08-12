@@ -28,7 +28,7 @@ Conditions:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
+      authStubDomainName: authstub.oidc.sandpit.account.gov.uk
       orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHzG8IFx1jE1+Ul44jQk96efPknCXVxWS4PqLrKfR/31UQovFQLfyxA46uiMOvr7+0hRwFX1fQhagsIK+dfB5PA==
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
