@@ -51,7 +51,7 @@
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.25.8",
     "jose": "^5.9.6",
-    "pino": "^9.5.0"
+    "pino": "^9.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
