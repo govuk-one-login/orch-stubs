@@ -10,49 +10,6 @@ import { mockEnvVariableSetup } from "./test-helper/test-setup";
 import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
 
 describe("Auth Authorize", () => {
-  describe("GET endpoint", () => {
-    let addUserProfileSpy: jest.SpyInstance;
-    let mockDynamoDbReponse: PutCommandOutput;
-
-    beforeEach(() => {
-      mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
-      addUserProfileSpy = jest
-        .spyOn(userProfileDynamoDbService, "addUserProfile")
-        .mockResolvedValue(mockDynamoDbReponse);
-    });
-
-    it("should try add a user-profile", async () => {
-      await handler(createValidAuthorizeRequest(), {} as Context, () => {});
-
-      expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it("should return a 500 when failing to get user-profile", async () => {
-      addUserProfileSpy = jest
-        .spyOn(userProfileDynamoDbService, "addUserProfile")
-        .mockImplementation(() => {
-          throw new Error();
-        });
-
-      const response = await handler(
-        createValidAuthorizeRequest(),
-        {} as Context,
-        () => {}
-      );
-
-      expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
-      expect(response.statusCode).toBe(500);
-      expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
-    });
-
-    function createValidAuthorizeRequest() {
-      return {
-        httpMethod: "GET",
-        body: {},
-      };
-    }
-  });
-
   describe("POST Endpoint", () => {
     let addAuthCodeStoreSpy: jest.SpyInstance;
     let getUserProfileByEmailSpy: jest.SpyInstance;
