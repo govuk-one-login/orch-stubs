@@ -47,6 +47,35 @@ export const handler: Handler = async (
 async function get(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  // const redirectUri = `${ROOT_URI}/orchestration-redirect`;
+
+  if (!event.body) {
+    throw new CodedError(400, "Missing request body");
+  }
+  // const url = new URL(redirectUri);
+
+  const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
+  const clientId = parsedBody.client_id;
+  const responseType = parsedBody.response_type;
+  // const email = parsedBody.email ?? "dummy.email@mail.com";
+  // const passwordResetTime = parsedBody.password_reset_time
+  //   ? Number(parsedBody.password_reset_time)
+  //   : 10;
+
+  // let claims: Claims;
+
+  try {
+    validateQueryParams(clientId, responseType);
+    const encryptedAuthRequestJWE = parsedBody["request"];
+    const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
+    await validateClaims(authRequestJweDecryptedAsJwt);
+  } catch (error) {
+    throw new CodedError(
+      400,
+      error instanceof Error ? error.message : "Unknown error."
+    );
+  }
+
   try {
     await addUserProfile(createUserPofile("dummy.email@mail.com"));
   } catch (error) {
