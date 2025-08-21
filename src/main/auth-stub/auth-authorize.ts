@@ -49,14 +49,19 @@ async function get(
 ): Promise<APIGatewayProxyResult> {
   // const redirectUri = `${ROOT_URI}/orchestration-redirect`;
 
-  if (!event.body) {
-    throw new CodedError(400, "Missing request body");
+  if (event.queryStringParameters == null) {
+    throw new CodedError(400, "Query string parameters are null");
+  }
+  const requestObject = event.queryStringParameters["request"] as string;
+
+  if (!requestObject) {
+    throw new CodedError(400, "Request query string parameter not found");
   }
   // const url = new URL(redirectUri);
 
-  const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
-  const clientId = parsedBody.client_id;
-  const responseType = parsedBody.response_type;
+  // const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
+  const clientId = event.queryStringParameters["client_id"] as string;
+  const responseType = event.queryStringParameters["response_type"] as string;
   // const email = parsedBody.email ?? "dummy.email@mail.com";
   // const passwordResetTime = parsedBody.password_reset_time
   //   ? Number(parsedBody.password_reset_time)
@@ -66,7 +71,7 @@ async function get(
 
   try {
     validateQueryParams(clientId, responseType);
-    const encryptedAuthRequestJWE = parsedBody["request"];
+    const encryptedAuthRequestJWE = requestObject;
     const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
     await validateClaims(authRequestJweDecryptedAsJwt);
   } catch (error) {
