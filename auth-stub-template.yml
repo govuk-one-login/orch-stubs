@@ -130,7 +130,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ENCRYPTION_KEY_ID: "{{resolve:secretsmanager:/orch-stubs/authentication-encryption-key-id:SecretString}}"
+          ENCRYPTION_KEY_ID: !GetAtt AuthEncryptionKey.KeyId
+          AUTH_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: !GetAtt AuthEncryptionKey.KeyId
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: "https://signin.sandpit.account.gov.uk/"
           # These will always be over-written when running locally in parameters.json
@@ -153,6 +154,7 @@ Resources:
         - !Ref AuthCodeTableWriteAccessPolicy
         - !Ref UserProfileTableReadAccessPolicy
         - !Ref UserProfileTableWriteAccessPolicy
+        - !Ref AuthEncryptionKeyAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -313,6 +315,17 @@ Resources:
               - dynamodb:UpdateItem
               - dynamodb:PutItem
             Resource: !GetAtt UserProfileTable.Arn
+
+  AuthEncryptionKeyAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowDecryptOfParameters
+            Effect: Allow
+            Action: kms:Decrypt
+            Resource: !GetAtt AuthEncryptionKey.Arn
   
   AuthEncryptionKeyAlias:
     Type: "AWS::KMS::Alias"
