@@ -151,6 +151,8 @@ Resources:
             Method: post
       Policies:
         - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref UserProfileTableReadAccessPolicy
+        - !Ref UserProfileTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -225,6 +227,7 @@ Resources:
       Policies:
         - !Ref AuthCodeTableWriteAccessPolicy
         - !Ref AccessTokenTableWriteAccessPolicy
+        - !Ref UserProfileTableReadAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
