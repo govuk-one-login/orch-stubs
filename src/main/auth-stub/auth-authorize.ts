@@ -10,8 +10,8 @@ import {
   getUserProfileByEmail,
 } from "./services/user-profile-dynamodb-service";
 import { getOrchToAuthExpectedClientId } from "./helpers/config";
-import { decrypt } from "./helpers/decryption-helper";
-import { validateClaims } from "./helpers/jwt-helper";
+// import { decrypt } from "./helpers/decryption-helper";
+// import { validateClaims } from "./helpers/jwt-helper";
 import { generateAuthCode } from "./helpers/auth-code-generator";
 import { Claims } from "./helpers/claims-config";
 import {
@@ -23,6 +23,7 @@ import {
 import { ROOT_URI } from "./data/auth-dummy-constants";
 import { createUserPofile } from "./helpers/mock-token-data-helper";
 import renderAuthAuthorize from "./render-auth-authorize";
+import { createMockClaims } from "./test-helper/test-data";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -60,8 +61,6 @@ async function get(
   // const url = new URL(redirectUri);
 
   // const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
-  const clientId = event.queryStringParameters["client_id"] as string;
-  const responseType = event.queryStringParameters["response_type"] as string;
   // const email = parsedBody.email ?? "dummy.email@mail.com";
   // const passwordResetTime = parsedBody.password_reset_time
   //   ? Number(parsedBody.password_reset_time)
@@ -70,10 +69,12 @@ async function get(
   // let claims: Claims;
 
   try {
+    const clientId = event.queryStringParameters["client_id"] as string;
+    const responseType = event.queryStringParameters["response_type"] as string;
     validateQueryParams(clientId, responseType);
-    const encryptedAuthRequestJWE = requestObject;
-    const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
-    await validateClaims(authRequestJweDecryptedAsJwt);
+    // const encryptedAuthRequestJWE = requestObject;
+    // const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
+    // await validateClaims(authRequestJweDecryptedAsJwt);
   } catch (error) {
     throw new CodedError(
       400,
@@ -101,26 +102,26 @@ async function post(
   const url = new URL(redirectUri);
 
   const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
-  const clientId = parsedBody.client_id;
-  const responseType = parsedBody.response_type;
+  // const clientId = parsedBody.client_id;
+  // const responseType = parsedBody.response_type;
   const email = parsedBody.email ?? "dummy.email@mail.com";
   const passwordResetTime = parsedBody.password_reset_time
     ? Number(parsedBody.password_reset_time)
     : 10;
 
-  let claims: Claims;
+  const claims: Claims = createMockClaims();
 
-  try {
-    validateQueryParams(clientId, responseType);
-    const encryptedAuthRequestJWE = parsedBody["request"];
-    const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
-    claims = await validateClaims(authRequestJweDecryptedAsJwt);
-  } catch (error) {
-    throw new CodedError(
-      400,
-      error instanceof Error ? error.message : "Unknown error."
-    );
-  }
+  // try {
+  //   validateQueryParams(clientId, responseType);
+  //   const encryptedAuthRequestJWE = parsedBody["request"];
+  //   const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
+  //   claims = await validateClaims(authRequestJweDecryptedAsJwt);
+  // } catch (error) {
+  //   throw new CodedError(
+  //     400,
+  //     error instanceof Error ? error.message : "Unknown error."
+  //   );
+  // }
 
   let authCode: string;
 
