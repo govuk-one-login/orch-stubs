@@ -131,7 +131,7 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           ENCRYPTION_KEY_ID: !GetAtt AuthEncryptionKey.KeyId
-          AUTH_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: !GetAtt AuthEncryptionKey.KeyId
+          AUTH_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/authentication-encryption-isaac-test:SecretString}}"
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: "https://signin.sandpit.account.gov.uk/"
           # These will always be over-written when running locally in parameters.json
