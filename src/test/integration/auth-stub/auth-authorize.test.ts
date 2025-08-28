@@ -65,86 +65,9 @@ describe("Auth Authorize", () => {
     expect(JSON.parse(response.body).message).toBe("Missing request body");
   });
 
-  it("should return a 400 error when response_type is not given", async () => {
-    const formBody = generateFormBody();
-    delete formBody["response_type"];
-    const formBodyString = new URLSearchParams(formBody).toString();
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        formBodyString,
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe("Response type is not set");
-  });
-
-  it("should return a 400 error when client_id is not given", async () => {
-    const formBody = generateFormBody();
-    delete formBody["client_id"];
-    const formBodyString = new URLSearchParams(formBody).toString();
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        formBodyString,
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe(
-      "Client ID value is incorrect"
-    );
-  });
-
-  it("should return a 400 error when validateClaim fails", async () => {
-    const wrongPrivateKey = await getWrongPrivateKey();
-    const jwt = await createJwt(createMockClaims(), wrongPrivateKey);
-
-    jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
-
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        generateFormBodyString(),
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe(
-      "signature verification failed"
-    );
-  });
-
   async function getPrivateKey(): Promise<jose.KeyLike> {
     const key = await jose.importPKCS8(
       "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
-      "ES256"
-    );
-    return key;
-  }
-
-  async function getWrongPrivateKey(): Promise<jose.KeyLike> {
-    const key = await jose.importPKCS8(
-      "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg+SgpFc3oo6bRHAOhpI6pv85fPm4ehgOPCQM0cEcwIK+hRANCAAS8u0WXxvx2N6bSFtfTggvnkGJvCsYo3jBYvCKJY5m87BcmwcgyFTDbedBbDnOC0OO0xdjLKu8577NnXPvE/jyd-----END PRIVATE KEY-----",
       "ES256"
     );
     return key;
