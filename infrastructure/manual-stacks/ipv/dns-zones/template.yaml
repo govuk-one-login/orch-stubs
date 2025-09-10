@@ -9,9 +9,6 @@ Parameters:
     AllowedValues:
       - dev
       - build
-      - staging
-      - integration
-      - production
 
 Mappings:
   EnvironmentConfiguration:
@@ -19,13 +16,6 @@ Mappings:
       ipvStubDomainName: ipvstub.oidc.authdev3.dev.account.gov.uk
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
-    staging:
-      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
-    integration:
-      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
-    production:
-      ipvStubDomainName: ipvstub.oidc.account.gov.uk
-
 Resources:
   IpvStubCertificate:
     Type: AWS::CertificateManager::Certificate

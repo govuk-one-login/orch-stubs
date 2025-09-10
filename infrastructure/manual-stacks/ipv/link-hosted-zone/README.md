@@ -24,7 +24,7 @@ profile that you can set as an environment variable, by running `export AWS_PROF
 **_NOTE:_** Make sure the hosted zone is created in the orchestration account first and then the NS values copied over to the right root account
 
 After this you can then run the below, replacing `<environment>`with one
-of `dev`, `build`, `staging`, `integration`, `production`:
+of `dev`, `build`:
 
 ```shell
 ./deploy_link_hosted_zone.sh <environment>
