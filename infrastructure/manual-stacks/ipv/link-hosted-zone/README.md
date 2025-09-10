@@ -13,7 +13,7 @@ into this template to deploy into the root domain account.
  - Integration = `gds-di-development`
  - Staging     = `di-auth-staging`
  - Build       = `gds-di-development`
- - Dev         = `gds-di-development`
+ - Dev         = `di-auth-development`
 
 ## Deployment
 
