@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 ENVIRONMENT=${1}
 
-sam deploy --stack-name $ENVIRONMENT-orch-stub-link-hosted-zone \
+sam deploy --stack-name $ENVIRONMENT-orch-ipv-stub-link-hosted-zone \
   --template-file template.yaml \
   --parameter-overrides Environment=$ENVIRONMENT \
   --tags \

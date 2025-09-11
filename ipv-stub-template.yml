@@ -27,25 +27,15 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      ipvStubDomainName: ipvstub.oidc.sandpit.account.gov.uk
-      orchJwksUrl: https://oidc.sandpit.account.gov.uk/.well-known/ipv-jwks.json
+      ipvStubDomainName: ipvstub.oidc.authdev3.dev.account.gov.uk
+      orchJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/ipv-jwks.json
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
       orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/ipv-jwks.json
-    staging:
-      ipvStubDomainName: ipvstub.oidc.staging.account.gov.uk
-      orchJwksUrl: https://oidc.staging.account.gov.uk/.well-known/ipv-jwks.json
-    integration:
-      ipvStubDomainName: ipvstub.oidc.integration.account.gov.uk
-      orchJwksUrl: https://oidc.integration.account.gov.uk/.well-known/ipv-jwks.json
-    production:
-      ipvStubDomainName: ipvstub.oidc.account.gov.uk
-      orchJwksUrl: https://oidc.account.gov.uk/.well-known/ipv-jwks.json
 
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
-  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
   IsLocalEnv: !Equals [!Ref Environment, local]
 
 Globals:
@@ -162,10 +152,7 @@ Resources:
           ENVIRONMENT: !Sub ${Environment}
           ORCH_PUBLIC_SIGNING_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
-          IPV_AUDIENCE: !If
-            - IsNotProduction
-            - !Sub https://identity.${Environment}.account.gov.uk/
-            - https://identity.account.gov.uk/
+          IPV_AUDIENCE: !Sub https://identity.${Environment}.account.gov.uk/
       Events:
         Get:
           Type: Api
