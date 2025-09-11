@@ -1,11 +1,13 @@
 # Manual stacks - DNS
+
 ## Intro
 
 The SAM template creates a DNS record and certificate for `ipvstub.oidc.<environment>.account.gov.uk`
-Note that the `dev` environment gets mapped to `authdev3.dev`. 
+Note that the `dev` environment gets mapped to `authdev3.dev`.
 
-This Stack is deployed manually once per environment as part of the DNS set up process. 
+This Stack is deployed manually once per environment as part of the DNS set up process.
 
+**_NOTE:_** Make sure the link-hosted-zone stack is deployed otherwise this stack will fail to create the certificate.
 
 ## Deployment
 
