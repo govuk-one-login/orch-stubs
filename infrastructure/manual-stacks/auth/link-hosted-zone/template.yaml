@@ -9,9 +9,6 @@ Parameters:
     AllowedValues:
       - dev
       - build
-      - staging
-      - integration
-      - production
 
 Mappings:
   EnvironmentConfiguration:
@@ -33,15 +30,6 @@ Mappings:
             ns-1961.awsdns-53.co.uk,
             ns-1311.awsdns-35.org
           ]
-    staging:
-      oidcHostedZoneId: Z013545810R9Q9A5U2JW5
-      authStubDomainName: authstub.oidc.staging.account.gov.uk
-    integration:
-      oidcHostedZoneId: Z015965529V3Z8WL9WJMF
-      authStubDomainName: authstub.oidc.integration.account.gov.uk
-    production:
-      oidcHostedZoneId: Z06269462RT1OC3QFCZZE
-      authStubDomainName: authstub.oidc.account.gov.uk
 
 Resources:
   AuthStubNSRecord:
