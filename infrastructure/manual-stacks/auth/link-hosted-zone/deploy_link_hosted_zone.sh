@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ENVIRONMENT=${1}
 
 sam deploy --stack-name $ENVIRONMENT-orch-auth-stub-link-hosted-zone \
