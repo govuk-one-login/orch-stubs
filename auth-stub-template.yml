@@ -161,6 +161,7 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+        UseNpmCi: True
 
   AuthTokenLambda:
     Type: AWS::Serverless::Function
@@ -199,6 +200,7 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+        UseNpmCi: True
 
   AuthUserInfoLambda:
     Type: AWS::Serverless::Function
@@ -236,6 +238,7 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+        UseNpmCi: True
 
   AuthCodeTableReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy

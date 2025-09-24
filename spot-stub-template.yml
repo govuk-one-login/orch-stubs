@@ -82,6 +82,7 @@ Resources:
         Minify: true
         Sourcemap: true
         Target: node20
+        UseNpmCi: True
 
   SpotResponseQueueWritePolicy:
     Type: AWS::IAM::ManagedPolicy
