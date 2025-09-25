@@ -1,11 +1,11 @@
 # Manual stacks - DNS
+
 ## Intro
 
-The SAM template creates a DNS record and certificate for `authstub.oidc.<environment>.account.gov.uk` (or `authstub.oidc.account.gov.uk` if environment is `production`).
-Note that the `dev` environment gets mapped to `authdev3`. 
+The SAM template creates a DNS record and certificate for `authstub.oidc.<environment>.account.gov.uk`.
+Note that the `dev` environment gets mapped to `authdev3`.
 
-This Stack is deployed manually once per environment as part of the DNS set up process. 
-
+This Stack is deployed manually once per environment as part of the DNS set up process.
 
 ## Deployment
 
@@ -17,7 +17,7 @@ to login into that profile to use.
 **_NOTE:_** Make sure the link-hosted-zone stack is deployed otherwwise this stack will fail to create the certificate.
 
 After this you can then run the below, replacing `<environment>`with one
-of `dev`, `build`, `staging`, `integration`, `production`:
+of `dev`, `build`:
 
 ```shell
 ./deploy_dns_zone.sh <environment>

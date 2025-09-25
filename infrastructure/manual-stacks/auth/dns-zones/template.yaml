@@ -9,9 +9,6 @@ Parameters:
     AllowedValues:
       - dev
       - build
-      - staging
-      - integration
-      - production
 
 Mappings:
   EnvironmentConfiguration:
@@ -19,12 +16,6 @@ Mappings:
       authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
-    staging:
-      authStubDomainName: authstub.oidc.staging.account.gov.uk
-    integration:
-      authStubDomainName: authstub.oidc.integration.account.gov.uk
-    production:
-      authStubDomainName: authstub.oidc.account.gov.uk
 
 Resources:
   AuthStubCertificate:

@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Authentication, IPV and SPOT stubs
 
@@ -11,7 +11,9 @@ Parameters:
   Environment:
     Type: String
     Description: The name of the environment to deploy to
-    Default: none
+    AllowedValues:
+      - dev
+      - build
   CodeSigningConfigArn:
     Type: String
     Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
@@ -31,9 +33,11 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
+      authDomain: authdev3.dev.account.gov.uk
       orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHzG8IFx1jE1+Ul44jQk96efPknCXVxWS4PqLrKfR/31UQovFQLfyxA46uiMOvr7+0hRwFX1fQhagsIK+dfB5PA==
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
+      authDomain: build.account.gov.uk
       orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==
 
 Globals:
@@ -118,7 +122,6 @@ Resources:
       StageName: Live
       AlwaysDeploy: true
 
-
   AuthAuthorizeLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -132,7 +135,14 @@ Resources:
           ENVIRONMENT: !Sub ${Environment}
           ENCRYPTION_KEY_ID: "{{resolve:secretsmanager:/orch-stubs/authentication-encryption-key-id:SecretString}}"
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
-          ORCH_TO_AUTH_AUDIENCE: "https://signin.sandpit.account.gov.uk/"
+          ORCH_TO_AUTH_AUDIENCE: !Sub
+            - "https://signin.${authDomain}/"
+            - authDomain:
+                !FindInMap [
+                  EnvironmentConfiguration,
+                  !Ref Environment,
+                  authDomain,
+                ]
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           DUMMY_ENCRYPTION_PUBLIC_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
@@ -174,11 +184,12 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY: !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                orchToAuthSigningPublicKey,
-              ]
+          ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              orchToAuthSigningPublicKey,
+            ]
       Events:
         Get:
           Type: Api
@@ -317,7 +328,7 @@ Resources:
               - dynamodb:UpdateItem
               - dynamodb:PutItem
             Resource: !GetAtt UserProfileTable.Arn
-  
+
   AuthEncryptionKeyAlias:
     Type: "AWS::KMS::Alias"
     Properties:

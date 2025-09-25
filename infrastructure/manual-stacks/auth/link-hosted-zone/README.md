@@ -9,9 +9,6 @@ into this template to deploy into the root domain account.
 
 ### Root Domain accounts
 
- - Production  = `gds-di-production`
- - Integration = `gds-di-development`
- - Staging     = `di-auth-staging`
  - Build       = `gds-di-development`
  - Dev         = `di-auth-development`
 
@@ -25,7 +22,7 @@ to login into that profile to use.
 **_NOTE:_** Make sure the hosted zone is created in the orchestration account first and then the NS values copied over to the right root account
 
 After this you can then run the below, replacing `<environment>`with one
-of `dev`, `build`, `staging`, `integration`, `production`:
+of `dev`, `build`:
 
 ```shell
 ./deploy_link_hosted_zone.sh <environment>
