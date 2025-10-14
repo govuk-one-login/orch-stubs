@@ -1,4 +1,4 @@
-import * as jose from "jose";
+import { CryptoKey, importPKCS8, SignJWT } from "jose";
 import { Claims, requiredClaimsKeys } from "../helpers/claims-config";
 
 export function createMockClaims(): Claims {
@@ -43,16 +43,16 @@ export function createListOfMissingMockClaims(): Array<Array<string | Claims>> {
   return listOfMissingClaims;
 }
 
-export async function getPrivateKey(): Promise<jose.KeyLike> {
-  const key = await jose.importPKCS8(
+export async function getPrivateKey(): Promise<CryptoKey> {
+  const key = await importPKCS8(
     "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
     "ES256"
   );
   return key;
 }
 
-export async function getWrongPrivateKey(): Promise<jose.KeyLike> {
-  const key = await jose.importPKCS8(
+export async function getWrongPrivateKey(): Promise<CryptoKey> {
+  const key = await importPKCS8(
     "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg+SgpFc3oo6bRHAOhpI6pv85fPm4ehgOPCQM0cEcwIK+hRANCAAS8u0WXxvx2N6bSFtfTggvnkGJvCsYo3jBYvCKJY5m87BcmwcgyFTDbedBbDnOC0OO0xdjLKu8577NnXPvE/jyd-----END PRIVATE KEY-----",
     "ES256"
   );
@@ -62,9 +62,9 @@ export async function getWrongPrivateKey(): Promise<jose.KeyLike> {
 export async function createJwt(
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   jwtObject: any,
-  privateKey: jose.KeyLike
+  privateKey: CryptoKey
 ): Promise<string> {
-  const jwt = await new jose.SignJWT(jwtObject)
+  const jwt = await new SignJWT(jwtObject)
     .setProtectedHeader({ alg: "ES256" })
     .sign(privateKey);
   return jwt;

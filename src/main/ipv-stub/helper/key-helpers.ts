@@ -5,7 +5,7 @@ import {
   importPKCS8,
   importSPKI,
   JWSHeaderParameters,
-  KeyLike,
+  CryptoKey,
 } from "jose";
 import { logger } from "../../../main/logger";
 import { getEnv } from "./env-helper";
@@ -14,7 +14,7 @@ import { CodedError } from "../../helper/result-helper";
 type JWKSVerifier = (
   protectedHeader?: JWSHeaderParameters,
   token?: FlattenedJWSInput
-) => Promise<KeyLike>;
+) => Promise<CryptoKey>;
 export const getOrchJwks = (): JWKSVerifier => {
   const localJwks = getEnv("DUMMY_ORCH_JWKS", false);
   if (localJwks) {
@@ -31,7 +31,7 @@ export const getOrchJwks = (): JWKSVerifier => {
   }
 };
 
-export const getIpvPrivateKey = async (): Promise<KeyLike> => {
+export const getIpvPrivateKey = async (): Promise<CryptoKey> => {
   const ipvPrivateKeyPem = getEnv("IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY");
   try {
     return importPKCS8(ipvPrivateKeyPem, "RSA-OAEP-256");
@@ -43,7 +43,7 @@ export const getIpvPrivateKey = async (): Promise<KeyLike> => {
   }
 };
 
-export const getIpvPublicKey = async (): Promise<KeyLike> => {
+export const getIpvPublicKey = async (): Promise<CryptoKey> => {
   const ipvPublicKeyPem = getEnv("IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY");
   try {
     return importSPKI(ipvPublicKeyPem, "RSA-OAEP-256");

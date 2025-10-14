@@ -1,4 +1,4 @@
-import { KeyLike } from "jose";
+import { CryptoKey } from "jose";
 import {
   createJwt,
   createListOfMissingMockClaims,
@@ -13,8 +13,8 @@ import { CodedError } from "../../helper/result-helper";
 
 describe("JWT service", () => {
   let claims: Claims;
-  let privateKey: KeyLike;
-  let wrongPrivateKey: KeyLike;
+  let privateKey: CryptoKey;
+  let wrongPrivateKey: CryptoKey;
   let validJwt: string;
   const listOfMissingClaims: Array<Array<string | Claims>> =
     createListOfMissingMockClaims();

@@ -1,10 +1,10 @@
-import * as jose from "jose";
+import { importSPKI, JWTPayload, jwtVerify } from "jose";
 import { getAuthPublicKey } from "./key-helpers";
 import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config";
 import { CodedError } from "../../helper/result-helper";
 
 export const validateClaims = async (jwt: string): Promise<Claims> => {
-  let claims: jose.JWTPayload;
+  let claims: JWTPayload;
 
   try {
     claims = await validateUsingKey(jwt);
@@ -22,11 +22,11 @@ export const validateClaims = async (jwt: string): Promise<Claims> => {
   return validateCustomClaims(claims);
 };
 
-const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
+const validateUsingKey = async (jwt: string): Promise<JWTPayload> => {
   const publicKey = getAuthPublicKey();
-  const keyObject = await jose.importSPKI(publicKey, "ES256");
+  const keyObject = await importSPKI(publicKey, "ES256");
 
-  const result = await jose.jwtVerify(jwt, keyObject, {
+  const result = await jwtVerify(jwt, keyObject, {
     requiredClaims: requiredClaimsKeys,
     clockTolerance: 30,
   });
