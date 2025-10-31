@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "module": "node16",
     "lib": ["es2023"],
     "target": "es2022",
+    "noImplicitAny": true,
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "rootDir": "./src",
     "outDir": "dist",
