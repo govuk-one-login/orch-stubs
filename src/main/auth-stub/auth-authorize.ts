@@ -45,7 +45,6 @@ export const handler: Handler = async (
 };
 
 async function get(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -54,7 +53,7 @@ async function get(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return successfulHtmlResult(200, renderAuthAuthorize());
+  return successfulHtmlResult(200, renderAuthAuthorize(event));
 }
 
 async function post(
