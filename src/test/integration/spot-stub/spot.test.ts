@@ -60,7 +60,7 @@ describe("SPOT stub handler", () => {
       status: "ACCEPTED",
       sub: "",
     });
-  });
+  }, 10000);
 });
 
 function generateSqsMessage(body: string) {

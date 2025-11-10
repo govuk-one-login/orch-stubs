@@ -37,6 +37,10 @@ async function processRecord(
 ): Promise<Result<void, SQSBatchItemFailure>> {
   logger.info("Received record: " + JSON.stringify(record));
   const input: SpotRequest = JSON.parse(record.body);
+
+  logger.info("Waiting 5 seconds to send the spot response");
+  await new Promise((r) => setTimeout(r, 5000));
+
   const output: SpotResponse = {
     sub: input.out_sub,
     log_ids: input.log_ids,
