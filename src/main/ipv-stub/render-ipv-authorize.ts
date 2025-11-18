@@ -1,6 +1,6 @@
 import { JWTPayload, ProtectedHeaderParameters } from "jose";
-import { renderPage } from "../template";
-import config, { getTrustmarkUri } from "./config/config";
+import { renderPage } from "../template.ts";
+import config, { getTrustmarkUri } from "./config/config.ts";
 
 export default function renderIPVAuthorize(
   decodedHeader: ProtectedHeaderParameters,

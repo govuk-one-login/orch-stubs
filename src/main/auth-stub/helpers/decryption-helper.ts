@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import { base64DecodeToUint8Array } from "./encoding";
-import { getContentEncryptionKey } from "./key-helpers";
-import { CodedError } from "../../helper/result-helper";
+import { base64DecodeToUint8Array } from "./encoding.ts";
+import { getContentEncryptionKey } from "./key-helpers.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 export const decrypt = async (
   encryptedJwe: string | undefined

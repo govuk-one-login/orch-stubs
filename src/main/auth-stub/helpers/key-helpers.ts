@@ -1,13 +1,13 @@
-import { logger } from "../../../main/logger";
-import { getEnv } from "./env-helper";
+import { logger } from "../../../main/logger.ts";
+import { getEnv } from "./env-helper.ts";
 import {
   DecryptCommandInput,
   DecryptCommandOutput,
   EncryptionAlgorithmSpec,
   KMS,
 } from "@aws-sdk/client-kms";
-import { base64DecodeToUint8Array } from "./encoding";
-import { getAwsRegion, getKmsKeyId } from "./config";
+import { base64DecodeToUint8Array } from "./encoding.ts";
+import { getAwsRegion, getKmsKeyId } from "./config.ts";
 
 export const getContentEncryptionKey = async (
   encryptedKey: string

@@ -1,12 +1,12 @@
 import { Context } from "aws-lambda";
-import { handler } from "./auth-userinfo";
-import * as requestHeaderHelper from "./helpers/request-header-helper";
-import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service";
-import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
+import { handler } from "./auth-userinfo.ts";
+import * as requestHeaderHelper from "./helpers/request-header-helper.ts";
+import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service.ts";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service.ts";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { AccessTokenStore } from "./interfaces/access-token-store-interface";
-import { CodedError } from "../helper/result-helper";
-import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
+import { AccessTokenStore } from "./interfaces/access-token-store-interface.ts";
+import { CodedError } from "../helper/result-helper.ts";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
 
 describe("Auth User Info", () => {
   const mockEmail = "testEmail";

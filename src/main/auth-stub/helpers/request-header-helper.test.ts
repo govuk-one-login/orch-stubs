@@ -2,7 +2,7 @@ import { APIGatewayProxyEventHeaders } from "aws-lambda";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,
-} from "./request-header-helper";
+} from "./request-header-helper.ts";
 
 describe("Request header helper", () => {
   describe("getHeaderValueFromHeaders tests", () => {

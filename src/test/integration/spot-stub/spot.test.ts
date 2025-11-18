@@ -1,6 +1,6 @@
 import { SQSEvent } from "aws-lambda";
-import { SpotRequest } from "../../../main/spot-stub/spot-request";
-import { handler } from "../../../main/spot-stub/spot";
+import { SpotRequest } from "../../../main/spot-stub/spot-request.ts";
+import { handler } from "../../../main/spot-stub/spot.ts";
 import * as process from "node:process";
 import {
   CreateQueueCommand,

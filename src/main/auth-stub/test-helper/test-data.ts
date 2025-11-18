@@ -1,5 +1,5 @@
 import { CryptoKey, importPKCS8, SignJWT } from "jose";
-import { Claims, requiredClaimsKeys } from "../helpers/claims-config";
+import { Claims, requiredClaimsKeys } from "../helpers/claims-config.ts";
 
 export function createMockClaims(): Claims {
   const timestamp = Math.floor(new Date().getTime() / 1000);

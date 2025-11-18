@@ -1,5 +1,5 @@
 import { createPublicKey, KeyObject } from "crypto";
-import { getEnv } from "./env-helper";
+import { getEnv } from "./env-helper.ts";
 
 export const getAwsRegion = (): string => {
   const envAwsRegion = getEnv("AWS_REGION");

@@ -8,6 +8,12 @@ const config: Config = {
   testEnvironment: "node",
   testPathIgnorePatterns: ["/node_modules/"],
   setupFiles: ["<rootDir>/src/test/integration/setup.ts"],
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+  },
+  moduleNameMapper: {
+    "^jose": require.resolve("jose"),
+  },
 };
 
 export default config;

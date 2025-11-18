@@ -1,16 +1,16 @@
-import { AuthCodeStore } from "../interfaces/auth-code-store-interface";
+import { AuthCodeStore } from "../interfaces/auth-code-store-interface.ts";
 import {
   createAuthCodeStore,
   createAuthCodeStoreThatHasBeenUsed,
   createAuthCodeStoreThatHasExpired,
-} from "../test-helper/mock-auth-code-data-helper";
+} from "../test-helper/mock-auth-code-data-helper.ts";
 import {
   validateAuthCode,
   ensureClientAssertionType,
   validatePlainTextParameters,
   verifyClientAssertion,
-} from "./token-validation-helper";
-import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service";
+} from "./token-validation-helper.ts";
+import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service.ts";
 import { generateKeyPairSync, KeyPairKeyObjectResult } from "crypto";
 import { SignJWT } from "jose";
 

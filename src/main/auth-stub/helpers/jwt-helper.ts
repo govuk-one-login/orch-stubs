@@ -1,7 +1,7 @@
 import { importSPKI, JWTPayload, jwtVerify } from "jose";
-import { getAuthPublicKey } from "./key-helpers";
-import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config";
-import { CodedError } from "../../helper/result-helper";
+import { getAuthPublicKey } from "./key-helpers.ts";
+import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 export const validateClaims = async (jwt: string): Promise<Claims> => {
   let claims: JWTPayload;

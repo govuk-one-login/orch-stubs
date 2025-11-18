@@ -2,11 +2,11 @@ import {
   addAuthCodeStore,
   getAuthCodeStore,
   updateHasBeenUsedAuthCodeStore,
-} from "./auth-code-dynamodb-service";
+} from "./auth-code-dynamodb-service.ts";
 import {
   createAuthCodeStore,
   createAuthCodeStoreInput,
-} from "../test-helper/mock-auth-code-data-helper";
+} from "../test-helper/mock-auth-code-data-helper.ts";
 
 const TEST_AUTH_CODE = "testAuthCode";
 

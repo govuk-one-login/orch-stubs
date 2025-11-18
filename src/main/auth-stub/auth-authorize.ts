@@ -3,26 +3,26 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { AuthCodeStoreInput } from "./interfaces/auth-code-store-interface";
-import { addAuthCodeStore } from "./services/auth-code-dynamodb-service";
+import { AuthCodeStoreInput } from "./interfaces/auth-code-store-interface.ts";
+import { addAuthCodeStore } from "./services/auth-code-dynamodb-service.ts";
 import {
   addUserProfile,
   getUserProfileByEmail,
-} from "./services/user-profile-dynamodb-service";
-import { getOrchToAuthExpectedClientId } from "./helpers/config";
-import { decrypt } from "./helpers/decryption-helper";
-import { validateClaims } from "./helpers/jwt-helper";
-import { generateAuthCode } from "./helpers/auth-code-generator";
-import { Claims } from "./helpers/claims-config";
+} from "./services/user-profile-dynamodb-service.ts";
+import { getOrchToAuthExpectedClientId } from "./helpers/config.ts";
+import { decrypt } from "./helpers/decryption-helper.ts";
+import { validateClaims } from "./helpers/jwt-helper.ts";
+import { generateAuthCode } from "./helpers/auth-code-generator.ts";
+import { Claims } from "./helpers/claims-config.ts";
 import {
   CodedError,
   handleErrors,
   successfulHtmlResult,
   successfulJsonResult,
-} from "../helper/result-helper";
-import { ROOT_URI } from "./data/auth-dummy-constants";
-import { createUserPofile } from "./helpers/mock-token-data-helper";
-import renderAuthAuthorize from "./render-auth-authorize";
+} from "../helper/result-helper.ts";
+import { ROOT_URI } from "./data/auth-dummy-constants.ts";
+import { createUserPofile } from "./helpers/mock-token-data-helper.ts";
+import renderAuthAuthorize from "./render-auth-authorize.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent

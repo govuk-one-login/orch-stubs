@@ -1,6 +1,6 @@
 import { generateKeyPairSync } from "crypto";
-import * as config from "../helpers/config";
-import * as keyHelper from "../helpers/key-helpers";
+import * as config from "../helpers/config.ts";
+import * as keyHelper from "../helpers/key-helpers.ts";
 
 export const mockEnvVariableSetup = () => {
   const ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });

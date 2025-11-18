@@ -1,6 +1,6 @@
 import { KeyObject } from "crypto";
-import * as config from "../../../../main/auth-stub/helpers/config";
-import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers";
+import * as config from "../../../../main/auth-stub/helpers/config.ts";
+import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers.ts";
 
 export const orchToAuthExpectedClientId = "orchestrationAuth";
 

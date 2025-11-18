@@ -1,15 +1,15 @@
 import { exportPKCS8, importPKCS8, SignJWT } from "jose";
-import { IpvTokenResponse } from "../../../main/ipv-stub/interfaces/ipv-token-response-interface";
+import { IpvTokenResponse } from "../../../main/ipv-stub/interfaces/ipv-token-response-interface.ts";
 import {
   getUserIdentity,
   putUserIdentity,
   resetUserIdentityTable,
-} from "./helper/dynamo-helper";
-import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants";
+} from "./helper/dynamo-helper.ts";
+import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
 import localParams from "../../../../parameters.json";
 import { generateKeyPairSync } from "crypto";
-import { handler } from "../../../main/ipv-stub/ipv-token";
-import { createApiGatewayEvent } from "../util";
+import { handler } from "../../../main/ipv-stub/ipv-token.ts";
+import { createApiGatewayEvent } from "../util.ts";
 
 describe("IPV Token", () => {
   const AUTH_CODE = "12345";

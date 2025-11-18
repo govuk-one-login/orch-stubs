@@ -4,12 +4,12 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { getIpvPublicKey } from "./helper/key-helpers";
+import { getIpvPublicKey } from "./helper/key-helpers.ts";
 import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-} from "../helper/result-helper";
+} from "../helper/result-helper.ts";
 import { createHash } from "node:crypto";
 
 export const handler: Handler = async (

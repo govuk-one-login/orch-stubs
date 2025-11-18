@@ -7,9 +7,9 @@ import {
   JWSHeaderParameters,
   CryptoKey,
 } from "jose";
-import { logger } from "../../../main/logger";
-import { getEnv } from "./env-helper";
-import { CodedError } from "../../helper/result-helper";
+import { logger } from "../../../main/logger.ts";
+import { getEnv } from "./env-helper.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 type JWKSVerifier = (
   protectedHeader?: JWSHeaderParameters,

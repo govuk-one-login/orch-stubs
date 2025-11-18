@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
+    "module": "node16",
     "lib": ["es2023"],
     "target": "es2022",
     "noImplicitAny": true,
-    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "rootDir": "./src",
     "outDir": "dist",
@@ -14,7 +14,9 @@
     "sourceMap": true,
     "strict": true,
     "typeRoots": ["@types", "node_modules/@types"],
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/tests", "coverage", "src/**/**/tests"]

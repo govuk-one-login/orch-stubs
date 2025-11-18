@@ -1,4 +1,4 @@
-import { CodedError } from "../../helper/result-helper";
+import { CodedError } from "../../helper/result-helper.ts";
 
 export function base64DecodeToUint8Array(value: string): Uint8Array {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);

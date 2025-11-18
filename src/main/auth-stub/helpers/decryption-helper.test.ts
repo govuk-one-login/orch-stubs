@@ -1,5 +1,5 @@
-import { decrypt } from "./decryption-helper";
-import * as keyHelper from "./key-helpers";
+import { decrypt } from "./decryption-helper.ts";
+import * as keyHelper from "./key-helpers.ts";
 
 const jwe =
   "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.ZjhoKAi_KnCTbSTKjX8WIwdEXo_XuNbDRzJRtmt3mLS6FCXaaUTyyOXi4qQyZNjA2Fxn6D4UB121kmF58mcyDrhHtSN-ebT3wnsJ_VOd5Mv0IVRNRAQnAW15dWgJy_uLHva6IKgL6GNrH9DYrPhEG1f9e6b8qMZiag3OAmtX6bZAtHFikw3i9Dvhdx_HMKCO1nX5z5qatF8K6XxAjq1-W0TT5OllJQC8aiE2Xtznu23Uft2jnrdqidvaG0JBdaMjIvcy-cvVaogW4WyUyXGLvna4hC7fmU2TZYqtk63bhv4XYrCfEwNe5qLDXW8-G6EyJO6C3OTMh8otvm1_EDS3LQ.78xU5KBJixV96DRA.YqpzvqoyiDCjUJj2qIhg1k3SuxFdK4l2ou4uja1g-aQjcJZ15C-9szBXCBtYNqqGuoymgi_mcJNyf0DaCkAcsUFyQhe2fQv9YkkkhwcJSe47DDnLNiJyL7hA8cJpDJkzrxoRzVdimbaCEUs_pkYPMi3ojEivE2Fpz7rg5yCLf_VjR5SLlohWSG7qJ1ypkpon4JJjYGKVTzu98XLJuSVqdJq_81pwSn-OMm5V90qmNozzeA.2dFUI2yJLGxgo6yEDfqtjw";

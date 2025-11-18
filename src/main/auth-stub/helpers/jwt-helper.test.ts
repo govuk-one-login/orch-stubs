@@ -5,11 +5,11 @@ import {
   createMockClaims,
   getPrivateKey,
   getWrongPrivateKey,
-} from "../test-helper/test-data";
-import { validateClaims } from "./jwt-helper";
-import { Claims } from "./claims-config";
-import { mockEnvVariableSetup } from "../test-helper/test-setup";
-import { CodedError } from "../../helper/result-helper";
+} from "../test-helper/test-data.ts";
+import { validateClaims } from "./jwt-helper.ts";
+import { Claims } from "./claims-config.ts";
+import { mockEnvVariableSetup } from "../test-helper/test-setup.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 describe("JWT service", () => {
   let claims: Claims;

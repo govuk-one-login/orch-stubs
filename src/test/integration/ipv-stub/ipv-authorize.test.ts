@@ -2,13 +2,13 @@ import {
   getState,
   getUserIdentity,
   resetUserIdentityTable,
-} from "./helper/dynamo-helper";
+} from "./helper/dynamo-helper.ts";
 import { CompactEncrypt, importPKCS8, SignJWT } from "jose";
-import formConfig from "../../../main/ipv-stub/config/config";
+import formConfig from "../../../main/ipv-stub/config/config.ts";
 import localParams from "../../../../parameters.json";
 import { createPublicKey, randomUUID } from "crypto";
-import { handler } from "./../../../main/ipv-stub/ipv-authorize";
-import { createApiGatewayEvent } from "../util";
+import { handler } from "./../../../main/ipv-stub/ipv-authorize.ts";
+import { createApiGatewayEvent } from "../util.ts";
 import { Context } from "aws-lambda";
 
 const STATE = "test-state";

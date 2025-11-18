@@ -1,7 +1,7 @@
-import { logger } from "../../logger";
-import { CodedError } from "../../helper/result-helper";
-import { getAuthCodeStore } from "../services/auth-code-dynamodb-service";
-import { decodeJwt, jwtVerify, CryptoKey } from "jose";
+import { logger } from "../../logger.ts";
+import { CodedError } from "../../helper/result-helper.ts";
+import { getAuthCodeStore } from "../services/auth-code-dynamodb-service.ts";
+import { decodeJwt, jwtVerify, KeyObject } from "jose";
 
 export const validateAuthCode = async (authCode: string | undefined) => {
   if (!authCode) {
@@ -81,7 +81,7 @@ export const verifyClientAssertion = async (
   body: {
     [k: string]: string;
   },
-  signingKey: CryptoKey
+  signingKey: KeyObject
 ) => {
   const clientAssertion = body["client_assertion"];
   if (!clientAssertion) {

@@ -1,23 +1,23 @@
-import { createApiGatewayEvent } from "../util";
-import { handler } from "../../../main/auth-stub/auth-token";
+import { createApiGatewayEvent } from "../util.ts";
+import { handler } from "../../../main/auth-stub/auth-token.ts";
 import {
   addAuthCodeStore,
   getAccessTokenStore,
   getAuthCodeStore,
   resetAccessTokenStore,
   resetAuthCodeStore,
-} from "./helpers/dynamo-helper";
+} from "./helpers/dynamo-helper.ts";
 import {
   createAuthCodeStoreInput,
   createAuthCodeStoreThatHasBeenUsed,
-} from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper";
+} from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper.ts";
 import { SignJWT } from "jose";
 import { generateKeyPairSync, KeyObject, KeyPairKeyObjectResult } from "crypto";
 import {
   mockEnvVariableSetup,
   mockSigningKeyEnv,
   orchToAuthExpectedClientId,
-} from "./helpers/test-setup";
+} from "./helpers/test-setup.ts";
 
 interface AuthTokenResponse {
   access_token: string;

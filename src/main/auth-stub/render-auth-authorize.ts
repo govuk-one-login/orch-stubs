@@ -1,4 +1,4 @@
-import { renderPage } from "../template";
+import { renderPage } from "../template.ts";
 
 export default function renderAuthAuthorize() {
   return renderPage(

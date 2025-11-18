@@ -1,15 +1,15 @@
-import { createApiGatewayEvent } from "../util";
-import { handler } from "../../../main/auth-stub/auth-authorize";
+import { createApiGatewayEvent } from "../util.ts";
+import { handler } from "../../../main/auth-stub/auth-authorize.ts";
 import { CryptoKey, importPKCS8, SignJWT } from "jose";
-import { Claims } from "src/main/auth-stub/helpers/claims-config";
-import { mockEnvVariableSetup } from "./helpers/test-setup";
-import * as decryptionHelper from "../../../main/auth-stub/helpers/decryption-helper";
+import { Claims } from "src/main/auth-stub/helpers/claims-config.ts";
+import { mockEnvVariableSetup } from "./helpers/test-setup.ts";
+import * as decryptionHelper from "../../../main/auth-stub/helpers/decryption-helper.ts";
 import {
   addUserProfile,
   resetAuthCodeStore,
   resetUserProfile,
-} from "./helpers/dynamo-helper";
-import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token-data-helper";
+} from "./helpers/dynamo-helper.ts";
+import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
 
 describe("Auth Authorize", () => {
   const EMAIL = "dummy.email@mail.com";

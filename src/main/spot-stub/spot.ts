@@ -1,15 +1,15 @@
 import { SQSBatchResponse, SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
-import { SQSBatchItemFailure } from "aws-lambda/trigger/sqs";
-import { ok, fail, Result } from "../types/result";
+import { SQSBatchItemFailure } from "aws-lambda/trigger/sqs.ts";
+import { ok, fail, Result } from "../types/result.ts";
 import {
   SendMessageCommand,
   SQSClient,
   SQSClientConfig,
 } from "@aws-sdk/client-sqs";
 import * as process from "node:process";
-import { logger } from "../logger";
-import { SpotRequest } from "./spot-request";
-import { SpotResponse } from "./spot-response";
+import { logger } from "../logger.ts";
+import { SpotRequest } from "./spot-request.ts";
+import { SpotResponse } from "./spot-response.ts";
 
 const sqsConfig: SQSClientConfig = process.env.LOCALSTACK_ENDPOINT
   ? { endpoint: process.env.LOCALSTACK_ENDPOINT }

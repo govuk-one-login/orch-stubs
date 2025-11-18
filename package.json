@@ -51,6 +51,7 @@
     "@aws-sdk/lib-dynamodb": "^3.883.0",
     "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@babel/preset-env": "^7.28.3",
+    "@babel/preset-typescript": "^7.27.1",
     "@types/node-jose": "^1.1.13",
     "babel-plugin-explicit-exports-references": "^1.0.2",
     "esbuild": "^0.25.8",

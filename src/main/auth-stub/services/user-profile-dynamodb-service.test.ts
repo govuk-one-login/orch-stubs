@@ -1,8 +1,8 @@
-import { createUserProfile } from "../test-helper/mock-user-profile-data-helper";
+import { createUserProfile } from "../test-helper/mock-user-profile-data-helper.ts";
 import {
   getUserProfileByEmail,
   getUserProfileBySubjectId,
-} from "./user-profile-dynamodb-service";
+} from "./user-profile-dynamodb-service.ts";
 
 const EMAIL = "testEmail@gov.uk";
 const SUBJECT_ID = "testSubjectId";

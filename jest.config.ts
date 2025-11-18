@@ -8,6 +8,9 @@ const config: Config = {
   transform: {
     "^.+\\.(ts|tsx)$": "babel-jest",
   },
+  moduleNameMapper: {
+    "^jose": require.resolve("jose"),
+  },
 };
 
 export default config;
