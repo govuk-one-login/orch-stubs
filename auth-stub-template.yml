@@ -121,6 +121,9 @@ Resources:
       Name: !Sub ${AWS::StackName}-ApiGateway
       StageName: Live
       AlwaysDeploy: true
+      Tags:
+        FMSRegionalPolicy: false
+        CustomPolicy: true
 
   AuthAuthorizeLambda:
     Type: AWS::Serverless::Function
