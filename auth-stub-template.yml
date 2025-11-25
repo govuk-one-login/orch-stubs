@@ -28,6 +28,7 @@ Conditions:
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
   IsNotProduction: !Not [!Equals [!Ref Environment, production]]
   IsLocalEnv: !Equals [!Ref Environment, local]
+  IsDev: !Equals [!Ref Environment, dev]
 
 Mappings:
   EnvironmentConfiguration:
@@ -122,8 +123,15 @@ Resources:
       StageName: Live
       AlwaysDeploy: true
       Tags:
-        FMSRegionalPolicy: false
-        CustomPolicy: true
+        FMSRegionalPolicy:
+          !If # Apply CustomPolicy FMS tags in dev only. If seeing WAF issues in build remove condition
+          - IsDev
+          - false
+          - !Ref AWS::NoValue
+        CustomPolicy: !If
+          - IsDev
+          - true
+          - !Ref AWS::NoValue
 
   AuthAuthorizeLambda:
     Type: AWS::Serverless::Function
