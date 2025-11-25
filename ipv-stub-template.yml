@@ -37,6 +37,7 @@ Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
   IsLocalEnv: !Equals [!Ref Environment, local]
+  IsDev: !Equals [!Ref Environment, dev]
 
 Globals:
   Function:
@@ -74,6 +75,16 @@ Resources:
       Name: !Sub ${AWS::StackName}-ApiGateway
       StageName: Live
       AlwaysDeploy: true
+      Tags:
+        FMSRegionalPolicy:
+          !If # Apply CustomPolicy FMS tags in dev only. If seeing WAF issues in build remove condition
+          - IsDev
+          - false
+          - !Ref AWS::NoValue
+        CustomPolicy: !If
+          - IsDev
+          - true
+          - !Ref AWS::NoValue
 
   IPVAuthorizeLambda:
     Type: AWS::Serverless::Function
