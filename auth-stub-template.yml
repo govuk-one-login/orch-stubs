@@ -123,15 +123,8 @@ Resources:
       StageName: Live
       AlwaysDeploy: true
       Tags:
-        FMSRegionalPolicy:
-          !If # Apply CustomPolicy FMS tags in dev only. If seeing WAF issues in build remove condition
-          - IsDev
-          - false
-          - !Ref AWS::NoValue
-        CustomPolicy: !If
-          - IsDev
-          - true
-          - !Ref AWS::NoValue
+        FMSRegionalPolicy: false
+        CustomPolicy: true
 
   AuthAuthorizeLambda:
     Type: AWS::Serverless::Function
