@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SPOT stub
 
@@ -20,7 +20,7 @@ Mappings:
     dev:
       requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:dev-stub-spot-request-queue"
       requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/dev-stub-spot-request-queue"
-      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/c0134a8b-44ea-4927-ba9b-d78647dccce9" # This will need to change when the key is recreated
+      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/ea0a9780-458c-49a2-9fc8-17eee1338b9f" # This will need to change when the key is recreated
     build:
       requestQueueArn: "arn:aws:sqs:eu-west-2:767397776536:build-stub-spot-request-queue"
       requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/767397776536/build-stub-spot-request-queue"
@@ -59,13 +59,14 @@ Resources:
           Properties:
             BatchSize: 1
             Enabled: true
-            Queue: !FindInMap [
-              EnvironmentConfiguration,
-              !Ref Environment,
-              requestQueueArn,
-            ]
+            Queue:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                requestQueueArn,
+              ]
             FunctionResponseTypes:
-             - ReportBatchItemFailures
+              - ReportBatchItemFailures
       Policies:
         - !Ref SpotRequestQueueConsumePolicy
         - !Ref SpotResponseQueueWritePolicy
@@ -117,17 +118,19 @@ Resources:
               - sqs:DeleteMessage
               - sqs:GetQueueAttributes
               - sqs:ChangeMessageVisibility
-            Resource: !FindInMap [
-                      EnvironmentConfiguration,
-                      !Ref Environment,
-                      requestQueueArn,
-                    ]
+            Resource:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                requestQueueArn,
+              ]
 
           - Sid: AllowEncryptionAccessToSpotQueueKey
             Effect: Allow
             Action:
               - kms:Decrypt
-            Resource: !FindInMap [
+            Resource:
+              !FindInMap [
                 EnvironmentConfiguration,
                 !Ref Environment,
                 requestQueueKeyArn,
