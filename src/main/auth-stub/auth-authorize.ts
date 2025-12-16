@@ -23,6 +23,7 @@ import {
 import { ROOT_URI } from "./data/auth-dummy-constants";
 import { createUserPofile } from "./helpers/mock-token-data-helper";
 import renderAuthAuthorize from "./render-auth-authorize";
+import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -47,24 +48,9 @@ export const handler: Handler = async (
 async function get(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  try {
-    await addUserProfile(createUserPofile("dummy.email@mail.com"));
-  } catch (error) {
-    throw new CodedError(500, `dynamoDb error: ${error}`);
-  }
-
-  return successfulHtmlResult(200, renderAuthAuthorize(event));
-}
-
-async function post(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
-  const redirectUri = `${ROOT_URI}/orchestration-redirect`;
-
   if (!event.body) {
     throw new CodedError(400, "Missing request body");
   }
-  const url = new URL(redirectUri);
 
   const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
   const clientId = parsedBody.client_id;
@@ -88,20 +74,51 @@ async function post(
     );
   }
 
+  try {
+    await addUserProfile(createUserPofile("dummy.email@mail.com"));
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
+
+  const authRequest: AuthRequestBody = {
+    clientId: clientId,
+    responseType: responseType,
+    email: email,
+    passwordResetTime: passwordResetTime,
+    sectorIdentifier: parsedBody.sectorIdentifier,
+    isNewAccount: parsedBody.isNewAccount,
+    claims: claims,
+  };
+
+  return successfulHtmlResult(200, renderAuthAuthorize(authRequest));
+}
+
+async function post(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const redirectUri = `${ROOT_URI}/orchestration-redirect`;
+  const url = new URL(redirectUri);
+  const body = Object.fromEntries(new URLSearchParams(event.body!));
+  const authRequest: AuthRequestBody = JSON.parse(
+    body.authRequest
+  ) as unknown as AuthRequestBody;
+
   let authCode: string;
 
   try {
-    const user = await getUserProfileByEmail(email);
-    const claimsList = claims.claim ? JSON.parse(claims.claim) : [];
-    authCode = generateAuthCode();
+    const user = await getUserProfileByEmail(authRequest.email);
+    const claimsList = authRequest.claims.claim
+      ? JSON.parse(authRequest.claims.claim)
+      : [];
 
+    authCode = generateAuthCode();
     const authCodeResult: AuthCodeStoreInput = {
       authCode,
       subjectId: user.subjectId,
       claims: claimsList,
-      sectorIdentifier: parsedBody.sectorIdentifier,
-      isNewAccount: parsedBody.isNewAccount === "true",
-      passwordResetTime,
+      sectorIdentifier: authRequest.sectorIdentifier,
+      isNewAccount: authRequest.isNewAccount === "true",
+      passwordResetTime: authRequest.passwordResetTime,
       hasBeenUsed: false,
     };
 

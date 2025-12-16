@@ -27,11 +27,46 @@ describe("Auth Authorize", () => {
     await resetUserProfile();
   });
 
+  it("should return 200 for valid GET request", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "GET",
+        generateFormBodyAuthRequestGet(),
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it("should return a 400 error when body is invalid", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "GET",
+        "",
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body).message).toBe("Missing request body");
+  });
+
   it("should return 302 for valid POST request and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "POST",
-        generateFormBodyString(),
+        generateFormBodyAuthRequestPost(),
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
@@ -47,93 +82,6 @@ describe("Auth Authorize", () => {
     );
   });
 
-  it("should return a 400 error when body is not given", async () => {
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        "",
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe("Missing request body");
-  });
-
-  it("should return a 400 error when response_type is not given", async () => {
-    const formBody = generateFormBody();
-    delete formBody["response_type"];
-    const formBodyString = new URLSearchParams(formBody).toString();
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        formBodyString,
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe("Response type is not set");
-  });
-
-  it("should return a 400 error when client_id is not given", async () => {
-    const formBody = generateFormBody();
-    delete formBody["client_id"];
-    const formBodyString = new URLSearchParams(formBody).toString();
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        formBodyString,
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe(
-      "Client ID value is incorrect"
-    );
-  });
-
-  it("should return a 400 error when validateClaim fails", async () => {
-    const wrongPrivateKey = await getWrongPrivateKey();
-    const jwt = await createJwt(createMockClaims(), wrongPrivateKey);
-
-    jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
-
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        generateFormBodyString(),
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
-      null!,
-      null!
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe(
-      "signature verification failed"
-    );
-  });
-
   async function getPrivateKey(): Promise<jose.KeyLike> {
     const key = await jose.importPKCS8(
       "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
@@ -142,15 +90,31 @@ describe("Auth Authorize", () => {
     return key;
   }
 
-  async function getWrongPrivateKey(): Promise<jose.KeyLike> {
-    const key = await jose.importPKCS8(
-      "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg+SgpFc3oo6bRHAOhpI6pv85fPm4ehgOPCQM0cEcwIK+hRANCAAS8u0WXxvx2N6bSFtfTggvnkGJvCsYo3jBYvCKJY5m87BcmwcgyFTDbedBbDnOC0OO0xdjLKu8577NnXPvE/jyd-----END PRIVATE KEY-----",
-      "ES256"
-    );
-    return key;
+  function generateFormBodyAuthRequestPost(): string {
+    return new URLSearchParams({
+      authRequest: JSON.stringify(generateFormBodyPost()),
+    }).toString();
   }
 
-  function generateFormBody(): Record<string, string> {
+  function generateFormBodyPost(): Record<string, string> {
+    return {
+      clientId: "orchestrationAuth",
+      responseType: "code",
+      email: EMAIL,
+      request: "testJWE",
+      passwordResetTime: "10",
+      sectorIdentifier: "test",
+      claims: JSON.stringify({
+        claim: "testClaim",
+      }),
+    } as Record<string, string>;
+  }
+
+  function generateFormBodyAuthRequestGet(): string {
+    return new URLSearchParams(generateFormBodyGet()).toString();
+  }
+
+  function generateFormBodyGet(): Record<string, string> {
     return {
       client_id: "orchestrationAuth",
       response_type: "code",
@@ -158,10 +122,6 @@ describe("Auth Authorize", () => {
       request: "testJWE",
       password_reset_time: "10",
     } as Record<string, string>;
-  }
-
-  function generateFormBodyString(): string {
-    return new URLSearchParams(generateFormBody()).toString();
   }
 
   function createMockClaims(): Claims {
