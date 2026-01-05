@@ -138,7 +138,12 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           ENCRYPTION_KEY_ID: !GetAtt AuthEncryptionKey.KeyId
-          AUTH_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: !GetAtt AuthEncryptionKey.KeyId
+          AUTH_AUTHORIZE_PUBLIC_SIGNING_KEY:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              orchToAuthSigningPublicKey,
+            ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: !Sub
             - "https://signin.${authDomain}/"
