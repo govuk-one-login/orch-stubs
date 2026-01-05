@@ -8,7 +8,7 @@ type EnvVar =
   | "ORCH_TO_AUTH_AUDIENCE"
   | "ORCH_TO_AUTH_CLIENT_ID"
   | "AUTH_AUTHORIZE_PUBLIC_SIGNING_KEY"
-  | "DUMMY_ENCRYPTION_PUBLIC_KEY"
+  | "LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"
   | "ENVIRONMENT";
 
 export const getEnv = (key: EnvVar, throwIfMissing = true): string => {
