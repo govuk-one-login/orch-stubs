@@ -124,6 +124,8 @@ async function post(
       : [];
 
     logger.info("Generating auth code");
+
+    const journeyId = authRequest.claims.govuk_signin_journey_id;
     authCode = generateAuthCode();
     const authCodeResult: AuthCodeStoreInput = {
       authCode,
@@ -133,6 +135,7 @@ async function post(
       isNewAccount: authRequest.isNewAccount === "true",
       passwordResetTime: authRequest.passwordResetTime,
       hasBeenUsed: false,
+      journeyId: journeyId,
     };
     logger.info("Storing auth code");
     await addAuthCodeStore(authCodeResult);

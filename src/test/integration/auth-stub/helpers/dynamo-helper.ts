@@ -107,6 +107,7 @@ export const addAuthCodeStore = async (authCodeStore: AuthCodeStoreInput) => {
       passwordResetTime: authCodeStore.passwordResetTime,
       ttl: oneHourFromNow(),
       hasBeenUsed: authCodeStore.hasBeenUsed,
+      journeyId: authCodeStore.journeyId,
     },
   });
 };
