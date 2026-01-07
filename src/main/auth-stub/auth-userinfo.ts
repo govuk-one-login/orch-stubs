@@ -15,6 +15,7 @@ import {
 } from "./services/access-token-dynamodb-service";
 import { UserInfoClaims } from "./interfaces/user-info-claim-interface";
 import { getUserProfileBySubjectId } from "./services/user-profile-dynamodb-service";
+import { logger } from "../logger";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -61,6 +62,7 @@ async function get(
       throw new Error("Invalid bearer token");
     }
   } catch (error) {
+    logger.error(`Error received: ${(error as Error).message}`);
     return {
       statusCode: 401,
       body: "",

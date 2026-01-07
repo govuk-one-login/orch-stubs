@@ -39,7 +39,10 @@ export const getAccessTokenFromAuthorizationHeader = (
     }
 
     return parts[1];
-  } catch {
-    throw new CodedError(401, "Unable to extract (opaque) bearer token");
+  } catch (error) {
+    throw new CodedError(
+      401,
+      "Unable to extract (opaque) bearer token: " + (error as Error).message
+    );
   }
 };

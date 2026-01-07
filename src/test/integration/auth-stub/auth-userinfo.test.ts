@@ -99,7 +99,7 @@ describe("Auth User Info", () => {
 
     expect(response.statusCode).toBe(401);
     expect(response.multiValueHeaders["WWW-Authenticate"]).toStrictEqual([
-      `Bearer error="invalid_token", error_description="Error: Unable to extract (opaque) bearer token"`,
+      `Bearer error="invalid_token", error_description="Error: Unable to extract (opaque) bearer token: Invalid HTTP Authorization header value"`,
     ]);
   });
 
