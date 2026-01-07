@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import { getAuthPublicKey } from "./key-helpers";
+import { getAuthPublicSigningKey } from "./key-helpers";
 import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config";
 import { CodedError } from "../../helper/result-helper";
 
@@ -23,7 +23,7 @@ export const validateClaims = async (jwt: string): Promise<Claims> => {
 };
 
 const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
-  const publicKey = getAuthPublicKey();
+  const publicKey = getAuthPublicSigningKey();
   const keyObject = await jose.importSPKI(publicKey, "ES256");
 
   const result = await jose.jwtVerify(jwt, keyObject, {

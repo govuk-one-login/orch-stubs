@@ -27,7 +27,7 @@ export const getContentEncryptionKey = async (
   }
 };
 
-export const getAuthPublicKey = (): string => {
+export const getAuthPublicSigningKey = (): string => {
   return getEnv("AUTH_AUTHORIZE_PUBLIC_SIGNING_KEY");
 };
 
