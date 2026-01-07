@@ -24,6 +24,7 @@ import { ROOT_URI } from "./data/auth-dummy-constants";
 import { createUserPofile } from "./helpers/mock-token-data-helper";
 import renderAuthAuthorize from "./render-auth-authorize";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
+import { logger } from "../logger";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -48,12 +49,18 @@ export const handler: Handler = async (
 async function get(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const queryStringParams = event.queryStringParameters!;
+  const queryStringParams = event.queryStringParameters;
+  if (!queryStringParams) {
+    throw new CodedError(400, "Missing query parameters");
+  }
 
   const clientId = queryStringParams.client_id!;
   const responseType = queryStringParams.response_type!;
-
   const requestBody = queryStringParams?.request;
+
+  if (!requestBody) {
+    throw new CodedError(400, "Missing request in query parameters");
+  }
 
   const parsedBody = Object.fromEntries(new URLSearchParams(requestBody));
   const email = parsedBody.email ?? "dummy.email@mail.com";
@@ -99,7 +106,9 @@ async function post(
 ): Promise<APIGatewayProxyResult> {
   const redirectUri = `${ROOT_URI}/orchestration-redirect`;
   const url = new URL(redirectUri);
-  const body = Object.fromEntries(new URLSearchParams(event.body!));
+  const bodyUrlParams = new URLSearchParams(event.body!);
+  const body = Object.fromEntries(bodyUrlParams);
+  logger.info("Parsing authRequest in body");
   const authRequest: AuthRequestBody = JSON.parse(
     body.authRequest
   ) as unknown as AuthRequestBody;
@@ -107,11 +116,14 @@ async function post(
   let authCode: string;
 
   try {
+    logger.info("Getting user profile by email");
     const user = await getUserProfileByEmail(authRequest.email);
+    logger.info("Parsing claims list");
     const claimsList = authRequest.claims.claim
       ? JSON.parse(authRequest.claims.claim)
       : [];
 
+    logger.info("Generating auth code");
     authCode = generateAuthCode();
     const authCodeResult: AuthCodeStoreInput = {
       authCode,
@@ -122,7 +134,7 @@ async function post(
       passwordResetTime: authRequest.passwordResetTime,
       hasBeenUsed: false,
     };
-
+    logger.info("Storing auth code");
     await addAuthCodeStore(authCodeResult);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
