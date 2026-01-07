@@ -141,6 +141,7 @@ async function post(
   }
 
   url.searchParams.append("code", authCode);
+  url.searchParams.append("state", authRequest.claims.state);
 
   return successfulJsonResult(
     302,
