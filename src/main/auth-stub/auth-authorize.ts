@@ -48,13 +48,14 @@ export const handler: Handler = async (
 async function get(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  if (!event.body) {
-    throw new CodedError(400, "Missing request body");
-  }
+  const queryStringParams = event.queryStringParameters!;
 
-  const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
-  const clientId = parsedBody.client_id;
-  const responseType = parsedBody.response_type;
+  const clientId = queryStringParams.client_id!;
+  const responseType = queryStringParams.response_type!;
+
+  const requestBody = queryStringParams?.request;
+
+  const parsedBody = Object.fromEntries(new URLSearchParams(requestBody));
   const email = parsedBody.email ?? "dummy.email@mail.com";
   const passwordResetTime = parsedBody.password_reset_time
     ? Number(parsedBody.password_reset_time)
@@ -64,7 +65,7 @@ async function get(
 
   try {
     validateQueryParams(clientId, responseType);
-    const encryptedAuthRequestJWE = parsedBody["request"];
+    const encryptedAuthRequestJWE = requestBody;
     const authRequestJweDecryptedAsJwt = await decrypt(encryptedAuthRequestJWE);
     claims = await validateClaims(authRequestJweDecryptedAsJwt);
   } catch (error) {
