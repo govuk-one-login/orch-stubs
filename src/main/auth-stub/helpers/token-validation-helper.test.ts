@@ -126,6 +126,15 @@ describe("Token Validation Helper", () => {
       );
     });
 
+    it("should not error when the redirect-uri is an empty string", () => {
+      tokenRequestBody["redirect_uri"] = "";
+
+      const action = () =>
+        validatePlainTextParameters("", clientId, tokenRequestBody);
+
+      expect(action).not.toThrow();
+    });
+
     it("should error when the client-id is does not exist", () => {
       delete tokenRequestBody["client_id"];
 

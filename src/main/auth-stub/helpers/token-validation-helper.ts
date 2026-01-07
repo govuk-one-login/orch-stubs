@@ -39,7 +39,7 @@ export const validatePlainTextParameters = (
     throw new CodedError(400, "Request has invalid grant_type parameter");
   }
 
-  if (!body["redirect_uri"]) {
+  if (!body["redirect_uri"] && body["redirect_uri"] !== "") {
     throw new CodedError(400, "Request is missing redirect_uri parameter");
   }
 
