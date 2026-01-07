@@ -19,6 +19,7 @@ import {
   getOrchToAuthExpectedClientId,
   getOrchToAuthSigningPublicKey,
 } from "./helpers/config";
+import { importSPKI } from "jose";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -51,7 +52,11 @@ async function post(
     // Since its in Auth's code we have replicated the validation in the stub as well.
     validatePlainTextParameters("", getOrchToAuthExpectedClientId(), body);
     ensureClientAssertionType(body);
-    await verifyClientAssertion(body, getOrchToAuthSigningPublicKey());
+    const publicKey = await importSPKI(
+      getOrchToAuthSigningPublicKey(),
+      "ES256"
+    );
+    await verifyClientAssertion(body, publicKey);
   } catch (error) {
     throw new CodedError(
       400,

@@ -2,11 +2,13 @@ import { generateKeyPairSync } from "crypto";
 import * as config from "../helpers/config";
 import * as keyHelper from "../helpers/key-helpers";
 
-export const mockEnvVariableSetup = () => {
+export const mockEnvVariableSetup = async () => {
   const ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
   jest
     .spyOn(config, "getOrchToAuthSigningPublicKey")
-    .mockReturnValue(ecKeyPair.publicKey);
+    .mockReturnValue(
+      ecKeyPair.publicKey.export({ type: "spki", format: "pem" }).toString()
+    );
   jest
     .spyOn(config, "getOrchToAuthExpectedAudience")
     .mockReturnValue("testURL");

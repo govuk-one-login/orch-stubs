@@ -1,4 +1,3 @@
-import { createPublicKey, KeyObject } from "crypto";
 import { getEnv } from "./env-helper";
 
 export const getAwsRegion = (): string => {
@@ -10,8 +9,8 @@ export const getKmsKeyId = (): string => {
   return getEnv("ENCRYPTION_KEY_ID");
 };
 
-export const getOrchToAuthSigningPublicKey = (): KeyObject => {
-  return createPublicKey(getEnv("ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY"));
+export const getOrchToAuthSigningPublicKey = (): string => {
+  return getEnv("ORCH_TO_AUTH_TOKEN_SIGNING_PUBLIC_KEY");
 };
 
 export const getOrchToAuthExpectedClientId = (): string => {

@@ -28,5 +28,7 @@ export const mockEnvVariableSetup = () => {
 export const mockSigningKeyEnv = (publickKey: KeyObject) => {
   jest
     .spyOn(config, "getOrchToAuthSigningPublicKey")
-    .mockReturnValue(publickKey);
+    .mockReturnValue(
+      publickKey.export({ type: "spki", format: "pem" }).toString()
+    );
 };
