@@ -212,6 +212,10 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /token
             Method: post
+      Policies:
+        - !Ref AuthCodeTableReadAccessPolicy
+        - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref AccessTokenTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -247,9 +251,10 @@ Resources:
             Path: /userinfo
             Method: post
       Policies:
-        - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref AccessTokenTableReadAccessPolicy
         - !Ref AccessTokenTableWriteAccessPolicy
         - !Ref UserProfileTableReadAccessPolicy
+        - !Ref UserProfileTableQueryIndexAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -323,7 +328,20 @@ Resources:
             Action:
               - dynamodb:DescribeTable
               - dynamodb:Get*
+              - dynamodb:Query
             Resource: !GetAtt UserProfileTable.Arn
+
+  UserProfileTableQueryIndexAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubUserProfileTableQueryIndexAccess
+            Effect: Allow
+            Action:
+              - dynamodb:Query
+            Resource: !Sub ${UserProfileTable.Arn}/index/*
 
   UserProfileTableWriteAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
