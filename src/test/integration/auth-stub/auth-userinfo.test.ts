@@ -45,7 +45,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -90,7 +90,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: "bearer",
+          Authorization: "Bearer",
         }
       ),
       null!,
@@ -117,7 +117,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -144,7 +144,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -167,7 +167,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,

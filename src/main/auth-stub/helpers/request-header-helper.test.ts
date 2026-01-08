@@ -43,7 +43,7 @@ describe("Request header helper", () => {
 
   describe("getAccessTokenFromAuthorizationHeader tests", () => {
     it("should return header value from header with valid header", () => {
-      const header = "bearer testValue";
+      const header = "Bearer testValue";
 
       const headerValue = getAccessTokenFromAuthorizationHeader(header);
 
@@ -59,7 +59,7 @@ describe("Request header helper", () => {
     });
 
     it("should return null when length is not 2", () => {
-      const header = "bearer test value";
+      const header = "Bearer test value";
 
       const action = () => getAccessTokenFromAuthorizationHeader(header);
 
@@ -67,7 +67,7 @@ describe("Request header helper", () => {
     });
 
     it("should return null when second half is empty", () => {
-      const header = "bearer ";
+      const header = "Bearer ";
 
       const action = () => getAccessTokenFromAuthorizationHeader(header);
 

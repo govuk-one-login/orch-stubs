@@ -21,7 +21,7 @@ export const getAccessTokenFromAuthorizationHeader = (
   authorizationHeader: string
 ): string => {
   try {
-    if (!authorizationHeader.startsWith("bearer")) {
+    if (!authorizationHeader.startsWith("Bearer")) {
       throw new CodedError(
         401,
         "authorizationHeader is not a bearer access token type"
