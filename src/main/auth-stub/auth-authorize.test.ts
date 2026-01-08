@@ -1,4 +1,4 @@
-import { Context } from "aws-lambda";
+import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { handler } from "./auth-authorize";
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
 import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
@@ -35,8 +35,7 @@ describe("Auth Authorize", () => {
 
       expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
     });
-
-    it("should return a 400 error when body is not given", async () => {
+    it("should return a 400 error when queryParameters are not given", async () => {
       const response = await handler(
         {
           httpMethod: "GET",
@@ -46,15 +45,18 @@ describe("Auth Authorize", () => {
       );
 
       expect(response.statusCode).toBe(400);
-      expect(JSON.parse(response.body).message).toBe("Missing request body");
+      expect(JSON.parse(response.body).message).toBe(
+        "Missing query parameters"
+      );
     });
-
     it("should return a 400 error when response_type is not given", async () => {
       const response = await handler(
         {
           httpMethod: "GET",
-          body: {
+          queryStringParameters: {
             client_id: "orchestrationAuth",
+            request:
+              "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.ZjhoKAi_KnCTbSTKjX8WIwdEXo_XuNbDRzJRtmt3mLS6FCXaaUTyyOXi4qQyZNjA2Fxn6D4UB121kmF58mcyDrhHtSN-ebT3wnsJ_VOd5Mv0IVRNRAQnAW15dWgJy_uLHva6IKgL6GNrH9DYrPhEG1f9e6b8qMZiag3OAmtX6bZAtHFikw3i9Dvhdx_HMKCO1nX5z5qatF8K6XxAjq1-W0TT5OllJQC8aiE2Xtznu23Uft2jnrdqidvaG0JBdaMjIvcy-cvVaogW4WyUyXGLvna4hC7fmU2TZYqtk63bhv4XYrCfEwNe5qLDXW8-G6EyJO6C3OTMh8otvm1_EDS3LQ.78xU5KBJixV96DRA.YqpzvqoyiDCjUJj2qIhg1k3SuxFdK4l2ou4uja1g-aQjcJZ15C-9szBXCBtYNqqGuoymgi_mcJNyf0DaCkAcsUFyQhe2fQv9YkkkhwcJSe47DDnLNiJyL7hA8cJpDJkzrxoRzVdimbaCEUs_pkYPMi3ojEivE2Fpz7rg5yCLf_VjR5SLlohWSG7qJ1ypkpon4JJjYGKVTzu98XLJuSVqdJq_81pwSn-OMm5V90qmNozzeA.2dFUI2yJLGxgo6yEDfqtjw",
           },
         },
         {} as Context,
@@ -71,8 +73,10 @@ describe("Auth Authorize", () => {
       const response = await handler(
         {
           httpMethod: "GET",
-          body: {
+          queryStringParameters: {
             response_type: "code",
+            request:
+              "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.ZjhoKAi_KnCTbSTKjX8WIwdEXo_XuNbDRzJRtmt3mLS6FCXaaUTyyOXi4qQyZNjA2Fxn6D4UB121kmF58mcyDrhHtSN-ebT3wnsJ_VOd5Mv0IVRNRAQnAW15dWgJy_uLHva6IKgL6GNrH9DYrPhEG1f9e6b8qMZiag3OAmtX6bZAtHFikw3i9Dvhdx_HMKCO1nX5z5qatF8K6XxAjq1-W0TT5OllJQC8aiE2Xtznu23Uft2jnrdqidvaG0JBdaMjIvcy-cvVaogW4WyUyXGLvna4hC7fmU2TZYqtk63bhv4XYrCfEwNe5qLDXW8-G6EyJO6C3OTMh8otvm1_EDS3LQ.78xU5KBJixV96DRA.YqpzvqoyiDCjUJj2qIhg1k3SuxFdK4l2ou4uja1g-aQjcJZ15C-9szBXCBtYNqqGuoymgi_mcJNyf0DaCkAcsUFyQhe2fQv9YkkkhwcJSe47DDnLNiJyL7hA8cJpDJkzrxoRzVdimbaCEUs_pkYPMi3ojEivE2Fpz7rg5yCLf_VjR5SLlohWSG7qJ1ypkpon4JJjYGKVTzu98XLJuSVqdJq_81pwSn-OMm5V90qmNozzeA.2dFUI2yJLGxgo6yEDfqtjw",
           },
         },
         {} as Context,
@@ -82,6 +86,24 @@ describe("Auth Authorize", () => {
       expect(response.statusCode).toBe(400);
       expect(JSON.parse(response.body).message).toBe(
         "Client ID value is incorrect"
+      );
+    });
+    it("should return a 400 error when request is not given", async () => {
+      const response = await handler(
+        {
+          httpMethod: "GET",
+          queryStringParameters: {
+            client_id: "orchestrationAuth",
+            response_type: "code",
+          },
+        },
+        {} as Context,
+        () => {}
+      );
+
+      expect(response.statusCode).toBe(400);
+      expect(JSON.parse(response.body).message).toBe(
+        "Missing request in query parameters"
       );
     });
 
@@ -136,13 +158,13 @@ describe("Auth Authorize", () => {
     function createValidAuthorizeRequest() {
       return {
         httpMethod: "GET",
-        body: {
+        queryStringParameters: {
           client_id: "orchestrationAuth",
           response_type: "code",
           request:
             "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.ZjhoKAi_KnCTbSTKjX8WIwdEXo_XuNbDRzJRtmt3mLS6FCXaaUTyyOXi4qQyZNjA2Fxn6D4UB121kmF58mcyDrhHtSN-ebT3wnsJ_VOd5Mv0IVRNRAQnAW15dWgJy_uLHva6IKgL6GNrH9DYrPhEG1f9e6b8qMZiag3OAmtX6bZAtHFikw3i9Dvhdx_HMKCO1nX5z5qatF8K6XxAjq1-W0TT5OllJQC8aiE2Xtznu23Uft2jnrdqidvaG0JBdaMjIvcy-cvVaogW4WyUyXGLvna4hC7fmU2TZYqtk63bhv4XYrCfEwNe5qLDXW8-G6EyJO6C3OTMh8otvm1_EDS3LQ.78xU5KBJixV96DRA.YqpzvqoyiDCjUJj2qIhg1k3SuxFdK4l2ou4uja1g-aQjcJZ15C-9szBXCBtYNqqGuoymgi_mcJNyf0DaCkAcsUFyQhe2fQv9YkkkhwcJSe47DDnLNiJyL7hA8cJpDJkzrxoRzVdimbaCEUs_pkYPMi3ojEivE2Fpz7rg5yCLf_VjR5SLlohWSG7qJ1ypkpon4JJjYGKVTzu98XLJuSVqdJq_81pwSn-OMm5V90qmNozzeA.2dFUI2yJLGxgo6yEDfqtjw",
         },
-      };
+      } as unknown as APIGatewayProxyEvent;
     }
   });
 
