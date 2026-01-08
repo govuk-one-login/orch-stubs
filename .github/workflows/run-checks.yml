@@ -72,7 +72,7 @@ jobs:
           aws-region: eu-west-2
 
       - name: SAM validate Auth
-        run: sam validate -t auth-stub-template.yml
+        run: sam validate -t auth-stub-template.yml --lint
 
       - name: SAM validate IPV
         run: sam validate -t ipv-stub-template.yml
