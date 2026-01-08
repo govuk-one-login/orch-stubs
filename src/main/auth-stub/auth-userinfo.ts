@@ -107,8 +107,8 @@ const populateUserInfo = async (
   );
 
   return {
-    sub: "",
-    rp_pairwise_id: "",
+    sub: accessTokenStore.subjectId,
+    rp_pairwise_id: "test-rp-pairwise-id",
     new_account: accessTokenStore.isNewAccount,
     password_reset_time: accessTokenStore.passwordResetTime,
     legacy_subject_id: userProfile.legacySubjectId,
@@ -121,6 +121,6 @@ const populateUserInfo = async (
     salt: "",
     verified_mfa_method_type: "",
     uplift_required: "",
-    achieved_credential_strength: "",
+    achieved_credential_strength: "MEDIUM_LEVEL",
   };
 };
