@@ -51,9 +51,7 @@ describe("Auth User Info", () => {
     );
 
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body).claims.local_account_id).toBe(
-      mockSubjectId
-    );
+    expect(JSON.parse(response.body).local_account_id).toBe(mockSubjectId);
   });
 
   it("should return a 401 error when headers is not given", async () => {

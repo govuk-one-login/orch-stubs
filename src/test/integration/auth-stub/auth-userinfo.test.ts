@@ -54,8 +54,8 @@ describe("Auth User Info", () => {
 
     expect(response.statusCode).toBe(200);
     const authUserInfoResponse: UserInfoClaims = JSON.parse(response.body);
-    expect(authUserInfoResponse.claims.email).toBe(userProfileMock.email);
-    expect(authUserInfoResponse.claims.local_account_id).toBe(
+    expect(authUserInfoResponse.email).toBe(userProfileMock.email);
+    expect(authUserInfoResponse.local_account_id).toBe(
       userProfileMock.subjectId
     );
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);

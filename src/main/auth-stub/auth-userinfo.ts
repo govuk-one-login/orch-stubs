@@ -107,22 +107,20 @@ const populateUserInfo = async (
   );
 
   return {
-    claims: {
-      sub: "",
-      rp_pairwise_id: "",
-      new_account: accessTokenStore.isNewAccount,
-      password_reset_time: accessTokenStore.passwordResetTime,
-      legacy_subject_id: userProfile.legacySubjectId,
-      public_subject_id: userProfile.publicSubjectId,
-      local_account_id: userProfile.subjectId,
-      email: userProfile.email,
-      email_verified: userProfile.emailVerified,
-      phone_number: userProfile.phoneNumber,
-      phone_number_verified: userProfile.phoneNumberVerified,
-      salt: "",
-      verified_mfa_method_type: "",
-      uplift_required: "",
-      achieved_credential_strength: "",
-    },
+    sub: "",
+    rp_pairwise_id: "",
+    new_account: accessTokenStore.isNewAccount,
+    password_reset_time: accessTokenStore.passwordResetTime,
+    legacy_subject_id: userProfile.legacySubjectId,
+    public_subject_id: userProfile.publicSubjectId,
+    local_account_id: userProfile.subjectId,
+    email: userProfile.email,
+    email_verified: userProfile.emailVerified,
+    phone_number: userProfile.phoneNumber,
+    phone_number_verified: userProfile.phoneNumberVerified,
+    salt: "",
+    verified_mfa_method_type: "",
+    uplift_required: "",
+    achieved_credential_strength: "",
   };
 };
