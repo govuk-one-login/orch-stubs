@@ -1,7 +1,10 @@
 import { renderPage } from "../template";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
 
-export default function renderAuthAuthorize(authRequest: AuthRequestBody) {
+export default function renderAuthAuthorize(
+  authRequest: AuthRequestBody,
+  authorizeErrors: string[]
+) {
   return renderPage(
     "Auth Stub Form",
     `<h1 class="govuk-heading-l">Auth stub</h1>
@@ -17,7 +20,10 @@ export default function renderAuthAuthorize(authRequest: AuthRequestBody) {
             oAuth Error
         </dt>
         <dd class="govuk-summary-list__value" id="email">
-        <textarea class="govuk-textarea" rows="2" id="email" name="email" type="text"></textarea>
+        <select class="govuk-select" id="error" name="error">
+          <option value="">None</option>
+          ${authorizeErrors.map((errorCode) => `<option value="${errorCode}">${errorCode}</option>`)}
+        </select>
         </dd>
       </div>
     </dl>

@@ -26,6 +26,9 @@ import renderAuthAuthorize from "./render-auth-authorize";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
 import { logger } from "../logger";
 
+const SFAD_ERROR: string = "SFAD_ERROR";
+const AUTHORIZE_ERRORS: string[] = [SFAD_ERROR];
+
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -98,7 +101,10 @@ async function get(
     claims: claims,
   };
 
-  return successfulHtmlResult(200, renderAuthAuthorize(authRequest));
+  return successfulHtmlResult(
+    200,
+    renderAuthAuthorize(authRequest, AUTHORIZE_ERRORS)
+  );
 }
 
 async function post(
@@ -108,6 +114,15 @@ async function post(
   const url = new URL(redirectUri);
   const bodyUrlParams = new URLSearchParams(event.body!);
   const body = Object.fromEntries(bodyUrlParams);
+  if (body.error) {
+    return successfulJsonResult(
+      302,
+      {},
+      {
+        Location: `${url.toString()}?error=${body.error}`,
+      }
+    );
+  }
   logger.info("Parsing authRequest in body");
   const authRequest: AuthRequestBody = JSON.parse(
     body.authRequest
