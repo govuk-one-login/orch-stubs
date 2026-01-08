@@ -29,14 +29,9 @@ describe("Auth Authorize", () => {
 
   it("should return 200 for valid GET request", async () => {
     const response = await handler(
-      createApiGatewayEvent(
-        "GET",
-        generateFormBodyAuthRequestGet(),
-        {},
-        {
-          "Content-Type": "x-www-form-urlencoded",
-        }
-      ),
+      createApiGatewayEvent("GET", "", generateQueryParams(), {
+        "Content-Type": "x-www-form-urlencoded",
+      }),
       null!,
       null!
     );
@@ -44,7 +39,7 @@ describe("Auth Authorize", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it("should return a 400 error when body is invalid", async () => {
+  it("should return a 400 error when query parameters are invalid for GET request", async () => {
     const response = await handler(
       createApiGatewayEvent(
         "GET",
@@ -59,7 +54,9 @@ describe("Auth Authorize", () => {
     );
 
     expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body).message).toBe("Missing request body");
+    expect(JSON.parse(response.body).message).toBe(
+      "Missing request in query parameters"
+    );
   });
 
   it("should return 302 for valid POST request and update Dynamo", async () => {
@@ -110,11 +107,7 @@ describe("Auth Authorize", () => {
     } as Record<string, string>;
   }
 
-  function generateFormBodyAuthRequestGet(): string {
-    return new URLSearchParams(generateFormBodyGet()).toString();
-  }
-
-  function generateFormBodyGet(): Record<string, string> {
+  function generateQueryParams(): Record<string, string> {
     return {
       client_id: "orchestrationAuth",
       response_type: "code",

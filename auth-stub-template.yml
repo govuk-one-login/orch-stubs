@@ -138,7 +138,12 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           ENCRYPTION_KEY_ID: !GetAtt AuthEncryptionKey.KeyId
-          AUTH_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: !GetAtt AuthEncryptionKey.KeyId
+          AUTH_AUTHORIZE_PUBLIC_SIGNING_KEY:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              orchToAuthSigningPublicKey,
+            ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: !Sub
             - "https://signin.${authDomain}/"
@@ -150,7 +155,7 @@ Resources:
                 ]
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
-          DUMMY_ENCRYPTION_PUBLIC_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api

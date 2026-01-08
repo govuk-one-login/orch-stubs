@@ -36,7 +36,8 @@
     "localstack:up": "docker compose -f docker-compose.local.yml up -d",
     "localstack:down": "docker compose -f docker-compose.local.yml down",
     "prepare": "husky",
-    "createRequestObject": "node scripts/createIpvRequestObject.mjs"
+    "createIpvRequestObject": "node scripts/createIpvRequestObject.mjs",
+    "createAuthRequestObject": "node scripts/createAuthRequestObject.mjs"
   },
   "prettier": {
     "trailingComma": "es5",

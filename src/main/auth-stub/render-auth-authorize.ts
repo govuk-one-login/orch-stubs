@@ -10,7 +10,7 @@ export default function renderAuthAuthorize(authRequest: AuthRequestBody) {
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required Auth user identity response. On submit a POST request will be sent to /authorize and the Auth OAuth 2.0 flow will be initiated.</p>
   <form action="/authorize" method="post">
-    <input type="hidden" name="authRequest" value=${JSON.stringify(authRequest)}>
+    <input type="hidden" name="authRequest" value='${JSON.stringify(authRequest)}'>
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row" id="emailRow">
         <dt class="govuk-summary-list__key">

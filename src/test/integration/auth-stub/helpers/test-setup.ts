@@ -12,7 +12,7 @@ export const mockEnvVariableSetup = () => {
     .spyOn(config, "getOrchToAuthExpectedClientId")
     .mockReturnValue(orchToAuthExpectedClientId);
   jest
-    .spyOn(keyHelper, "getAuthPublicKey")
+    .spyOn(keyHelper, "getAuthPublicSigningKey")
     .mockReturnValue(
       "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEn8HvZP5umARULT+kFlJMC+djrruj4jnfQ0dzrAty0YKF4NPR/WV2QrpCRKQyBwbJk7dcGfW1HpafH78+T8bC9Q==-----END PUBLIC KEY-----"
     );
