@@ -9,6 +9,7 @@ const MOCK_SECTOR_IDENTIFIER = "9876543";
 const MOCK_IS_NEW_ACCOUNT = false;
 const MOCK_PASSWORD_RESET_TIME = 12;
 const MOCK_HAS_BEEN_USED = false;
+const MOCK_JOURNEY_ID = "mock_journey_id";
 
 export const createAuthCodeStoreInput = (
   authCode: string
@@ -21,6 +22,7 @@ export const createAuthCodeStoreInput = (
     isNewAccount: MOCK_IS_NEW_ACCOUNT,
     passwordResetTime: MOCK_PASSWORD_RESET_TIME,
     hasBeenUsed: MOCK_HAS_BEEN_USED,
+    journeyId: MOCK_JOURNEY_ID,
   };
 };
 
@@ -34,6 +36,7 @@ export const createAuthCodeStore = (authCode: string): AuthCodeStore => {
     passwordResetTime: MOCK_PASSWORD_RESET_TIME,
     hasBeenUsed: MOCK_HAS_BEEN_USED,
     ttl: createTimeFromNow(3600),
+    journeyId: MOCK_JOURNEY_ID,
   };
 };
 
@@ -49,6 +52,7 @@ export const createAuthCodeStoreThatHasBeenUsed = (
     passwordResetTime: MOCK_PASSWORD_RESET_TIME,
     hasBeenUsed: true,
     ttl: createTimeFromNow(3600),
+    journeyId: MOCK_JOURNEY_ID,
   };
 };
 
@@ -64,6 +68,7 @@ export const createAuthCodeStoreThatHasExpired = (
     passwordResetTime: MOCK_PASSWORD_RESET_TIME,
     hasBeenUsed: true,
     ttl: createTimeFromNow(-3600),
+    journeyId: MOCK_JOURNEY_ID,
   };
 };
 

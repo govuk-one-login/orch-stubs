@@ -10,4 +10,5 @@ export interface AuthCodeStoreInput {
   isNewAccount: boolean;
   passwordResetTime: number;
   hasBeenUsed: boolean;
+  journeyId: string;
 }
