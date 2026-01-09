@@ -1,4 +1,8 @@
-import { APIGatewayProxyEvent, Context } from "aws-lambda";
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from "aws-lambda";
 import { handler } from "./auth-authorize";
 import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
 import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
@@ -192,14 +196,26 @@ describe("Auth Authorize", () => {
       mockEnvVariableSetup();
     });
 
-    it("should return a 302 with valid request", async () => {
+    it("should return a 302 without error code when valid post request sent", async () => {
       const response = await handler(
-        createValidAuthorizeRequest(),
+        createValidPostRequest(),
         {} as Context,
         () => {}
       );
 
       expect(response.statusCode).toBe(302);
+      expect(response.headers!["Location"]).toContain("?code=");
+      expect(response.headers!["Location"]).not.toContain("error=");
+    });
+    it("should return a 302 with error code when post request with error is sent", async () => {
+      const response = (await handler(
+        createPostRequestWithErrorCode("test-error-code"),
+        {} as Context,
+        () => {}
+      )) as APIGatewayProxyResult;
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers!["Location"]).toContain("?error=test-error-code");
     });
 
     describe("accessing dynamoDb", () => {
@@ -211,7 +227,7 @@ describe("Auth Authorize", () => {
           });
 
         const response = await handler(
-          createValidAuthorizeRequest(),
+          createValidPostRequest(),
           {} as Context,
           () => {}
         );
@@ -222,7 +238,7 @@ describe("Auth Authorize", () => {
       });
 
       it("should try to add an auth code store to dynamoDb", async () => {
-        await handler(createValidAuthorizeRequest(), {} as Context, () => {});
+        await handler(createValidPostRequest(), {} as Context, () => {});
 
         expect(addAuthCodeStoreSpy).toHaveBeenCalledTimes(1);
       });
@@ -235,7 +251,7 @@ describe("Auth Authorize", () => {
           });
 
         const response = await handler(
-          createValidAuthorizeRequest(),
+          createValidPostRequest(),
           {} as Context,
           () => {}
         );
@@ -245,20 +261,31 @@ describe("Auth Authorize", () => {
       });
     });
 
-    function createValidAuthorizeRequest() {
+    function createValidPostRequest() {
       return {
         httpMethod: "POST",
-        body: generateFormBodyAuthRequestPost(),
+        body: createFormBody(),
       };
     }
 
-    function generateFormBodyAuthRequestPost(): string {
-      return new URLSearchParams({
-        authRequest: JSON.stringify(generateFormBody()),
-      }).toString();
+    function createPostRequestWithErrorCode(error: string) {
+      return {
+        httpMethod: "POST",
+        body: createFormBody(error),
+      };
     }
 
-    function generateFormBody(): Record<string, string> {
+    function createFormBody(error?: string): string {
+      const formObject: Record<string, string> = {
+        authRequest: JSON.stringify(generateAuthRequest()),
+      };
+      if (error) {
+        formObject["error"] = error;
+      }
+      return new URLSearchParams(formObject).toString();
+    }
+
+    function generateAuthRequest(): Record<string, string> {
       return {
         client_id: "orchestrationAuth",
         response_type: "code",
@@ -266,6 +293,7 @@ describe("Auth Authorize", () => {
         claims: JSON.stringify({
           claim: "testClaim",
         }),
+        state: "test-state",
       } as Record<string, string>;
     }
   });

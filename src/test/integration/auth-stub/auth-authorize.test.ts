@@ -63,7 +63,7 @@ describe("Auth Authorize", () => {
     const response = await handler(
       createApiGatewayEvent(
         "POST",
-        generateFormBodyAuthRequestPost(),
+        createValidPostRequest(),
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
@@ -74,11 +74,29 @@ describe("Auth Authorize", () => {
     );
 
     expect(response.statusCode).toBe(302);
-    expect(JSON.parse(response.body).message).toContain(
-      "Redirecting to https://oidc.local.account.gov.uk/orchestration-redirect?code="
+    expect(response.headers["Location"]).toContain(
+      "https://oidc.local.account.gov.uk/orchestration-redirect?code="
     );
   });
+  it("should return 302 for POST request with error and update Dynamo", async () => {
+    const response = await handler(
+      createApiGatewayEvent(
+        "POST",
+        createFormBodyWithErrorCode("test-error-code"),
+        {},
+        {
+          "Content-Type": "x-www-form-urlencoded",
+        }
+      ),
+      null!,
+      null!
+    );
 
+    expect(response.statusCode).toBe(302);
+    expect(response.headers["Location"]).toStrictEqual(
+      "https://oidc.local.account.gov.uk/orchestration-redirect?error=test-error-code"
+    );
+  });
   async function getPrivateKey(): Promise<jose.KeyLike> {
     const key = await jose.importPKCS8(
       "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
@@ -87,13 +105,21 @@ describe("Auth Authorize", () => {
     return key;
   }
 
-  function generateFormBodyAuthRequestPost(): string {
-    return new URLSearchParams({
-      authRequest: JSON.stringify(generateFormBodyPost()),
-    }).toString();
+  function createValidPostRequest(): string {
+    return createFormBodyWithErrorCode();
   }
 
-  function generateFormBodyPost(): Record<string, string> {
+  function createFormBodyWithErrorCode(error?: string): string {
+    const formObject: Record<string, string> = {
+      authRequest: JSON.stringify(generateAuthRequest()),
+    };
+    if (error) {
+      formObject["error"] = error;
+    }
+    return new URLSearchParams(formObject).toString();
+  }
+
+  function generateAuthRequest(): Record<string, string> {
     return {
       clientId: "orchestrationAuth",
       responseType: "code",
