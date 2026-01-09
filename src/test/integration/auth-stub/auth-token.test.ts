@@ -157,7 +157,7 @@ describe("Auth Token", () => {
           `grant_type=${"authorization_code"}`,
           `client_assertion=${"notValid.ClientAssertion"}`,
           `client_id=${orchToAuthExpectedClientId}`,
-          `redirect_uri=""`,
+          `redirect_uri=`,
         ].join("&"),
         {},
         {
@@ -195,7 +195,7 @@ describe("Auth Token", () => {
       `grant_type=${grantType}`,
       `client_assertion=${jwt}`,
       `client_id=${clientId}`,
-      `redirect_uri=""`,
+      `redirect_uri=`,
     ].join("&");
   }
 });

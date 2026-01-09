@@ -21,7 +21,7 @@ export const getAccessTokenFromAuthorizationHeader = (
   authorizationHeader: string
 ): string => {
   try {
-    if (!authorizationHeader.startsWith("bearer")) {
+    if (!authorizationHeader.startsWith("Bearer")) {
       throw new CodedError(
         401,
         "authorizationHeader is not a bearer access token type"
@@ -39,7 +39,10 @@ export const getAccessTokenFromAuthorizationHeader = (
     }
 
     return parts[1];
-  } catch {
-    throw new CodedError(401, "Unable to extract (opaque) bearer token");
+  } catch (error) {
+    throw new CodedError(
+      401,
+      "Unable to extract (opaque) bearer token: " + (error as Error).message
+    );
   }
 };

@@ -26,7 +26,6 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
-  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
   IsLocalEnv: !Equals [!Ref Environment, local]
   IsDev: !Equals [!Ref Environment, dev]
 
@@ -35,11 +34,11 @@ Mappings:
     dev:
       authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
       authDomain: authdev3.dev.account.gov.uk
-      orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHzG8IFx1jE1+Ul44jQk96efPknCXVxWS4PqLrKfR/31UQovFQLfyxA46uiMOvr7+0hRwFX1fQhagsIK+dfB5PA==
+      orchToAuthSigningPublicKey: -----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyu7XCXkDyxhHrmoOfLrl6tcd9e9VL1pzzWqVo1P546NLL2c1H2Qd7UNaa7oQX1/eNFDKaAZuJY3YUAPwNN4Ypg==-----END PUBLIC KEY-----
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
       authDomain: build.account.gov.uk
-      orchToAuthSigningPublicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==
+      orchToAuthSigningPublicKey: -----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==-----END PUBLIC KEY-----
 
 Globals:
   Function:
@@ -145,14 +144,12 @@ Resources:
               orchToAuthSigningPublicKey,
             ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
-          ORCH_TO_AUTH_AUDIENCE: !Sub
-            - "https://signin.${authDomain}/"
-            - authDomain:
-                !FindInMap [
-                  EnvironmentConfiguration,
-                  !Ref Environment,
-                  authDomain,
-                ]
+          ORCH_TO_AUTH_AUDIENCE: !If 
+            - IsDev
+            - "https://authstub.oidc.authdev3.dev.account.gov.uk/"
+            - !Sub
+              - "https://signin.${authDomain}/"
+              - authDomain: !FindInMap [EnvironmentConfiguration, !Ref Environment, authDomain]
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
@@ -201,6 +198,7 @@ Resources:
               !Ref Environment,
               orchToAuthSigningPublicKey,
             ]
+          ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
       Events:
         Get:
           Type: Api
@@ -214,6 +212,10 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /token
             Method: post
+      Policies:
+        - !Ref AuthCodeTableReadAccessPolicy
+        - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref AccessTokenTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -249,9 +251,10 @@ Resources:
             Path: /userinfo
             Method: post
       Policies:
-        - !Ref AuthCodeTableWriteAccessPolicy
+        - !Ref AccessTokenTableReadAccessPolicy
         - !Ref AccessTokenTableWriteAccessPolicy
         - !Ref UserProfileTableReadAccessPolicy
+        - !Ref UserProfileTableQueryIndexAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -325,7 +328,20 @@ Resources:
             Action:
               - dynamodb:DescribeTable
               - dynamodb:Get*
+              - dynamodb:Query
             Resource: !GetAtt UserProfileTable.Arn
+
+  UserProfileTableQueryIndexAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubUserProfileTableQueryIndexAccess
+            Effect: Allow
+            Action:
+              - dynamodb:Query
+            Resource: !Sub ${UserProfileTable.Arn}/index/*
 
   UserProfileTableWriteAccessPolicy:
     Type: AWS::IAM::ManagedPolicy

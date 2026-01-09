@@ -45,7 +45,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -54,8 +54,8 @@ describe("Auth User Info", () => {
 
     expect(response.statusCode).toBe(200);
     const authUserInfoResponse: UserInfoClaims = JSON.parse(response.body);
-    expect(authUserInfoResponse.claims.email).toBe(userProfileMock.email);
-    expect(authUserInfoResponse.claims.local_account_id).toBe(
+    expect(authUserInfoResponse.email).toBe(userProfileMock.email);
+    expect(authUserInfoResponse.local_account_id).toBe(
       userProfileMock.subjectId
     );
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
@@ -90,7 +90,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: "bearer",
+          Authorization: "Bearer",
         }
       ),
       null!,
@@ -99,7 +99,7 @@ describe("Auth User Info", () => {
 
     expect(response.statusCode).toBe(401);
     expect(response.multiValueHeaders["WWW-Authenticate"]).toStrictEqual([
-      `Bearer error="invalid_token", error_description="Error: Unable to extract (opaque) bearer token"`,
+      `Bearer error="invalid_token", error_description="Error: Unable to extract (opaque) bearer token: Invalid HTTP Authorization header value"`,
     ]);
   });
 
@@ -117,7 +117,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -144,7 +144,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -167,7 +167,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
         }
       ),
       null!,

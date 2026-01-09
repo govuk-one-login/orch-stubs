@@ -15,6 +15,7 @@ import {
 } from "./services/access-token-dynamodb-service";
 import { UserInfoClaims } from "./interfaces/user-info-claim-interface";
 import { getUserProfileBySubjectId } from "./services/user-profile-dynamodb-service";
+import { logger } from "../logger";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -61,6 +62,7 @@ async function get(
       throw new Error("Invalid bearer token");
     }
   } catch (error) {
+    logger.error(`Error received: ${(error as Error).message}`);
     return {
       statusCode: 401,
       body: "",
@@ -105,22 +107,20 @@ const populateUserInfo = async (
   );
 
   return {
-    claims: {
-      sub: "",
-      rp_pairwise_id: "",
-      new_account: accessTokenStore.isNewAccount,
-      password_reset_time: accessTokenStore.passwordResetTime,
-      legacy_subject_id: userProfile.legacySubjectId,
-      public_subject_id: userProfile.publicSubjectId,
-      local_account_id: userProfile.subjectId,
-      email: userProfile.email,
-      email_verified: userProfile.emailVerified,
-      phone_number: userProfile.phoneNumber,
-      phone_number_verified: userProfile.phoneNumberVerified,
-      salt: "",
-      verified_mfa_method_type: "",
-      uplift_required: "",
-      achieved_credential_strength: "",
-    },
+    sub: accessTokenStore.subjectId,
+    rp_pairwise_id: "test-rp-pairwise-id",
+    new_account: accessTokenStore.isNewAccount,
+    password_reset_time: accessTokenStore.passwordResetTime,
+    legacy_subject_id: userProfile.legacySubjectId,
+    public_subject_id: userProfile.publicSubjectId,
+    local_account_id: userProfile.subjectId,
+    email: userProfile.email,
+    email_verified: userProfile.emailVerified,
+    phone_number: userProfile.phoneNumber,
+    phone_number_verified: userProfile.phoneNumberVerified,
+    salt: "",
+    verified_mfa_method_type: "",
+    uplift_required: "",
+    achieved_credential_strength: "MEDIUM_LEVEL",
   };
 };
