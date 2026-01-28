@@ -14,8 +14,7 @@ import {
 import { SignJWT } from "jose";
 import { generateKeyPairSync, KeyObject, KeyPairKeyObjectResult } from "crypto";
 import {
-  mockEnvVariableSetup,
-  mockSigningKeyEnv,
+  mockEnvVariableSetupWithKey,
   orchToAuthExpectedClientId,
 } from "./helpers/test-setup";
 
@@ -30,10 +29,9 @@ describe("Auth Token", () => {
   let ecKeyPair: KeyPairKeyObjectResult;
 
   beforeEach(async () => {
-    mockEnvVariableSetup();
-    await setUpAuthCode();
     ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
-    mockSigningKeyEnv(ecKeyPair.publicKey);
+    mockEnvVariableSetupWithKey(ecKeyPair.publicKey);
+    await setUpAuthCode();
   });
 
   afterEach(async () => {

@@ -35,10 +35,12 @@ Mappings:
       authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
       authDomain: authdev3.dev.account.gov.uk
       orchToAuthSigningPublicKey: -----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyu7XCXkDyxhHrmoOfLrl6tcd9e9VL1pzzWqVo1P546NLL2c1H2Qd7UNaa7oQX1/eNFDKaAZuJY3YUAPwNN4Ypg==-----END PUBLIC KEY-----
+      orchAuthJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/auth-jwks.json
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
       authDomain: build.account.gov.uk
       orchToAuthSigningPublicKey: -----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENRdvNXHwk1TvrgFUsWXAE5oDTcPrCBp6HxbvYDLsqwNHiDFEzCwvbXKY2QQR/Rtel0o156CtU9k1lCZJGAsSIA==-----END PUBLIC KEY-----
+      orchAuthJwksUrl: https://oidc.build.account.gov.uk/.well-known/auth-jwks.json
 
 Globals:
   Function:
@@ -143,6 +145,12 @@ Resources:
               !Ref Environment,
               orchToAuthSigningPublicKey,
             ]
+          AUTH_JWKS_URL:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              orchAuthJwksUrl,
+            ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
           ORCH_TO_AUTH_AUDIENCE: !If 
             - IsDev
@@ -197,6 +205,12 @@ Resources:
               EnvironmentConfiguration,
               !Ref Environment,
               orchToAuthSigningPublicKey,
+            ]
+          AUTH_JWKS_URL:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              orchAuthJwksUrl,
             ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
       Events:
