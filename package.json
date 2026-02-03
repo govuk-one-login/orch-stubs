@@ -45,10 +45,10 @@
     "semi": true
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.679.0",
-    "@aws-sdk/client-kms": "^3.962.0",
-    "@aws-sdk/client-sqs": "^3.920.0",
-    "@aws-sdk/lib-dynamodb": "^3.934.0",
+    "@aws-sdk/client-dynamodb": "^3.981.0",
+    "@aws-sdk/client-kms": "^3.981.0",
+    "@aws-sdk/client-sqs": "^3.981.0",
+    "@aws-sdk/lib-dynamodb": "^3.981.0",
     "@types/node-jose": "^1.1.13",
     "esbuild": "^0.25.8",
     "jose": "^5.9.6",
