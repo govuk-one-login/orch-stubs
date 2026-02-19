@@ -130,7 +130,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-authorize.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -178,7 +178,7 @@ Resources:
           - src/main/auth-stub/auth-authorize.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   AuthTokenLambda:
@@ -186,7 +186,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-token.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -223,7 +223,7 @@ Resources:
           - src/main/auth-stub/auth-token.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   AuthUserInfoLambda:
@@ -231,7 +231,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-userinfo.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -262,7 +262,7 @@ Resources:
           - src/main/auth-stub/auth-userinfo.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   AuthCodeTableReadAccessPolicy:

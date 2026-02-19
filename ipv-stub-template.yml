@@ -86,7 +86,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-authorize.handler
       LoggingConfig:
         LogGroup: !Ref IPVAuthorizeLambdaLogGroup
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -133,7 +133,7 @@ Resources:
           - "@aws-sdk/client-dynamodb"
           - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   IPVAuthorizeLambdaLogGroup:
@@ -149,7 +149,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-token.handler
       LoggingConfig:
         LogGroup: !Ref IPVTokenLambdaLogGroup
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -193,7 +193,7 @@ Resources:
           - "@aws-sdk/client-dynamodb"
           - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   IPVTokenLambdaLogGroup:
@@ -209,7 +209,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-user-identity.handler
       LoggingConfig:
         LogGroup: !Ref IPVUserIdentityLambdaLogGroup
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -240,7 +240,7 @@ Resources:
           - "@aws-sdk/client-dynamodb"
           - "@aws-sdk/lib-dynamodb"
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   IPVJwksLambda:
@@ -248,7 +248,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-jwks.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -269,7 +269,7 @@ Resources:
           - src/main/ipv-stub/ipv-jwks.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   IPVUserIdentityLambdaLogGroup:
