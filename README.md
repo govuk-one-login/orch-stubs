@@ -2,7 +2,7 @@
 These stubs are owned by Orchestration for performance and scaling testing purposes.
 
 There are three stubs:
- - [Authentication](src/main//auth-stub/)
+ - [Authentication](src/main/auth-stub/)
  - [IPV](src/main/ipv-stub/)
  - [Spot](src/main/spot-stub/) 
 
@@ -10,7 +10,7 @@ This will allow Orchestration to exercise different journeys, write Orchestratio
 
 #### Prerequisites
 
-A version of SAM CLI (v1.120.0+) that supports Node.js version 20. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
+A version of SAM CLI (v1.130.0+) that supports Node.js version 22. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
 #### Build
 
