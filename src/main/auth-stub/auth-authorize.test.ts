@@ -10,28 +10,40 @@ import * as decryptionHelper from "./helpers/decryption-helper";
 import * as jwtHelper from "./helpers/jwt-helper";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { createMockClaims } from "./test-helper/test-data";
-import { mockEnvVariableSetup } from "./test-helper/test-setup";
+import {
+  createSignedJwt,
+  mockEnvVariableSetupWithKey,
+} from "./test-helper/test-setup";
 import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
+import * as jose from "jose";
+import { generateKeyPair } from "jose";
 
 describe("Auth Authorize", () => {
+  let authSigningKeyPair: jose.GenerateKeyPairResult;
+  beforeEach(async () => {
+    authSigningKeyPair = await generateKeyPair("ES256");
+  });
   describe("GET endpoint", () => {
     let addUserProfileSpy: jest.SpyInstance;
     let mockDynamoDbReponse: PutCommandOutput;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
       addUserProfileSpy = jest
         .spyOn(userProfileDynamoDbService, "addUserProfile")
         .mockResolvedValue(mockDynamoDbReponse);
-      jest
-        .spyOn(decryptionHelper, "decrypt")
-        .mockResolvedValue(
-          "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
-        );
+      jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
+        createSignedJwt(
+          {
+            aud: "test",
+          },
+          authSigningKeyPair.privateKey
+        )
+      );
       jest
         .spyOn(jwtHelper, "validateClaims")
         .mockResolvedValue(createMockClaims());
-      mockEnvVariableSetup();
+      mockEnvVariableSetupWithKey(authSigningKeyPair.publicKey);
     });
 
     it("should try add a user-profile", async () => {
@@ -193,7 +205,7 @@ describe("Auth Authorize", () => {
       jest
         .spyOn(jwtHelper, "validateClaims")
         .mockResolvedValue(createMockClaims());
-      mockEnvVariableSetup();
+      mockEnvVariableSetupWithKey(authSigningKeyPair.publicKey);
     });
 
     it("should return a 302 without error code when valid post request sent", async () => {

@@ -15,7 +15,7 @@ describe("Auth Token", () => {
   let verifyClientAssertionSpy: jest.SpyInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 200 } };
     addAccessTokenStoreSpy = jest
       .spyOn(accessTokenDynamoDbService, "addAccessTokenStore")
@@ -35,7 +35,7 @@ describe("Auth Token", () => {
     verifyClientAssertionSpy = jest
       .spyOn(tokenValidationHelper, "verifyClientAssertion")
       .mockResolvedValue(undefined);
-    mockEnvVariableSetup();
+    await mockEnvVariableSetup();
   });
 
   it("should return an access token when given an auth code", async () => {

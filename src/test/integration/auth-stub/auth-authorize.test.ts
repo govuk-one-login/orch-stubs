@@ -2,7 +2,7 @@ import { createApiGatewayEvent } from "../util";
 import { handler } from "../../../main/auth-stub/auth-authorize";
 import * as jose from "jose";
 import { Claims } from "src/main/auth-stub/helpers/claims-config";
-import { mockEnvVariableSetup } from "./helpers/test-setup";
+import { mockEnvVariableSetupWithKey } from "./helpers/test-setup";
 import * as decryptionHelper from "../../../main/auth-stub/helpers/decryption-helper";
 import {
   addUserProfile,
@@ -13,11 +13,14 @@ import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token
 
 describe("Auth Authorize", () => {
   const EMAIL = "dummy.email@mail.com";
+  let privateKey: jose.KeyLike;
 
   beforeEach(async () => {
-    const privateKey = await getPrivateKey();
+    const ecKeyPair = await jose.generateKeyPair("ES256");
+    privateKey = ecKeyPair.privateKey;
+
+    mockEnvVariableSetupWithKey(ecKeyPair.publicKey);
     const jwt = await createJwt(createMockClaims(), privateKey);
-    mockEnvVariableSetup();
     jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
     await addUserProfile(createUserPofile(EMAIL));
   });
@@ -97,13 +100,6 @@ describe("Auth Authorize", () => {
       "https://oidc.local.account.gov.uk/orchestration-redirect?error=test-error-code"
     );
   });
-  async function getPrivateKey(): Promise<jose.KeyLike> {
-    const key = await jose.importPKCS8(
-      "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
-      "ES256"
-    );
-    return key;
-  }
 
   function createValidPostRequest(): string {
     return createFormBodyWithErrorCode();
