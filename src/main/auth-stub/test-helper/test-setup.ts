@@ -1,6 +1,6 @@
 import * as config from "../helpers/config";
 import * as keyHelper from "../helpers/key-helpers";
-import { exportSPKI, generateKeyPair, KeyLike } from "jose";
+import { generateKeyPair, KeyLike } from "jose";
 import * as jose from "jose";
 
 export const mockEnvVariableSetup = async () => {
@@ -12,19 +12,11 @@ export const mockEnvVariableSetupWithKey = async (authPublicKey: KeyLike) => {
   process.env.AUTH_JWKS_URL = "http://localhost/.well-known/auth-jwks.json";
   process.env.ORCH_TO_AUTH_CLIENT_ID = "orchestrationAuth";
   jest
-    .spyOn(config, "getOrchToAuthSigningPublicKey")
-    .mockReturnValue(await exportSPKI(authPublicKey));
-  jest
     .spyOn(config, "getOrchToAuthExpectedAudience")
     .mockReturnValue("testURL");
   jest
     .spyOn(config, "getOrchToAuthExpectedClientId")
     .mockReturnValue("orchestrationAuth");
-  jest
-    .spyOn(keyHelper, "getAuthPublicSigningKey")
-    .mockReturnValue(
-      "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEn8HvZP5umARULT+kFlJMC+djrruj4jnfQ0dzrAty0YKF4NPR/WV2QrpCRKQyBwbJk7dcGfW1HpafH78+T8bC9Q==-----END PUBLIC KEY-----"
-    );
   jest
     .spyOn(keyHelper, "getContentEncryptionKey")
     .mockResolvedValue(
