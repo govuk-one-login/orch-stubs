@@ -1,7 +1,7 @@
 import { logger } from "../../logger";
 import { CodedError } from "../../helper/result-helper";
 import { getAuthCodeStore } from "../services/auth-code-dynamodb-service";
-import { decodeJwt, jwtVerify, KeyLike } from "jose";
+import { createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
 
 export const validateAuthCode = async (authCode: string | undefined) => {
   if (!authCode) {
@@ -81,7 +81,7 @@ export const verifyClientAssertion = async (
   body: {
     [k: string]: string;
   },
-  signingKey: KeyLike
+  jwks: ReturnType<typeof createRemoteJWKSet>
 ) => {
   const clientAssertion = body["client_assertion"];
   if (!clientAssertion) {
@@ -106,7 +106,7 @@ export const verifyClientAssertion = async (
   }
 
   try {
-    await jwtVerify(clientAssertion, signingKey);
+    await jwtVerify(clientAssertion, jwks);
   } catch {
     throw new CodedError(400, "JWT verificaiton failed");
   }

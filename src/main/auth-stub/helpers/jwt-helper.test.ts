@@ -1,14 +1,13 @@
-import { KeyLike } from "jose";
+import { generateKeyPair, KeyLike } from "jose";
 import {
   createJwt,
   createListOfMissingMockClaims,
   createMockClaims,
-  getPrivateKey,
   getWrongPrivateKey,
 } from "../test-helper/test-data";
 import { validateClaims } from "./jwt-helper";
 import { Claims } from "./claims-config";
-import { mockEnvVariableSetup } from "../test-helper/test-setup";
+import { mockEnvVariableSetupWithKey } from "../test-helper/test-setup";
 import { CodedError } from "../../helper/result-helper";
 
 describe("JWT service", () => {
@@ -20,11 +19,15 @@ describe("JWT service", () => {
     createListOfMissingMockClaims();
 
   beforeAll(async () => {
+    const authSigningKeyPair = await generateKeyPair("ES256");
     claims = createMockClaims();
-    privateKey = await getPrivateKey();
+    privateKey = authSigningKeyPair.privateKey;
     wrongPrivateKey = await getWrongPrivateKey();
-    validJwt = await createJwt(createMockClaims(), privateKey);
-    mockEnvVariableSetup();
+    validJwt = await createJwt(
+      createMockClaims(),
+      authSigningKeyPair.privateKey
+    );
+    mockEnvVariableSetupWithKey(authSigningKeyPair.publicKey);
   });
 
   describe("validateClaims", () => {

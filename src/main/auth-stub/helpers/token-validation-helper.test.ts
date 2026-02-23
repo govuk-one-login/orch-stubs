@@ -12,7 +12,7 @@ import {
 } from "./token-validation-helper";
 import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service";
 import { generateKeyPairSync, KeyPairKeyObjectResult } from "crypto";
-import { SignJWT } from "jose";
+import { createRemoteJWKSet, KeyLike, SignJWT } from "jose";
 
 describe("Token Validation Helper", () => {
   describe("validate auth-code", () => {
@@ -209,7 +209,8 @@ describe("Token Validation Helper", () => {
     });
 
     it("should error when the client-assertion does not exist", async () => {
-      const action = async () => verifyClientAssertion({}, ecKeyPair.publicKey);
+      const action = async () =>
+        verifyClientAssertion({}, jwksReturningKey(ecKeyPair.publicKey));
 
       await expect(action).rejects.toThrow(
         "Missing client_assertion parameter"
@@ -220,7 +221,7 @@ describe("Token Validation Helper", () => {
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: "invalid.jwt" },
-          ecKeyPair.publicKey
+          jwksReturningKey(ecKeyPair.publicKey)
         );
 
       await expect(action).rejects.toThrow(
@@ -232,7 +233,7 @@ describe("Token Validation Helper", () => {
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: signPayload },
-          ecKeyPair.publicKey
+          jwksReturningKey(ecKeyPair.publicKey)
         );
 
       await expect(action).rejects.toThrow(
@@ -244,7 +245,7 @@ describe("Token Validation Helper", () => {
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: signPayload, client_id: "incorrectClientId" },
-          ecKeyPair.publicKey
+          jwksReturningKey(ecKeyPair.publicKey)
         );
 
       await expect(action).rejects.toThrow(
@@ -260,7 +261,7 @@ describe("Token Validation Helper", () => {
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: signPayload, client_id: clientId },
-          incorrectPublicKey
+          jwksReturningKey(incorrectPublicKey)
         );
 
       await expect(action).rejects.toThrow("JWT verificaiton failed");
@@ -270,10 +271,16 @@ describe("Token Validation Helper", () => {
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: signPayload, client_id: clientId },
-          ecKeyPair.publicKey
+          jwksReturningKey(ecKeyPair.publicKey)
         );
 
       expect(action).not.toThrow();
     });
   });
 });
+
+const jwksReturningKey = (publicKey: KeyLike) => {
+  return (() => Promise.resolve(publicKey)) as ReturnType<
+    typeof createRemoteJWKSet
+  >;
+};
