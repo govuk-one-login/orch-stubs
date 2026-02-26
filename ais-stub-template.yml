@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Account intervention stub owned by Orchestration team
+
+Tags:
+  Service: Account intervention stub
+  Source: govuk-one-login/orch-stubs
+  Owner: di-orchestration@digital.cabinet-office.gov.uk
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+    AllowedValues:
+      - dev
+      - build
+  CodeSigningConfigArn:
+    Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+  VpcStackName:
+    Type: String
+    Description: The name of the stack used to create the VPC
+
+Conditions:
+  UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
+  UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  IsNotProduction: !Not [!Equals [!Ref Environment, production]]
+  IsLocalEnv: !Equals [!Ref Environment, local]
+  IsDev: !Equals [!Ref Environment, dev]
+
+
+Globals:
+  Function:
+    CodeSigningConfigArn: !If
+      - UseCodeSigning
+      - !Ref CodeSigningConfigArn
+      - !Ref AWS::NoValue
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
+Resources:
+
+  StubInterventionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Environment}-AIS-stub-interventions
+      KeySchema:
+        - AttributeName: pairwiseId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      Tags:
+        - Key: Name
+          Value: authCode
+
+
+  AccountInterventionsStubApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        -  "${Environment}-orch-ais-stub-api"
+      StageName: !Ref Environment]
+      OpenApiVersion: 3.0.1
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+          - Fn::ImportValue: !Sub "${VpcStackName}-ExecuteApiGatewayEndpointId"
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Allow
+              Action: "execute-api:Invoke"
+              Principal: "*"
+              Resource: "execute-api:/*"
+            - Effect: Deny
+              Action: "execute-api:Invoke"
+              Principal: "*"
+              Resource:
+                - "execute-api:/*"
+              Condition:
+                StringNotEquals:
+                  aws:SourceVpce:
+                    - Fn::ImportValue: !Sub "${VpcStackName}-ExecuteApiGatewayEndpointId"
+      MethodSettings:
+        - CachingEnabled: false
+          DataTraceEnabled: false
+          HttpMethod: "*"
+          ResourcePath: "/*"
+          LoggingLevel: INFO
+          MetricsEnabled: true
+      TracingEnabled: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: !Sub "${Environment}-orch-ais-stub-api"
+        paths:
+          /v1/ais/{internalPairwiseId}:
+            get:
+              parameters:
+                - name: internalPairwiseId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AisStubInterventionsHandler.Arn}:active/invocations"
+                requestParameters:
+                  integration.request.path.internalPairwiseId: method.request.path.internalPairwiseId
+                timeoutInMillis: 29000
+
+
+  AisStubInterventionsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/ais-stub/ais-stub.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          # These will always be over-written when running locally in parameters.json
+          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          STUB_AIS_TABLE_NAME: !Ref StubInterventionsTable
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/ais-stub/ais-stub.ts
+        Minify: true
+        Sourcemap: true
+        Target: node20
+        UseNpmCi: True
+    Policies:
+        - !Ref StubInterventionsTableReadPolicy
+
+
+  StubInterventionsTableReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAuthStubAuthCodeTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Query
+              - dynamodb:Scan
+            Resource: !GetAtt StubInterventionsTable.Arn    
