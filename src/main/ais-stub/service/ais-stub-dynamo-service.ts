@@ -2,7 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { StubInterventionData } from "../types/StubInterventionData";
 import { Optional } from "../types/Optional";
-import { getEnv } from "src/main/util/getEnv";
+import { getEnv } from "../../../main/util/getEnv";
 
 const dynamoClient = DynamoDBDocument.from(
   new DynamoDBClient({
