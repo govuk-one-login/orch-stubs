@@ -1,0 +1,31 @@
+#TODO: test in dev and then setup pipeline
+# name: Deploy Stubs Build and Promote AIS
+
+# permissions:
+#   id-token: write
+#   contents: read
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - "**ipv-stub**"
+#       - "**spot-stub**"
+#       - "**auth-stub**"
+
+# jobs:
+#   run-checks:
+#     uses: ./.github/workflows/run-checks.yml
+#     secrets:
+#       SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.ORCH_STUBS_SAM_APP_VALIDATE_ROLE_ARN }}
+#       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#   deploy:
+#     uses: ./.github/workflows/deploy-stubs.yml
+#     needs: run-checks
+#     secrets:
+#     # TODO: Provision build pipeline
+#       GH_ACTIONS_ROLE_ARN: ${{ secrets.AIS_STUB_GH_ACTIONS_ROLE_ARN }}
+#       ARTIFACT_BUCKET_NAME: ${{ secrets.AIS_STUB_ARTIFACT_BUCKET_NAME }}
+#       SIGNING_PROFILE_NAME: ${{ secrets.ORCH_STUBS_SIGNING_PROFILE_NAME }}
+#       WORKING_DIRECTORY: build/ais
