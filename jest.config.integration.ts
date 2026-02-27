@@ -6,7 +6,7 @@ const config: Config = {
   testEnvironment: "node",
   testPathIgnorePatterns: ["/node_modules/"],
   testMatch: ["<rootDir>/src/test/integration/**/*.test.ts"],
-  setupFiles: ["<rootDir>/src/test/integration/setup.ts"],
+  globalSetup: "<rootDir>/src/test/integration/setup.ts",
 };
 
 export default config;

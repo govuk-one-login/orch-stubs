@@ -14,3 +14,6 @@ awslocal dynamodb create-table --table-name local-AuthStub-UserProfile --key-sch
               }
           ]" \
   --billing-mode PAY_PER_REQUEST --region eu-west-2
+
+
+  awslocal dynamodb create-table --table-name local-AIS-stub-interventions --key-schema AttributeName=pairwiseId,KeyType=HASH --billing-mode PAY_PER_REQUEST --attribute-definitions AttributeName=pairwiseId,AttributeType=S --region eu-west-2
