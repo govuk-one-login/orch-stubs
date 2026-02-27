@@ -11,6 +11,7 @@ on:
     paths-ignore:
       - "**auth-stub**"
       - "**spot-stub**"
+      - "**ais-stub**"
 
 jobs:
   run-checks:
