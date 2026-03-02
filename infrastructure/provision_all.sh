@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
 ENVIRONMENT=${1}
 
 PROVISION_COMMAND="../../devplatform-deploy/stack-orchestration-tool/provisioner.sh"
