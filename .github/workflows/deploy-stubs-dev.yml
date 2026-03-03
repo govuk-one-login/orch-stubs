@@ -66,7 +66,6 @@ jobs:
     uses: ./.github/workflows/deploy-stubs.yml
     needs: run-checks
     secrets:
-    # TODO Provision dev pipeline
       GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_AIS_STUB_GH_ACTIONS_ROLE_ARN }}
       ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_AIS_STUB_ARTIFACT_BUCKET_NAME }}
       SIGNING_PROFILE_NAME: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
