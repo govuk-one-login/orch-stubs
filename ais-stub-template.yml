@@ -118,7 +118,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ais-stub/ais-stub.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -136,7 +136,7 @@ Resources:
           - src/main/ais-stub/ais-stub.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
 
   AisStubInterventionsHandlerApiInvokePermission:
