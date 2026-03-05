@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
 ENVIRONMENT=${1}
 
 PROVISION_COMMAND="../../devplatform-deploy/stack-orchestration-tool/provisioner.sh"
@@ -11,7 +14,7 @@ export TAGS_FILE
 ## Provision dependencies
 for dir in configuration/"$ENVIRONMENT"/*/; do
   STACK=$(basename "$dir")
-  if [[ $STACK != "$ENVIRONMENT-auth-stub-pipeline" && $STACK != "$ENVIRONMENT-ipv-stub-pipeline" && $STACK != "$ENVIRONMENT-spot-stub-pipeline"&& -f configuration/$ENVIRONMENT/$STACK/parameters.json ]]; then
+  if [[ $STACK != "$ENVIRONMENT-auth-stub-pipeline" && $STACK != "$ENVIRONMENT-ipv-stub-pipeline" && $STACK != "$ENVIRONMENT-spot-stub-pipeline" && $STACK != "$ENVIRONMENT-ais-stub-pipeline" && -f configuration/$ENVIRONMENT/$STACK/parameters.json ]]; then
     PARAMETERS_FILE="$(pwd)/configuration/${ENVIRONMENT}/${STACK}/parameters.json"
     export PARAMETERS_FILE
     $PROVISION_COMMAND "$ENVIRONMENT" "$STACK" "$STACK" LATEST &
@@ -21,7 +24,7 @@ done
 ## Provision secure pipelines
 for dir in configuration/"$ENVIRONMENT"/*/; do
   STACK=$(basename "$dir")
-  if [[ $STACK == "$ENVIRONMENT-auth-stub-pipeline" || $STACK == "$ENVIRONMENT-ipv-stub-pipeline" || $STACK == "$ENVIRONMENT-spot-stub-pipeline" ]]; then
+  if [[ $STACK == "$ENVIRONMENT-auth-stub-pipeline" || $STACK == "$ENVIRONMENT-ipv-stub-pipeline" || $STACK == "$ENVIRONMENT-spot-stub-pipeline" || $STACK == "$ENVIRONMENT-ais-stub-pipeline" ]]; then
     PARAMETERS_FILE="$(pwd)/configuration/${ENVIRONMENT}/${STACK}/parameters.json"
     export PARAMETERS_FILE
     $PROVISION_COMMAND "$ENVIRONMENT" "$STACK" sam-deploy-pipeline LATEST

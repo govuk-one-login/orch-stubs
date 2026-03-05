@@ -1,10 +1,11 @@
 import { APIGatewayEvent } from "aws-lambda";
 
 export const createApiGatewayEvent = (
-  httpMethod: "GET" | "POST",
+  httpMethod: string,
   body: string,
   queryParams: Record<string, string>,
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  pathParameters = {}
 ): APIGatewayEvent => ({
   httpMethod,
   body: body,
@@ -13,7 +14,7 @@ export const createApiGatewayEvent = (
   multiValueHeaders: {},
   multiValueQueryStringParameters: {},
   path: "/",
-  pathParameters: {},
+  pathParameters: pathParameters,
   queryStringParameters: queryParams,
   requestContext: {
     accountId: "123456789012",
