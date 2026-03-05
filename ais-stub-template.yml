@@ -127,6 +127,8 @@ Resources:
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           STUB_AIS_TABLE_NAME: !Ref StubInterventionsTable
+      Policies:
+        - !Ref StubInterventionsTableReadPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -136,8 +138,6 @@ Resources:
         Sourcemap: true
         Target: node20
         UseNpmCi: True
-    Policies:
-      - !Ref StubInterventionsTableReadPolicy
 
   AisStubInterventionsHandlerApiInvokePermission:
     Type: AWS::Lambda::Permission
@@ -152,7 +152,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Sid: AllowAuthStubAuthCodeTableWriteAccess
+          - Sid: AllowAccessToStubInterventionsTable
             Effect: Allow
             Action:
               - dynamodb:GetItem
