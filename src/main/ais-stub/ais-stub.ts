@@ -9,52 +9,63 @@ import {
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  if (event.httpMethod !== "GET") {
+  try {
+    if (event.httpMethod !== "GET") {
+      return {
+        statusCode: 405,
+        body: "Method not allowed",
+      };
+    }
+    const pathParameters = event.pathParameters;
+
+    if (!pathParameters) {
+      return {
+        statusCode: 400,
+        body: "No path parameters in request",
+      };
+    }
+
+    const pairwiseId = pathParameters.internalPairwiseId;
+
+    if (!pairwiseId) {
+      return {
+        statusCode: 400,
+        body: "No internalPairwiseId in path parameters",
+      };
+    }
+
+    const stubInterventionsData = (
+      await getStubIntervention(pairwiseId)
+    ).orElseGet(() => {
+      logger.info(
+        "No stub interventions data for pairwise ID. Returning default."
+      );
+      return { ...defaultState(), pairwiseId: pairwiseId };
+    });
+
+    const { blocked, reproveIdentity, suspended, resetPassword } =
+      stubInterventionsData;
+
     return {
-      statusCode: 405,
-      body: "Method not allowed",
+      statusCode: 200,
+      body: JSON.stringify({
+        intervention: defaultIntervention(),
+        state: {
+          blocked: blocked ?? false,
+          reproveIdentity: reproveIdentity ?? false,
+          suspended: suspended ?? false,
+          resetPassword: resetPassword ?? false,
+        },
+      }),
     };
-  }
-  const pathParameters = event.pathParameters;
-
-  if (!pathParameters) {
-    return {
-      statusCode: 400,
-      body: "No path parameters in request",
-    };
-  }
-
-  const pairwiseId = pathParameters.internalPairwiseId;
-
-  if (!pairwiseId) {
-    return {
-      statusCode: 400,
-      body: "No internalPairwiseId in path parameters",
-    };
-  }
-
-  const stubInterventionsData = (
-    await getStubIntervention(pairwiseId)
-  ).orElseGet(() => {
-    logger.info(
-      "No stub interventions data for pairwise ID. Returning default."
+  } catch (err) {
+    logger.error(
+      "Stub interventions handler threw unexpected error: " +
+        (err as Error).message
     );
-    return { ...defaultState(), pairwiseId: pairwiseId };
-  });
-
-  const { blocked, reproveIdentity, suspended, resetPassword } =
-    stubInterventionsData;
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      intervention: defaultIntervention(),
-      state: {
-        blocked: blocked ?? false,
-        reproveIdentity: reproveIdentity ?? false,
-        suspended: suspended ?? false,
-        resetPassword: resetPassword ?? false,
-      },
-    }),
-  };
+    return {
+      statusCode: 500,
+      body: "Unexpected exception thrown in interventions handler",
+    };
+  }
 };
