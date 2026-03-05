@@ -62,7 +62,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub "${Environment}-orch-ais-stub-api"
-      StageName: !Ref Environment]
+      StageName: !Ref Environment
       OpenApiVersion: 3.0.1
       EndpointConfiguration:
         Type: PRIVATE
