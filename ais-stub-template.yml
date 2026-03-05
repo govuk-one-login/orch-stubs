@@ -108,7 +108,7 @@ Resources:
               x-amazon-apigateway-integration:
                 type: aws_proxy
                 httpMethod: POST
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AisStubInterventionsHandler.Arn}:active/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AisStubInterventionsHandler.Arn}/invocations"
                 requestParameters:
                   integration.request.path.internalPairwiseId: method.request.path.internalPairwiseId
                 timeoutInMillis: 29000
@@ -138,6 +138,13 @@ Resources:
         UseNpmCi: True
     Policies:
       - !Ref StubInterventionsTableReadPolicy
+
+  AisStubInterventionsHandlerApiInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt AisStubInterventionsHandler.Arn
+      Principal: apigateway.amazonaws.com
 
   StubInterventionsTableReadPolicy:
     Type: AWS::IAM::ManagedPolicy
