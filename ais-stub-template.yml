@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Account intervention stub owned by Orchestration team
 
-Tags:
-  Service: Account intervention stub
-  Source: govuk-one-login/orch-stubs
-  Owner: di-orchestration@digital.cabinet-office.gov.uk
 
 Parameters:
   Environment:
