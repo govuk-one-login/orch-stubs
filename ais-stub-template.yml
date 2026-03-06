@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Account intervention stub owned by Orchestration team
 
-Tags:
-  Service: Account intervention stub
-  Source: govuk-one-login/orch-stubs
-  Owner: di-orchestration@digital.cabinet-office.gov.uk
-
 Parameters:
   Environment:
     Type: String
@@ -33,7 +28,6 @@ Conditions:
   IsLocalEnv: !Equals [!Ref Environment, local]
   IsDev: !Equals [!Ref Environment, dev]
 
-
 Globals:
   Function:
     CodeSigningConfigArn: !If
@@ -46,7 +40,6 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
-
   StubInterventionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -54,6 +47,9 @@ Resources:
       KeySchema:
         - AttributeName: pairwiseId
           KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: pairwiseId
+          AttributeType: S
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
         AttributeName: ttl
@@ -62,13 +58,11 @@ Resources:
         - Key: Name
           Value: stub-interventions
 
-
   AccountInterventionsStubApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub
-        -  "${Environment}-orch-ais-stub-api"
-      StageName: !Ref Environment]
+      Name: !Sub "${Environment}-orch-ais-stub-api"
+      StageName: !Ref Environment
       OpenApiVersion: 3.0.1
       EndpointConfiguration:
         Type: PRIVATE
@@ -114,18 +108,17 @@ Resources:
               x-amazon-apigateway-integration:
                 type: aws_proxy
                 httpMethod: POST
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AisStubInterventionsHandler.Arn}:active/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AisStubInterventionsHandler.Arn}/invocations"
                 requestParameters:
                   integration.request.path.internalPairwiseId: method.request.path.internalPairwiseId
                 timeoutInMillis: 29000
-
 
   AisStubInterventionsHandler:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/main/ais-stub/ais-stub.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -134,6 +127,8 @@ Resources:
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           STUB_AIS_TABLE_NAME: !Ref StubInterventionsTable
+      Policies:
+        - !Ref StubInterventionsTableReadPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -141,11 +136,15 @@ Resources:
           - src/main/ais-stub/ais-stub.ts
         Minify: true
         Sourcemap: true
-        Target: node20
+        Target: es2022
         UseNpmCi: True
-    Policies:
-        - !Ref StubInterventionsTableReadPolicy
 
+  AisStubInterventionsHandlerApiInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt AisStubInterventionsHandler.Arn
+      Principal: apigateway.amazonaws.com
 
   StubInterventionsTableReadPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -153,10 +152,10 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Sid: AllowAuthStubAuthCodeTableWriteAccess
+          - Sid: AllowAccessToStubInterventionsTable
             Effect: Allow
             Action:
               - dynamodb:GetItem
               - dynamodb:Query
               - dynamodb:Scan
-            Resource: !GetAtt StubInterventionsTable.Arn    
+            Resource: !GetAtt StubInterventionsTable.Arn
