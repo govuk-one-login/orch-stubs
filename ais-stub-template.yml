@@ -89,7 +89,7 @@ Resources:
           DataTraceEnabled: false
           HttpMethod: "*"
           ResourcePath: "/*"
-          LoggingLevel: INFO
+          LoggingLevel: "OFF"
           MetricsEnabled: true
       TracingEnabled: true
       DefinitionBody:
