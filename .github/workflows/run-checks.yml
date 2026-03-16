@@ -27,6 +27,15 @@ jobs:
 
   run-tests:
     runs-on: ubuntu-latest
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+          - 8000:8000
+      elasticmq:
+        image: softwaremill/elasticmq
+        ports:
+          - 9324:9324
     steps:
       - name: Check out repository code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -44,9 +53,6 @@ jobs:
         run: docker run --privileged --rm tonistiigi/binfmt --install all
       - name: Start and run tests
         run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test:ci; exit 0)
-        env:
-          AWS_ACCESS_KEY_ID: X
-          AWS_SECRET_ACCESS_KEY: X
       - name: SonarCloud Scan
         if: ${{ github.actor != 'dependabot[bot]' }}
         uses: sonarsource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0

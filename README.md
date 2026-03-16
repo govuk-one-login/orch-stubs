@@ -107,12 +107,6 @@ npm run dynamodblocal:up
 npm run elasticmq:up
 ```
 
-If this is the first time you are running the above command, you will also need to initialise the Dynamo tables.
-
-```shell
-npm run dynamodblocal:init
-```
-
 then run the tests as many times as needed with 
 
 ```shell

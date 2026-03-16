@@ -18,12 +18,6 @@ The IPV stub is able to be ran locally using DynamoDBLocal and sam local. To sta
 npm run dynamodblocal:up
 ```
 
-If this is the first time you are running the above command, you will also need to initialise the Dynamo tables.
-
-```bash
-npm run dynamodblocal:init
-```
-
 To run the local API Gateway with sam local, run the following:
 
 ```bash
