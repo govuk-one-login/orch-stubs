@@ -7,8 +7,12 @@ import {
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
-  ...(process.env.LOCALSTACK_ENDPOINT && {
-    endpoint: process.env.LOCALSTACK_ENDPOINT,
+  ...(process.env.DYNAMODB_LOCAL_ENDPOINT && {
+    endpoint: process.env.DYNAMODB_LOCAL_ENDPOINT,
+    credentials: {
+      accessKeyId: "test",
+      secretAccessKey: "test",
+    },
   }),
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);

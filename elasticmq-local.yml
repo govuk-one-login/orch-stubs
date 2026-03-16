@@ -1,0 +1,8 @@
+services:
+  elasticmq:
+    container_name: elasticmq
+    image: 
+      softwaremill/elasticmq-native
+    ports:
+      - "127.0.0.1:9324:9324"
+      - "127.0.0.1:9325:9325"
