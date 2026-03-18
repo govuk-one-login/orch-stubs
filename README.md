@@ -77,7 +77,7 @@ then in a separate terminal run
 ```shell
 npm run test:ci
 ```
-This will spin up localstack and run both unit and integration tests, reporting coverage.
+This will spin up DynamoDBLocal and ElasticMQ, then run both unit and integration tests, reporting coverage.
 This is what runs in GitHub actions against PRs.
 
 #### Unit tests
@@ -97,13 +97,14 @@ npm run test:unit:{stub}
 You can run just the integration tests with 
 
 ```shell
-npm run test:localstack:integration
+npm run test:local:integration
 ```
 
-To run the integration tests repeatedly, it may be faster to stand up localstack with 
+To run the integration tests repeatedly, it may be faster to stand up DynamoDBLocal and ElasticMQ with 
 
 ```shell
-npm run localstack:up
+npm run dynamodblocal:up
+npm run elasticmq:up
 ```
 
 then run the tests as many times as needed with 
@@ -112,8 +113,9 @@ then run the tests as many times as needed with
 npm run test:integration
 ```
 
-and finally tear down localstack with
+and finally tear down DynamoDBLocal and ElasticMQ with
 
 ```shell
-npm run localstack:down
+npm run dynamodblocal:down
+npm run elasticmq:down
 ```

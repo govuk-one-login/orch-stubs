@@ -19,3 +19,4 @@ coverage
 
 #docker
 volume
+docker/dynamodb/shared-local-instance.db

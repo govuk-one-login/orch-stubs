@@ -13,12 +13,15 @@ import {
 describe("AIS stub handler", () => {
   const invalidHttpMethods = ["POST", "PUT", "PATCH", "HEAD", "DELETE"];
   const tableName = "local-AIS-stub-interventions";
-  const localStackDynamoClient = DynamoDBDocument.from(
-    new DynamoDBClient({
-      region: "eu-west-2",
-      endpoint: getEnv("LOCALSTACK_ENDPOINT"),
-    })
-  );
+  const dynamoClient = new DynamoDBClient({
+    region: "eu-west-2",
+    endpoint: getEnv("DYNAMODB_LOCAL_ENDPOINT"),
+    credentials: {
+      accessKeyId: "test",
+      secretAccessKey: "test",
+    },
+  });
+  const localDynamoClient = DynamoDBDocument.from(dynamoClient);
 
   beforeAll(async () => {
     process.env.STUB_AIS_TABLE_NAME = tableName;
@@ -119,19 +122,19 @@ describe("AIS stub handler", () => {
   const putStubIntervention = async (
     stubInterventionData: StubInterventionData
   ): Promise<void> => {
-    await localStackDynamoClient.put({
+    await localDynamoClient.put({
       TableName: tableName,
       Item: stubInterventionData,
     });
   };
 
   const clearStubInterventions = async (): Promise<void> => {
-    const items = await localStackDynamoClient.scan({
+    const items = await localDynamoClient.scan({
       TableName: tableName,
     });
 
     items.Items?.forEach((si) => {
-      localStackDynamoClient.delete({
+      localDynamoClient.delete({
         TableName: tableName,
         Key: {
           pairwiseId: si.pairwiseId,

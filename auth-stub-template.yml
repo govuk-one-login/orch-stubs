@@ -151,7 +151,7 @@ Resources:
               - "https://signin.${authDomain}/"
               - authDomain: !FindInMap [EnvironmentConfiguration, !Ref Environment, authDomain]
           # These will always be over-written when running locally in parameters.json
-          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DYNAMODB_LOCAL_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:

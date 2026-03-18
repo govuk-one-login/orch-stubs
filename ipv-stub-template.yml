@@ -96,7 +96,7 @@ Resources:
           ORCH_PUBLIC_SIGNING_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           # These will always be over-written when running locally in parameters.json
-          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DYNAMODB_LOCAL_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           DUMMY_ORCH_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:

@@ -12,10 +12,10 @@ This will allow you to test the Orch IPV stub with an identity journey executed 
 
 ## Running the stub locally
 
-The IPV stub is able to be ran locally using localstack and sam local. To start the local stack container, which contains the dynamoDB table `local-IpvStub-UserIdentity`, run the following command:
+The IPV stub is able to be ran locally using DynamoDBLocal and sam local. To start the local stack container, which contains the dynamoDB table `local-IpvStub-UserIdentity`, run the following command:
 
 ```bash
-npm run localstack:up
+npm run dynamodblocal:up
 ```
 
 To run the local API Gateway with sam local, run the following:
