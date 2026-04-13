@@ -18,16 +18,12 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      requestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:dev-stub-spot-request-queue"
       spotRequestQueueArn: "arn:aws:sqs:eu-west-2:816047645251:dev-spot-request-queue"
       requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/816047645251/dev-stub-spot-request-queue"
-      requestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/ea0a9780-458c-49a2-9fc8-17eee1338b9f" # This will need to change when the key is recreated
-      spotRequestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/72965845-80e0-49fd-9e32-9f9e4cef6ab0" 
+      spotRequestQueueKeyArn: "arn:aws:kms:eu-west-2:816047645251:key/72965845-80e0-49fd-9e32-9f9e4cef6ab0" # This will need to change when the key is recreated
     build:
-      requestQueueArn: "arn:aws:sqs:eu-west-2:767397776536:build-stub-spot-request-queue"
       spotRequestQueueArn: "arn:aws:sqs:eu-west-2:767397776536:build-spot-request-queue"
       requestQueueUrl: "https://sqs.eu-west-2.amazonaws.com/767397776536/build-stub-spot-request-queue"
-      requestQueueKeyArn: "arn:aws:kms:eu-west-2:767397776536:key/81ba9cec-cdb3-4e77-833a-03b68683dd1a"
       spotRequestQueueKeyArn: "arn:aws:kms:eu-west-2:767397776536:key/a78b5fff-1d96-49cb-a021-f8a98b6ea949"
 
 Conditions:
@@ -58,19 +54,6 @@ Resources:
       Architectures:
         - arm64
       Events:
-        Request:
-          Type: SQS
-          Properties:
-            BatchSize: 1
-            Enabled: true
-            Queue:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                requestQueueArn,
-              ]
-            FunctionResponseTypes:
-              - ReportBatchItemFailures
         RequestQueue:
           Type: SQS
           Properties:
@@ -87,7 +70,6 @@ Resources:
       Policies:
         - !Ref SpotRequestQueueConsumePolicy
         - !Ref SpotResponseQueueWritePolicy
-        - !Ref SpotStubRequestQueueConsumePolicy
       Environment:
         Variables:
           DESTINATION_QUEUE_URL: !GetAtt SpotResponseQueue.QueueUrl
@@ -122,37 +104,6 @@ Resources:
               - kms:GenerateDataKey
               - kms:Decrypt
             Resource: !GetAtt SpotResponseQueueKey.Arn
-
-  SpotStubRequestQueueConsumePolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: AllowWriteAccessToSpotQueue
-            Effect: Allow
-            Action:
-              - sqs:ReceiveMessage
-              - sqs:DeleteMessage
-              - sqs:GetQueueAttributes
-              - sqs:ChangeMessageVisibility
-            Resource:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                requestQueueArn,
-              ]
-
-          - Sid: AllowEncryptionAccessToSpotQueueKey
-            Effect: Allow
-            Action:
-              - kms:Decrypt
-            Resource:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                requestQueueKeyArn,
-              ]
   
   SpotRequestQueueConsumePolicy:
     Type: AWS::IAM::ManagedPolicy
