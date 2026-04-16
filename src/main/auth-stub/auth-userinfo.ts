@@ -86,6 +86,10 @@ async function get(
   return {
     statusCode: 200,
     body: JSON.stringify(userInfoClaims),
+    headers: {
+      // TODO: add to all paths?
+      "Content-Type": "application/json",
+    },
   };
 }
 

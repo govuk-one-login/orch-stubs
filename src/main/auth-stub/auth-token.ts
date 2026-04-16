@@ -72,6 +72,9 @@ async function post(
   return {
     statusCode: 200,
     body: JSON.stringify(accessToken),
+    headers: {
+      "Content-Type": "application/json",
+    },
   };
 }
 
