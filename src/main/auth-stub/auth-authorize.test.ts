@@ -3,18 +3,18 @@ import {
   APIGatewayProxyResult,
   Context,
 } from "aws-lambda";
-import { handler } from "./auth-authorize";
-import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
-import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
-import * as decryptionHelper from "./helpers/decryption-helper";
-import * as jwtHelper from "./helpers/jwt-helper";
+import { handler } from "./auth-authorize.ts";
+import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service.ts";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service.ts";
+import * as decryptionHelper from "./helpers/decryption-helper.ts";
+import * as jwtHelper from "./helpers/jwt-helper.ts";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { createMockClaims } from "./test-helper/test-data";
+import { createMockClaims } from "./test-helper/test-data.ts";
 import {
   createSignedJwt,
   mockEnvVariableSetupWithKey,
-} from "./test-helper/test-setup";
-import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
+} from "./test-helper/test-setup.ts";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
 import * as jose from "jose";
 import { generateKeyPair } from "jose";
 

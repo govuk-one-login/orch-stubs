@@ -1,6 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
-import { UserIdentity } from "../interfaces/user-identity-interface";
+import { UserIdentity } from "../interfaces/user-identity-interface.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",

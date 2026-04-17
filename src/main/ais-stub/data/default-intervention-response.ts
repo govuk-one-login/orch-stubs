@@ -2,7 +2,7 @@ import {
   AccountIntervention,
   AccountInterventionResponse,
   InterventionState,
-} from "../types/AccountInterventionResponse";
+} from "../types/AccountInterventionResponse.ts";
 
 export const defaultInterventionResponse = (): AccountInterventionResponse => ({
   state: defaultState(),

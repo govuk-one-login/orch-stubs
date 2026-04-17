@@ -1,8 +1,8 @@
 import {
   AccessTokenStore,
   AccessTokenStoreInput,
-} from "../interfaces/access-token-store-interface";
-import { UserProfile } from "../interfaces/user-profile-interface";
+} from "../interfaces/access-token-store-interface.ts";
+import { UserProfile } from "../interfaces/user-profile-interface.ts";
 
 const MOCK_SUBJECT_ID = "testSubjectId";
 const MOCK_CLAIMS = ["claim1"];

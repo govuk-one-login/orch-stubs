@@ -1,5 +1,5 @@
-import * as config from "../helpers/config";
-import * as keyHelper from "../helpers/key-helpers";
+import * as config from "../helpers/config.ts";
+import * as keyHelper from "../helpers/key-helpers.ts";
 import { generateKeyPair, KeyLike } from "jose";
 import * as jose from "jose";
 

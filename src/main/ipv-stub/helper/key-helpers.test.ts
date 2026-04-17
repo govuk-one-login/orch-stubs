@@ -1,6 +1,6 @@
 import * as jose from "jose";
-import { getOrchJwks } from "./key-helpers";
-import localParams from "../../../../parameters.json";
+import { getOrchJwks } from "./key-helpers.ts";
+import localParams from "../../../../parameters.json" with { type: "json" };
 
 describe("Key helpers tests", () => {
   describe("get orch JWKS tests", () => {

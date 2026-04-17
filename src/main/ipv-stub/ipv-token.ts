@@ -11,14 +11,14 @@ import {
   handleErrors,
   methodNotAllowedError,
   successfulJsonResult,
-} from "../helper/result-helper";
+} from "../helper/result-helper.ts";
 import {
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
-} from "./service/dynamodb-form-response-service";
+} from "./service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
-import { logger } from "../logger";
-import { getOrchJwks } from "./helper/key-helpers";
+import { logger } from "../logger.ts";
+import { getOrchJwks } from "./helper/key-helpers.ts";
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {

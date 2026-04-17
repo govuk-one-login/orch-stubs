@@ -1,14 +1,14 @@
-import { getEnv } from "./env-helper";
+import { getEnv } from "./env-helper.ts";
 import {
   DecryptCommandInput,
   DecryptCommandOutput,
   EncryptionAlgorithmSpec,
-  KMS,
+  KMS
 } from "@aws-sdk/client-kms";
-import { base64DecodeToUint8Array } from "./encoding";
-import { getAwsRegion, getKmsKeyId } from "./config";
-import { logger } from "../..//logger";
-import { CodedError } from "../../helper/result-helper";
+import { base64DecodeToUint8Array } from "./encoding.ts";
+import { getAwsRegion, getKmsKeyId } from "./config.ts";
+import { logger } from "../..//logger.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 import {
   createPrivateKey,
   privateDecrypt,

@@ -1,5 +1,5 @@
-import { logger } from "../../../main/logger";
-import { CodedError } from "../../helper/result-helper";
+import { logger } from "../../../main/logger.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 type EnvVar =
   | "IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"

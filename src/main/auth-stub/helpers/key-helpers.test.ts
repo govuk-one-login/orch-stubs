@@ -1,5 +1,5 @@
 import { generateKeyPairSync, publicEncrypt } from "crypto";
-import { getContentEncryptionKey } from "./key-helpers";
+import { getContentEncryptionKey } from "./key-helpers.ts";
 import { RSA_PKCS1_OAEP_PADDING } from "constants";
 
 const cekValue = "test";

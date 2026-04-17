@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getStubIntervention } from "./service/ais-stub-dynamo-service";
-import { logger } from "../logger";
+import { getStubIntervention } from "./service/ais-stub-dynamo-service.ts";
+import { logger } from "../logger.ts";
 import {
   defaultIntervention,
   defaultState,
-} from "./data/default-intervention-response";
+} from "./data/default-intervention-response.ts";
 
 export const handler = async (
   event: APIGatewayProxyEvent

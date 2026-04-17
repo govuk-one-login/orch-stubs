@@ -1,7 +1,7 @@
 import {
   AuthCodeStore,
   AuthCodeStoreInput,
-} from "../interfaces/auth-code-store-interface";
+} from "../interfaces/auth-code-store-interface.ts";
 
 const MOCK_SUBJECT_ID = "123456";
 const MOCK_CLAIMS = ["claim1"];

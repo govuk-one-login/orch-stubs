@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { UserProfile } from "../interfaces/user-profile-interface";
+import { UserProfile } from "../interfaces/user-profile-interface.ts";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 
 const dynamoClient = new DynamoDBClient({

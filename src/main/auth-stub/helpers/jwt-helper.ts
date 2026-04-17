@@ -1,7 +1,7 @@
 import * as jose from "jose";
-import { getAuthJwksUrl } from "./key-helpers";
-import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config";
-import { CodedError } from "../../helper/result-helper";
+import { getAuthJwksUrl } from "./key-helpers.ts";
+import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 export const validateClaims = async (jwt: string): Promise<Claims> => {
   let claims: jose.JWTPayload;

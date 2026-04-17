@@ -3,7 +3,7 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   AuthCodeStore,
   AuthCodeStoreInput,
-} from "../interfaces/auth-code-store-interface";
+} from "../interfaces/auth-code-store-interface.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",

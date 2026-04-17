@@ -1,7 +1,7 @@
 import {
   getOrchToAuthExpectedClientId,
   getOrchToAuthExpectedAudience,
-} from "./config";
+} from "./config.ts";
 
 export type Claims = {
   iss: string;

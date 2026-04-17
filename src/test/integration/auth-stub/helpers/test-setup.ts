@@ -1,5 +1,5 @@
-import * as config from "../../../../main/auth-stub/helpers/config";
-import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers";
+import * as config from "../../../../main/auth-stub/helpers/config.ts";
+import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers.ts";
 import * as jose from "jose";
 import { generateKeyPair, KeyLike } from "jose";
 

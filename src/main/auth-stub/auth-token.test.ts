@@ -1,10 +1,10 @@
 import { Context } from "aws-lambda";
-import { handler } from "./auth-token";
-import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service";
-import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
-import * as tokenValidationHelper from "./helpers/token-validation-helper";
+import { handler } from "./auth-token.ts";
+import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service.ts";
+import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service.ts";
+import * as tokenValidationHelper from "./helpers/token-validation-helper.ts";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { mockEnvVariableSetup } from "./test-helper/test-setup";
+import { mockEnvVariableSetup } from "./test-helper/test-setup.ts";
 
 describe("Auth Token", () => {
   let addAccessTokenStoreSpy: jest.SpyInstance;

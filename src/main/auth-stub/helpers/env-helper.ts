@@ -1,5 +1,5 @@
-import { CodedError } from "../../helper/result-helper";
-import { logger } from "../../logger";
+import { CodedError } from "../../helper/result-helper.ts";
+import { logger } from "../../logger.ts";
 
 type EnvVar =
   | "ENCRYPTION_KEY_ID"
