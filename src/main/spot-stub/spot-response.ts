@@ -1,4 +1,4 @@
-import { LogIds } from "./spot-request";
+import { LogIds } from "./spot-request.ts";
 
 export interface SpotResponse {
   claims: Record<string, string>;

@@ -1,4 +1,4 @@
-import { UserProfile } from "../interfaces/user-profile-interface";
+import { UserProfile } from "../interfaces/user-profile-interface.ts";
 
 export const createUserProfile = (
   email: string,

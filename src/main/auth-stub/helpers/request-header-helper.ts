@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventHeaders } from "aws-lambda";
-import { CodedError } from "../../helper/result-helper";
+import { CodedError } from "../../helper/result-helper.ts";
 
 export function getHeaderValueFromHeaders(
   headers: APIGatewayProxyEventHeaders,

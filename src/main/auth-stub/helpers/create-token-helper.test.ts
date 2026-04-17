@@ -1,4 +1,4 @@
-import { createBearerAccessToken } from "./create-token-helper";
+import { createBearerAccessToken } from "./create-token-helper.ts";
 import { base64url } from "jose";
 
 describe("Create Token Helper", () => {

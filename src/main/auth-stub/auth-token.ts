@@ -3,21 +3,21 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { addAccessTokenStore } from "./services/access-token-dynamodb-service";
-import { createAccessTokenStoreInput } from "./helpers/mock-token-data-helper";
-import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-service";
-import { createBearerAccessToken } from "./helpers/create-token-helper";
-import { CodedError, handleErrors } from "../helper/result-helper";
-import { logger } from "../logger";
+import { addAccessTokenStore } from "./services/access-token-dynamodb-service.ts";
+import { createAccessTokenStoreInput } from "./helpers/mock-token-data-helper.ts";
+import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-service.ts";
+import { createBearerAccessToken } from "./helpers/create-token-helper.ts";
+import { CodedError, handleErrors } from "../helper/result-helper.ts";
+import { logger } from "../logger.ts";
 import {
   ensureClientAssertionType,
   validateAuthCode,
   validatePlainTextParameters,
   verifyClientAssertion,
-} from "./helpers/token-validation-helper";
-import { getOrchToAuthExpectedClientId } from "./helpers/config";
+} from "./helpers/token-validation-helper.ts";
+import { getOrchToAuthExpectedClientId } from "./helpers/config.ts";
 import { createRemoteJWKSet } from "jose";
-import { getAuthJwksUrl } from "./helpers/key-helpers";
+import { getAuthJwksUrl } from "./helpers/key-helpers.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent

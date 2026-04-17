@@ -1,4 +1,4 @@
-import { Claims } from "../helpers/claims-config";
+import { Claims } from "../helpers/claims-config.ts";
 
 export interface AuthRequestBody {
   clientId: string;

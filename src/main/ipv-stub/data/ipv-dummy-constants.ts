@@ -1,4 +1,4 @@
-import { UserIdentity } from "../interfaces/user-identity-interface";
+import { UserIdentity } from "../interfaces/user-identity-interface.ts";
 
 const env =
   process.env.ENVIRONMENT == "dev" ? "authdev3.dev" : process.env.ENVIRONMENT;

@@ -3,7 +3,7 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   AccessTokenStore,
   AccessTokenStoreInput,
-} from "../interfaces/access-token-store-interface";
+} from "../interfaces/access-token-store-interface.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",

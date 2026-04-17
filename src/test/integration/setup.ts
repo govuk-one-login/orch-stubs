@@ -1,4 +1,4 @@
-import localParams from "./../../../parameters.json";
+import localParams from "./../../../parameters.json" with { type: "json" };
 const waitForLocalStack = async () => {
   let polls = 0;
 

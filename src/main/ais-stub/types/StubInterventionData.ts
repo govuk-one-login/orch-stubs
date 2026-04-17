@@ -1,4 +1,4 @@
-import { InterventionState } from "./AccountInterventionResponse";
+import { InterventionState } from "./AccountInterventionResponse.ts";
 
 export type StubInterventionData = {
   pairwiseId: string;

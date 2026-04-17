@@ -1,6 +1,6 @@
-import { logger } from "../../logger";
-import { CodedError } from "../../helper/result-helper";
-import { getAuthCodeStore } from "../services/auth-code-dynamodb-service";
+import { logger } from "../../logger.ts";
+import { CodedError } from "../../helper/result-helper.ts";
+import { getAuthCodeStore } from "../services/auth-code-dynamodb-service.ts";
 import { createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
 
 export const validateAuthCode = async (authCode: string | undefined) => {

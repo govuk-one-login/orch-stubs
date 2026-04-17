@@ -1,4 +1,4 @@
-import { Optional } from "./Optional";
+import { Optional } from "./Optional.ts";
 
 describe("Optional tests", () => {
   it("Optional with value is present and not empty", () => {

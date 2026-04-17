@@ -2,11 +2,11 @@ import {
   addAccessTokenStore,
   getAccessTokenStore,
   updateHasBeenUsedAccessTokenStore,
-} from "./access-token-dynamodb-service";
+} from "./access-token-dynamodb-service.ts";
 import {
   createAccessTokenStoreInput,
   createAccessTokenStore,
-} from "../test-helper/mock-token-data-helper";
+} from "../test-helper/mock-token-data-helper.ts";
 
 const TEST_ACCESS_TOKEN = "testAccessToken";
 
