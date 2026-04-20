@@ -1,5 +1,5 @@
 import { createPublicKey, randomUUID } from "crypto";
-import localParams from "../parameters.json" assert { type: "json" };
+import localParams from "../parameters.json" with { type: "json" };
 import { CompactEncrypt, importPKCS8, SignJWT } from "jose";
 
 const publicEncryptionKey = createPublicKey(

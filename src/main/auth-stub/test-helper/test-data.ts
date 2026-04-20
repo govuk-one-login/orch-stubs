@@ -32,9 +32,9 @@ export function createMockClaims(): Claims {
   };
 }
 
-export function createListOfMissingMockClaims(): Array<Array<string | Claims>> {
+export function createListOfMissingMockClaims(): (string | Claims)[][] {
   const claims = createMockClaims();
-  const listOfMissingClaims = Array<Array<string | Claims>>();
+  const listOfMissingClaims = Array<(string | Claims)[]>();
   requiredClaimsKeys.forEach(async (claim) => {
     const withoutClaim = { ...claims };
     delete withoutClaim[claim as keyof Claims];

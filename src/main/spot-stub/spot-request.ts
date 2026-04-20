@@ -1,5 +1,5 @@
 export interface SpotRequest {
-  in_claims: { [key: string]: string };
+  in_claims: Record<string, string>;
   in_local_account_id: string;
   in_salt: string;
   in_rp_sector_id: string;

@@ -26,7 +26,7 @@ import renderAuthAuthorize from "./render-auth-authorize";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
 import { logger } from "../logger";
 
-const SFAD_ERROR: string = "SFAD_ERROR";
+const SFAD_ERROR = "SFAD_ERROR";
 const AUTHORIZE_ERRORS: string[] = [SFAD_ERROR];
 
 export const handler: Handler = async (

@@ -18,7 +18,7 @@ import {
 
 export const getContentEncryptionKey = async (
   encryptedKey: string
-): Promise<Uint8Array<ArrayBufferLike>> => {
+): Promise<Uint8Array> => {
   const environment = getEnv("ENVIRONMENT");
   if (environment === "local") {
     return await decryptUsingLocalPrivateKey(encryptedKey);

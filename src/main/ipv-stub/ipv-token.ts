@@ -37,7 +37,7 @@ async function post(
 ): Promise<APIGatewayProxyResult> {
   validateHeadersOrThrow(event.headers);
   const body = getValidBodyOrThrow(event.body);
-  const clientAssertionJwt = body["client_assertion"] as string;
+  const clientAssertionJwt = body.client_assertion as string;
   try {
     await jwtVerify(clientAssertionJwt, getOrchJwks());
   } catch (error) {
@@ -48,7 +48,7 @@ async function post(
   }
 
   const accessToken = base64url.encode(randomBytes(36));
-  const authCode = body["code"] as string;
+  const authCode = body.code as string;
   let userIdentity;
   try {
     userIdentity = await getUserIdentityWithAuthCode(authCode);
@@ -80,7 +80,7 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
 
   const query = querystring.parse(body);
 
-  const grantType = query["grant_type"];
+  const grantType = query.grant_type;
   if (grantType != "authorization_code") {
     throw new CodedError(
       400,
@@ -88,7 +88,7 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
     );
   }
 
-  const clientAssertionType = query["client_assertion_type"];
+  const clientAssertionType = query.client_assertion_type;
   if (
     clientAssertionType !=
     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
@@ -99,12 +99,12 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
     );
   }
 
-  const authCode = query["code"];
+  const authCode = query.code;
   if (!authCode) {
     throw new CodedError(400, "Auth code query parameter is null or undefined");
   }
 
-  const clientAssertion = query["client_assertion"];
+  const clientAssertion = query.client_assertion;
   if (typeof clientAssertion != "string" || clientAssertion == "") {
     throw new CodedError(
       400,
@@ -112,7 +112,7 @@ function getValidBodyOrThrow(body: string | null): querystring.ParsedUrlQuery {
     );
   }
 
-  const clientId = query["client_id"];
+  const clientId = query.client_id;
   if (clientId != "authOrchestrator") {
     throw new CodedError(
       400,

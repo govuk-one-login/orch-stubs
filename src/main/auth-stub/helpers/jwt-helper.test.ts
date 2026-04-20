@@ -110,7 +110,6 @@ describe("JWT service", () => {
           const action = async () => await validateClaims(jwtMissingClaim);
 
           await expect(action).rejects.toThrow(
-            // eslint-disable-next-line no-useless-escape
             `missing required \"${missingClaim as string}\" claim`
           );
         }

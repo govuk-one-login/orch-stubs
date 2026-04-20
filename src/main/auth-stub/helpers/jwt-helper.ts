@@ -15,8 +15,8 @@ export const validateClaims = async (jwt: string): Promise<Claims> => {
     );
   }
 
-  if (claims["claim"] !== undefined) {
-    validateClaimObject(claims["claim"] as string);
+  if (claims.claim !== undefined) {
+    validateClaimObject(claims.claim as string);
   }
 
   return validateCustomClaims(claims);

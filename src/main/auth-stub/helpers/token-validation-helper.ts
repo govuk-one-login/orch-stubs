@@ -21,40 +21,36 @@ export const validateAuthCode = async (authCode: string | undefined) => {
 export const validatePlainTextParameters = (
   redirectUri: string,
   clientId: string,
-  body:
-    | {
-        [k: string]: string;
-      }
-    | undefined
+  body: Record<string, string> | undefined
 ) => {
   if (body === undefined || Object.keys(body).length === 0) {
     throw new CodedError(400, "Request requires query parameters");
   }
 
-  if (!body["grant_type"]) {
+  if (!body.grant_type) {
     throw new CodedError(400, "Request is missing grant_type parameter");
   }
 
-  if (body["grant_type"] !== "authorization_code") {
+  if (body.grant_type !== "authorization_code") {
     throw new CodedError(400, "Request has invalid grant_type parameter");
   }
 
-  if (!body["redirect_uri"] && body["redirect_uri"] !== "") {
+  if (!body.redirect_uri && body.redirect_uri !== "") {
     throw new CodedError(400, "Request is missing redirect_uri parameter");
   }
 
-  if (body["redirect_uri"] !== redirectUri) {
+  if (body.redirect_uri !== redirectUri) {
     throw new CodedError(
       400,
       "Request redirect_uri is not the permitted redirect_uri"
     );
   }
 
-  if (!body["client_id"]) {
+  if (!body.client_id) {
     throw new CodedError(400, "Request is missing client_id parameter");
   }
 
-  if (body["client_id"] !== clientId) {
+  if (body.client_id !== clientId) {
     throw new CodedError(
       400,
       "Request client_id is not the permitted client_id"
@@ -62,8 +58,8 @@ export const validatePlainTextParameters = (
   }
 };
 
-export const ensureClientAssertionType = (body: { [k: string]: string }) => {
-  const clientAssertionType = body["client_assertion_type"];
+export const ensureClientAssertionType = (body: Record<string, string>) => {
+  const clientAssertionType = body.client_assertion_type;
   const expectedClientAssertionType =
     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
@@ -78,12 +74,10 @@ export const ensureClientAssertionType = (body: { [k: string]: string }) => {
 };
 
 export const verifyClientAssertion = async (
-  body: {
-    [k: string]: string;
-  },
+  body: Record<string, string>,
   jwks: ReturnType<typeof createRemoteJWKSet>
 ) => {
-  const clientAssertion = body["client_assertion"];
+  const clientAssertion = body.client_assertion;
   if (!clientAssertion) {
     throw new CodedError(400, "Missing client_assertion parameter");
   }
@@ -97,7 +91,7 @@ export const verifyClientAssertion = async (
   }
 
   const jwtClientId = decodeJwt(clientAssertion).sub;
-  const tokenRequestClientId = body["client_id"];
+  const tokenRequestClientId = body.client_id;
   if (!tokenRequestClientId || tokenRequestClientId !== jwtClientId) {
     throw new CodedError(
       400,
