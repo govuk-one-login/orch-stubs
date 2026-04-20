@@ -41,7 +41,7 @@ async function post(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const body = getBody(event);
-  const authCode = body["code"];
+  const authCode = body.code;
 
   try {
     await validateAuthCode(authCode);

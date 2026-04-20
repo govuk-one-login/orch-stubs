@@ -44,7 +44,7 @@ async function get(
 }
 
 function getTokenOrThrow(headers: APIGatewayProxyEventHeaders): string {
-  const accessToken = headers["Authorization"];
+  const accessToken = headers.Authorization;
   if (!accessToken) {
     throw new CodedError(400, "Access Token does not exist");
   }

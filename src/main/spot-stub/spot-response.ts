@@ -1,7 +1,7 @@
 import { LogIds } from "./spot-request.ts";
 
 export interface SpotResponse {
-  claims: { [key: string]: string };
+  claims: Record<string, string>;
   sub: string;
   status: "ACCEPTED" | "REJECTED";
   reason: string;

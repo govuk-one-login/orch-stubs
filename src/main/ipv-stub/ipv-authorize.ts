@@ -46,7 +46,7 @@ async function get(
   if (event.queryStringParameters == null) {
     throw new CodedError(400, "Query string parameters are null");
   }
-  const requestObject = event.queryStringParameters["request"] as string;
+  const requestObject = event.queryStringParameters.request!;
 
   if (!requestObject) {
     throw new CodedError(400, "Request query string parameter not found");
@@ -98,7 +98,7 @@ async function post(
     throw new CodedError(400, "Missing request body");
   }
   const parsedBody = Object.fromEntries(new URLSearchParams(event.body));
-  const authCode = parsedBody["authCode"];
+  const authCode = parsedBody.authCode;
   const url = new URL(redirectUri);
 
   try {
@@ -151,9 +151,9 @@ async function post(
   );
 }
 
-const mapFormToUserIdentity = (form: { [k: string]: string }): UserIdentity => {
+const mapFormToUserIdentity = (form: Record<string, string>): UserIdentity => {
   const userIdentity: Record<string, unknown> = {};
-  if (!form["identity_claim"] || form["identity_claim"].trim().length === 0) {
+  if (!form.identity_claim || form.identity_claim.trim().length === 0) {
     throw new CodedError(
       400,
       "Invalid Request: Core Identity Claim is required"
@@ -161,7 +161,7 @@ const mapFormToUserIdentity = (form: { [k: string]: string }): UserIdentity => {
   }
 
   userIdentity["https://vocab.account.gov.uk/v1/coreIdentity"] =
-    tryParseOrThrowError(form["identity_claim"], "identity_claim");
+    tryParseOrThrowError(form.identity_claim, "identity_claim");
 
   const optionalClaims = {
     address_claim: "https://vocab.account.gov.uk/v1/address",

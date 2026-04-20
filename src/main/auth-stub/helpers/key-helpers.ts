@@ -3,7 +3,7 @@ import {
   DecryptCommandInput,
   DecryptCommandOutput,
   EncryptionAlgorithmSpec,
-  KMS
+  KMS,
 } from "@aws-sdk/client-kms";
 import { base64DecodeToUint8Array } from "./encoding.ts";
 import { getAwsRegion, getKmsKeyId } from "./config.ts";
@@ -18,7 +18,7 @@ import {
 
 export const getContentEncryptionKey = async (
   encryptedKey: string
-): Promise<Uint8Array<ArrayBufferLike>> => {
+): Promise<Uint8Array> => {
   const environment = getEnv("ENVIRONMENT");
   if (environment === "local") {
     return await decryptUsingLocalPrivateKey(encryptedKey);
