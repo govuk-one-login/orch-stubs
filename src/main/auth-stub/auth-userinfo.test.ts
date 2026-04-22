@@ -7,6 +7,7 @@ import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { AccessTokenStore } from "./interfaces/access-token-store-interface.ts";
 import { CodedError } from "../helper/result-helper.ts";
 import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
+import { MockInstance } from "vitest";
 
 describe("Auth User Info", () => {
   const mockEmail = "testEmail";
@@ -22,25 +23,30 @@ describe("Auth User Info", () => {
     ttl: Math.floor(Date.now() / 1000) + 180,
   };
 
-  let getAccessTokenStoreSpy: jest.SpyInstance;
-  let updateHasBeenUsedAccessTokenStoreSpy: jest.SpyInstance;
-  let getUserProfileBySubjectId: jest.SpyInstance;
+  let getAccessTokenStoreSpy: MockInstance;
+  let updateHasBeenUsedAccessTokenStoreSpy: MockInstance;
+  let getUserProfileBySubjectId: MockInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(() => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
-    jest
-      .spyOn(requestHeaderHelper, "getAccessTokenFromAuthorizationHeader")
-      .mockReturnValue(mockSubjectId);
-    getAccessTokenStoreSpy = jest
+    vi.spyOn(
+      requestHeaderHelper,
+      "getAccessTokenFromAuthorizationHeader"
+    ).mockReturnValue(mockSubjectId);
+    getAccessTokenStoreSpy = vi
       .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
       .mockResolvedValue(mockAccessTokenStore);
-    updateHasBeenUsedAccessTokenStoreSpy = jest
+    updateHasBeenUsedAccessTokenStoreSpy = vi
       .spyOn(accessTokenDynamoDbService, "updateHasBeenUsedAccessTokenStore")
       .mockResolvedValue(mockDynamoDbReponse);
-    getUserProfileBySubjectId = jest
+    getUserProfileBySubjectId = vi
       .spyOn(userProfileDynamoDbService, "getUserProfileBySubjectId")
       .mockResolvedValue(createUserProfile(mockEmail, mockSubjectId));
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it("should return a 200 with valid request", async () => {
@@ -70,11 +76,12 @@ describe("Auth User Info", () => {
   });
 
   it("should return a 401 error when getAccessTokenFromAuthorizationHeader fails", async () => {
-    jest
-      .spyOn(requestHeaderHelper, "getAccessTokenFromAuthorizationHeader")
-      .mockImplementationOnce(() => {
-        throw new CodedError(401, "Unable to extract (opaque) bearer token");
-      });
+    vi.spyOn(
+      requestHeaderHelper,
+      "getAccessTokenFromAuthorizationHeader"
+    ).mockImplementationOnce(() => {
+      throw new CodedError(401, "Unable to extract (opaque) bearer token");
+    });
 
     const response = await handler(
       createValidUserInfoRequest(),
@@ -89,9 +96,10 @@ describe("Auth User Info", () => {
   });
 
   it("should return a 401 error when access token has been used", async () => {
-    jest
-      .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-      .mockResolvedValueOnce({ ...mockAccessTokenStore, hasBeenUsed: true });
+    vi.spyOn(
+      accessTokenDynamoDbService,
+      "getAccessTokenStore"
+    ).mockResolvedValueOnce({ ...mockAccessTokenStore, hasBeenUsed: true });
 
     const response = await handler(
       createValidUserInfoRequest(),
@@ -106,12 +114,13 @@ describe("Auth User Info", () => {
   });
 
   it("should return a 401 error when access token has expired", async () => {
-    jest
-      .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-      .mockResolvedValueOnce({
-        ...mockAccessTokenStore,
-        ttl: Math.floor(Date.now() / 1000) - 180,
-      });
+    vi.spyOn(
+      accessTokenDynamoDbService,
+      "getAccessTokenStore"
+    ).mockResolvedValueOnce({
+      ...mockAccessTokenStore,
+      ttl: Math.floor(Date.now() / 1000) - 180,
+    });
 
     const response = await handler(
       createValidUserInfoRequest(),
@@ -134,9 +143,10 @@ describe("Auth User Info", () => {
     });
 
     it("should return a 401 error when access token dynamo errors", async () => {
-      jest
-        .spyOn(accessTokenDynamoDbService, "getAccessTokenStore")
-        .mockRejectedValueOnce(new Error("failed to find in database"));
+      vi.spyOn(
+        accessTokenDynamoDbService,
+        "getAccessTokenStore"
+      ).mockRejectedValueOnce(new Error("failed to find in database"));
 
       const response = await handler(
         createValidUserInfoRequest(),
@@ -151,11 +161,12 @@ describe("Auth User Info", () => {
     });
 
     it("should return a 500 error when failing to update access-token-store", async () => {
-      jest
-        .spyOn(accessTokenDynamoDbService, "updateHasBeenUsedAccessTokenStore")
-        .mockImplementation(() => {
-          throw new Error();
-        });
+      vi.spyOn(
+        accessTokenDynamoDbService,
+        "updateHasBeenUsedAccessTokenStore"
+      ).mockImplementation(() => {
+        throw new Error();
+      });
 
       const response = await handler(
         createValidUserInfoRequest(),
@@ -168,7 +179,7 @@ describe("Auth User Info", () => {
     });
 
     it("should return a 500 error when failing to get user-profile", async () => {
-      getUserProfileBySubjectId = jest
+      getUserProfileBySubjectId = vi
         .spyOn(userProfileDynamoDbService, "getUserProfileBySubjectId")
         .mockImplementation(() => {
           throw new Error();

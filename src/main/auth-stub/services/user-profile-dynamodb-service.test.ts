@@ -7,15 +7,15 @@ import {
 const EMAIL = "testEmail@gov.uk";
 const SUBJECT_ID = "testSubjectId";
 
-jest.mock("@aws-sdk/lib-dynamodb", () => {
+vi.mock("@aws-sdk/lib-dynamodb", () => {
   return {
     DynamoDBDocument: {
-      from: jest.fn().mockImplementation(() => {
+      from: vi.fn().mockImplementation(() => {
         return {
-          get: jest.fn(() =>
+          get: vi.fn(() =>
             Promise.resolve({ Item: createUserProfile(EMAIL, SUBJECT_ID) })
           ),
-          query: jest.fn(() =>
+          query: vi.fn(() =>
             Promise.resolve({ Items: [createUserProfile(EMAIL, SUBJECT_ID)] })
           ),
         };
@@ -26,7 +26,7 @@ jest.mock("@aws-sdk/lib-dynamodb", () => {
 
 describe("User Profile DynamoDb Service", () => {
   afterAll(() => {
-    jest.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should return the dummy UserProfile if the right email is given", async () => {

@@ -14,6 +14,10 @@ import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service
 import { createRemoteJWKSet, CryptoKey, generateKeyPair, SignJWT } from "jose";
 
 describe("Token Validation Helper", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe("validate auth-code", () => {
     const AUTH_CODE = "testAuthCode";
 
@@ -27,9 +31,9 @@ describe("Token Validation Helper", () => {
 
     it("should error when auth-code has been used", async () => {
       authCodeStore = createAuthCodeStoreThatHasBeenUsed(AUTH_CODE);
-      jest
-        .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockResolvedValue(authCodeStore);
+      vi.spyOn(authCodeDynamoDbService, "getAuthCodeStore").mockResolvedValue(
+        authCodeStore
+      );
 
       const action = async () => validateAuthCode(AUTH_CODE);
 
@@ -38,9 +42,9 @@ describe("Token Validation Helper", () => {
 
     it("should error when auth-code has expired", async () => {
       authCodeStore = createAuthCodeStoreThatHasExpired(AUTH_CODE);
-      jest
-        .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockResolvedValue(authCodeStore);
+      vi.spyOn(authCodeDynamoDbService, "getAuthCodeStore").mockResolvedValue(
+        authCodeStore
+      );
 
       const action = async () => validateAuthCode(AUTH_CODE);
 
@@ -49,9 +53,9 @@ describe("Token Validation Helper", () => {
 
     it("should not error when given a valid auth-code", async () => {
       authCodeStore = createAuthCodeStore(AUTH_CODE);
-      jest
-        .spyOn(authCodeDynamoDbService, "getAuthCodeStore")
-        .mockResolvedValue(authCodeStore);
+      vi.spyOn(authCodeDynamoDbService, "getAuthCodeStore").mockResolvedValue(
+        authCodeStore
+      );
 
       const action = async () => validateAuthCode(AUTH_CODE);
 
@@ -63,7 +67,7 @@ describe("Token Validation Helper", () => {
     const redirectUri = "testUri";
     const clientId = "testClientId";
 
-    let tokenRequestBody: { [k: string]: string };
+    let tokenRequestBody: Record<string, string>;
 
     beforeEach(() => {
       tokenRequestBody = {
@@ -74,51 +78,57 @@ describe("Token Validation Helper", () => {
     });
 
     it("should error when the request-parameters does not exist", () => {
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, undefined);
+      };
 
       expect(action).toThrow("Request requires query parameters");
     });
 
     it("should error when the request-parameters are empty", () => {
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, {});
+      };
 
       expect(action).toThrow("Request requires query parameters");
     });
 
     it("should error when the grant-type does not exist", () => {
-      delete tokenRequestBody["grant_type"];
+      delete tokenRequestBody.grant_type;
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow("Request is missing grant_type parameter");
     });
 
     it("should error when the grant-type is not valid", () => {
-      tokenRequestBody["grant_type"] = "incorrect_grant_type";
+      tokenRequestBody.grant_type = "incorrect_grant_type";
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow("Request has invalid grant_type parameter");
     });
 
     it("should error when the redirect-uri does not exist", () => {
-      delete tokenRequestBody["redirect_uri"];
+      delete tokenRequestBody.redirect_uri;
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow("Request is missing redirect_uri parameter");
     });
 
     it("should error when the redirect-uri is not valid", () => {
-      tokenRequestBody["redirect_uri"] = "incorrect_redirect_uri";
+      tokenRequestBody.redirect_uri = "incorrect_redirect_uri";
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow(
         "Request redirect_uri is not the permitted redirect_uri"
@@ -126,28 +136,31 @@ describe("Token Validation Helper", () => {
     });
 
     it("should not error when the redirect-uri is an empty string", () => {
-      tokenRequestBody["redirect_uri"] = "";
+      tokenRequestBody.redirect_uri = "";
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters("", clientId, tokenRequestBody);
+      };
 
       expect(action).not.toThrow();
     });
 
     it("should error when the client-id is does not exist", () => {
-      delete tokenRequestBody["client_id"];
+      delete tokenRequestBody.client_id;
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow("Request is missing client_id parameter");
     });
 
     it("should error when the client-id is not valid", () => {
-      tokenRequestBody["client_id"] = "incorrect_client_id";
+      tokenRequestBody.client_id = "incorrect_client_id";
 
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).toThrow(
         "Request client_id is not the permitted client_id"
@@ -155,8 +168,9 @@ describe("Token Validation Helper", () => {
     });
 
     it("should not error when passed valid text-parameters", () => {
-      const action = () =>
+      const action = () => {
         validatePlainTextParameters(redirectUri, clientId, tokenRequestBody);
+      };
 
       expect(action).not.toThrow();
     });
@@ -164,16 +178,19 @@ describe("Token Validation Helper", () => {
 
   describe("ensure client assertion type", () => {
     it("should error when the client-assertion-type does not exist", () => {
-      const action = () => ensureClientAssertionType({});
+      const action = () => {
+        ensureClientAssertionType({});
+      };
 
       expect(action).toThrow("Missing client_assertion_type parameter");
     });
 
     it("should error when the client-id is not valid", () => {
-      const action = () =>
+      const action = () => {
         ensureClientAssertionType({
           client_assertion_type: "incorrect_client_assertion_type",
         });
+      };
 
       expect(action).toThrow(
         "Invalid client_assertion_type parameter, must be urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
@@ -181,11 +198,12 @@ describe("Token Validation Helper", () => {
     });
 
     it("should not error when passed a valid body", () => {
-      const action = () =>
+      const action = () => {
         ensureClientAssertionType({
           client_assertion_type:
             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         });
+      };
 
       expect(action).not.toThrow();
     });

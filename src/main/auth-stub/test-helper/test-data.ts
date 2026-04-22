@@ -43,14 +43,6 @@ export function createListOfMissingMockClaims(): (string | Claims)[][] {
   return listOfMissingClaims;
 }
 
-export async function getPrivateKey(): Promise<CryptoKey> {
-  const key = await importPKCS8(
-    "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg7KK6gFv7hs2DImXpBaaD1ytDX0MJdh/pTK5LDyUzckWhRANCAASfwe9k/m6YBFQtP6QWUkwL52Ouu6PiOd9DR3OsC3LRgoXg09H9ZXZCukJEpDIHBsmTt1wZ9bUelp8fvz5PxsL1-----END PRIVATE KEY-----",
-    "ES256"
-  );
-  return key;
-}
-
 export async function getWrongPrivateKey(): Promise<CryptoKey> {
   const key = await importPKCS8(
     "-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg+SgpFc3oo6bRHAOhpI6pv85fPm4ehgOPCQM0cEcwIK+hRANCAAS8u0WXxvx2N6bSFtfTggvnkGJvCsYo3jBYvCKJY5m87BcmwcgyFTDbedBbDnOC0OO0xdjLKu8577NnXPvE/jyd-----END PRIVATE KEY-----",
