@@ -110,7 +110,8 @@ async function get(
 async function post(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const redirectUri = process.env.ORCH_CALLBACK_URL || `${ROOT_URI}/orchestration-redirect`;
+  const redirectUri =
+    process.env.ORCH_CALLBACK_URL || `${ROOT_URI}/orchestration-redirect`;
   const url = new URL(redirectUri);
   const bodyUrlParams = new URLSearchParams(event.body!);
   const body = Object.fromEntries(bodyUrlParams);

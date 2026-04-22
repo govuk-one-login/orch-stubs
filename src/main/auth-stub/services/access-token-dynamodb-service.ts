@@ -1,4 +1,9 @@
-import { CreateTableCommand, DescribeTableCommand, DynamoDBClient, ResourceNotFoundException } from "@aws-sdk/client-dynamodb";
+import {
+  CreateTableCommand,
+  DescribeTableCommand,
+  DynamoDBClient,
+  ResourceNotFoundException,
+} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   AccessTokenStore,
@@ -17,23 +22,34 @@ const tableName = `${process.env.ENVIRONMENT}-AuthStub-AccessToken`;
 
 export const warmUp = async (): Promise<void> => {
   try {
-    await dynamoClient.send(new DescribeTableCommand({
-      TableName: tableName,
-    }));
-  } catch (err) {
-    if (err instanceof ResourceNotFoundException && process.env.ENVIRONMENT === 'local') {
-      await dynamoClient.send(new CreateTableCommand({
+    await dynamoClient.send(
+      new DescribeTableCommand({
         TableName: tableName,
-        KeySchema: [{
-          AttributeName: "accessToken",
-          KeyType: "HASH",
-        }],
-        AttributeDefinitions: [{
-          AttributeName: "accessToken",
-          AttributeType: "S",
-        }],
-        BillingMode: "PAY_PER_REQUEST",
-      }));
+      })
+    );
+  } catch (err) {
+    if (
+      err instanceof ResourceNotFoundException &&
+      process.env.ENVIRONMENT === "local"
+    ) {
+      await dynamoClient.send(
+        new CreateTableCommand({
+          TableName: tableName,
+          KeySchema: [
+            {
+              AttributeName: "accessToken",
+              KeyType: "HASH",
+            },
+          ],
+          AttributeDefinitions: [
+            {
+              AttributeName: "accessToken",
+              AttributeType: "S",
+            },
+          ],
+          BillingMode: "PAY_PER_REQUEST",
+        })
+      );
     }
   }
 };

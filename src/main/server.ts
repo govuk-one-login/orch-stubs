@@ -24,8 +24,12 @@ const initialise = async (): Promise<void> => {
   app.all("/auth-stub/authorize", apiGatewayRoute(authAuthorize));
   app.all("/auth-stub/token", apiGatewayRoute(authToken));
   app.all("/auth-stub/userinfo", apiGatewayRoute(authUserinfo));
-  app.all("/auth-stub/error", (req, res) => res.send("Something went wrong! Look at the Orchestration logs"));
-  app.all("/auth-stub/signed-out", (req, res) => res.send("You have signed out"));
+  app.all("/auth-stub/error", (req, res) =>
+    res.send("Something went wrong! Look at the Orchestration logs")
+  );
+  app.all("/auth-stub/signed-out", (req, res) =>
+    res.send("You have signed out")
+  );
 
   // IPV stub
   app.all("/ipv-stub/authorize", apiGatewayRoute(ipvAuthorize));
@@ -54,4 +58,4 @@ const initialise = async (): Promise<void> => {
   process.on("SIGINT", server.close);
 };
 
-initialise().catch(err => console.error(err))
+initialise().catch((err) => console.error(err));

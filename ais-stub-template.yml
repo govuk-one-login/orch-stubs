@@ -125,7 +125,7 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           # These will always be over-written when running locally in parameters.json
-          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           STUB_AIS_TABLE_NAME: !Ref StubInterventionsTable
       Policies:
         - !Ref StubInterventionsTableReadPolicy

@@ -11,8 +11,8 @@ import { logger } from "../logger.ts";
 import { SpotRequest } from "./spot-request.ts";
 import { SpotResponse } from "./spot-response.ts";
 
-const sqsConfig: SQSClientConfig = process.env.LOCALSTACK_ENDPOINT
-  ? { endpoint: process.env.LOCALSTACK_ENDPOINT }
+const sqsConfig: SQSClientConfig = process.env.SQS_ENDPOINT
+  ? { endpoint: process.env.SQS_ENDPOINT }
   : {};
 const sqsClient = new SQSClient(sqsConfig);
 const destinationQueueUrl: string = process.env.DESTINATION_QUEUE_URL!;

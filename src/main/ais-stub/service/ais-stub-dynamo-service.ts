@@ -1,4 +1,9 @@
-import { CreateTableCommand, DescribeTableCommand, DynamoDBClient, ResourceNotFoundException } from "@aws-sdk/client-dynamodb";
+import {
+  CreateTableCommand,
+  DescribeTableCommand,
+  DynamoDBClient,
+  ResourceNotFoundException,
+} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { StubInterventionData } from "../types/StubInterventionData.ts";
 import { Optional } from "../types/Optional.ts";
@@ -7,8 +12,8 @@ import { getEnv } from "../../../main/util/getEnv.ts";
 const dynamoClient = DynamoDBDocument.from(
   new DynamoDBClient({
     region: "eu-west-2",
-    ...(process.env.LOCALSTACK_ENDPOINT && {
-      endpoint: process.env.LOCALSTACK_ENDPOINT,
+    ...(process.env.DYNAMO_ENDPOINT && {
+      endpoint: process.env.DYNAMO_ENDPOINT,
     }),
   })
 );
@@ -17,23 +22,34 @@ const tableName = getEnv("STUB_AIS_TABLE_NAME");
 
 export const warmUp = async (): Promise<void> => {
   try {
-    await dynamoClient.send(new DescribeTableCommand({
-      TableName: tableName,
-    }));
-  } catch (err) {
-    if (err instanceof ResourceNotFoundException && process.env.ENVIRONMENT === 'local') {
-      await dynamoClient.send(new CreateTableCommand({
+    await dynamoClient.send(
+      new DescribeTableCommand({
         TableName: tableName,
-        KeySchema: [{
-          AttributeName: "pairwiseId",
-          KeyType: "HASH",
-        }],
-        AttributeDefinitions: [{
-          AttributeName: "pairwiseId",
-          AttributeType: "S",
-        }],
-        BillingMode: "PAY_PER_REQUEST",
-      }));
+      })
+    );
+  } catch (err) {
+    if (
+      err instanceof ResourceNotFoundException &&
+      process.env.ENVIRONMENT === "local"
+    ) {
+      await dynamoClient.send(
+        new CreateTableCommand({
+          TableName: tableName,
+          KeySchema: [
+            {
+              AttributeName: "pairwiseId",
+              KeyType: "HASH",
+            },
+          ],
+          AttributeDefinitions: [
+            {
+              AttributeName: "pairwiseId",
+              AttributeType: "S",
+            },
+          ],
+          BillingMode: "PAY_PER_REQUEST",
+        })
+      );
     }
   }
 };

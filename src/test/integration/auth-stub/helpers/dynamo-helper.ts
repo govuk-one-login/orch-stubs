@@ -9,7 +9,7 @@ import { UserProfile } from "src/main/auth-stub/interfaces/user-profile-interfac
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
-  endpoint: process.env.LOCALSTACK_ENDPOINT!,
+  endpoint: process.env.DYNAMO_ENDPOINT!,
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 

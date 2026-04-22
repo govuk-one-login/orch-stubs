@@ -74,7 +74,7 @@ Resources:
         Variables:
           DESTINATION_QUEUE_URL: !GetAtt SpotResponseQueue.QueueUrl
           # These will always be over-written when running locally in parameters.json
-          LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          SQS_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
