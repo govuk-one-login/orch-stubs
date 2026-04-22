@@ -53,13 +53,17 @@ describe("Auth User Info", () => {
     );
 
     expect(response.statusCode).toBe(200);
+
     const authUserInfoResponse: UserInfoClaims = JSON.parse(response.body);
+
     expect(authUserInfoResponse.email).toBe(userProfileMock.email);
     expect(authUserInfoResponse.local_account_id).toBe(
       userProfileMock.subjectId
     );
+
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
-    expect(accessTokenStore.hasBeenUsed).toBeTruthy();
+
+    expect(accessTokenStore.hasBeenUsed).toBe(true);
   });
 
   it("should return a 401 error when headers is not given", async () => {

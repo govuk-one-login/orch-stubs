@@ -11,12 +11,12 @@ import {
   createAuthCodeStoreInput,
   createAuthCodeStoreThatHasBeenUsed,
 } from "../../../main/auth-stub/test-helper/mock-auth-code-data-helper.ts";
-import { SignJWT } from "jose";
-import { generateKeyPairSync, KeyObject, KeyPairKeyObjectResult } from "crypto";
+import { importPKCS8, SignJWT } from "jose";
 import {
-  mockEnvVariableSetupWithKey,
+  mockEnvVariableSetup,
   orchToAuthExpectedClientId,
 } from "./helpers/test-setup.ts";
+import localParams from "../../../../parameters.json";
 
 interface AuthTokenResponse {
   access_token: string;
@@ -26,17 +26,15 @@ interface AuthTokenResponse {
 describe("Auth Token", () => {
   const AUTH_CODE = "12345";
 
-  let ecKeyPair: KeyPairKeyObjectResult;
-
   beforeEach(async () => {
-    ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
-    mockEnvVariableSetupWithKey(ecKeyPair.publicKey);
+    mockEnvVariableSetup();
     await setUpAuthCode();
   });
 
   afterEach(async () => {
     await resetAccessTokenStore();
     await resetAuthCodeStore();
+    vi.clearAllMocks();
   });
 
   it("should return 200 for valid POST request and update Dynamo", async () => {
@@ -47,8 +45,7 @@ describe("Auth Token", () => {
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
           AUTH_CODE,
           "authorization_code",
-          orchToAuthExpectedClientId,
-          ecKeyPair.privateKey
+          orchToAuthExpectedClientId
         ),
         {},
         {
@@ -60,14 +57,22 @@ describe("Auth Token", () => {
     );
 
     expect(response.statusCode).toBe(200);
+
     const authTokenResponse: AuthTokenResponse = JSON.parse(response.body);
-    expect(typeof authTokenResponse.access_token).toBe("string");
+
+    expectTypeOf(authTokenResponse.access_token).toBeString();
+
     expect(authTokenResponse.token_type).toBe("Bearer");
-    expect(
-      await getAccessTokenStore(authTokenResponse.access_token)
-    ).toBeTruthy();
+
+    const action = async () => {
+      await getAccessTokenStore(authTokenResponse.access_token);
+    };
+
+    await expect(action()).resolves.not.toThrow();
+
     const authCodeStore = await getAuthCodeStore(AUTH_CODE);
-    expect(authCodeStore.hasBeenUsed).toBeTruthy();
+
+    expect(authCodeStore.hasBeenUsed).toBe(true);
   });
 
   it("should return a 400 error for invalid auth-code", async () => {
@@ -81,8 +86,7 @@ describe("Auth Token", () => {
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
           invalidAuthCode,
           "authorization_code",
-          orchToAuthExpectedClientId,
-          ecKeyPair.privateKey
+          orchToAuthExpectedClientId
         ),
         {},
         {
@@ -127,8 +131,7 @@ describe("Auth Token", () => {
           "invalidClientAssertionType",
           AUTH_CODE,
           "authorization_code",
-          orchToAuthExpectedClientId,
-          ecKeyPair.privateKey
+          orchToAuthExpectedClientId
         ),
         {},
         {
@@ -152,8 +155,8 @@ describe("Auth Token", () => {
         [
           `client_assertion_type=${encodeURIComponent("urn:ietf:params:oauth:client-assertion-type:jwt-bearer")}`,
           `code=${AUTH_CODE}`,
-          `grant_type=${"authorization_code"}`,
-          `client_assertion=${"notValid.ClientAssertion"}`,
+          `grant_type=authorization_code`,
+          `client_assertion=notValid.ClientAssertion`,
           `client_id=${orchToAuthExpectedClientId}`,
           `redirect_uri=`,
         ].join("&"),
@@ -180,13 +183,16 @@ describe("Auth Token", () => {
     clientAssertionType: string,
     authCode: string,
     grantType: string,
-    clientId: string,
-    privateKey: KeyObject
+    clientId: string
   ): Promise<string> {
+    const key = await importPKCS8(
+      localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY,
+      "ES256"
+    );
     const jwt = await new SignJWT()
       .setSubject(clientId)
       .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
-      .sign(privateKey);
+      .sign(key);
     return [
       `client_assertion_type=${encodeURIComponent(clientAssertionType)}`,
       `code=${authCode}`,

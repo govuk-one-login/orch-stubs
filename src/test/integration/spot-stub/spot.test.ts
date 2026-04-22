@@ -11,16 +11,16 @@ import {
 
 const sqsClient = new SQSClient({ endpoint: process.env.LOCALSTACK_ENDPOINT });
 
-beforeAll(async () => {
-  await createSqsQueue();
-});
-
-afterEach(async () => {
-  await purgeQueue();
-});
-
 describe("SPOT stub handler", () => {
-  it("Should return the correct value", async () => {
+  beforeAll(async () => {
+    await createSqsQueue();
+  });
+
+  afterEach(async () => {
+    await purgeQueue();
+  });
+
+  it("should return the correct value", async () => {
     const messageBody: SpotRequest = {
       in_claims: {},
       in_local_account_id: "",
@@ -41,11 +41,15 @@ describe("SPOT stub handler", () => {
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const response = await handler(input, null as any, null as any);
 
-    expect(response).toEqual({ batchItemFailures: [] });
+    expect(response).toStrictEqual({ batchItemFailures: [] });
+
     const queueItems = await getQueueItems();
+
     expect(queueItems?.length).toBe(1);
+
     const queueResponseBody = JSON.parse(queueItems![0].Body!);
-    expect(queueResponseBody).toEqual({
+
+    expect(queueResponseBody).toStrictEqual({
       claims: {
         "https://vocab.account.gov.uk/v1/coreIdentityJWT": "STUB_IDENTITY",
       },

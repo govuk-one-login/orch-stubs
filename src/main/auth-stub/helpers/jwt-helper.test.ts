@@ -21,19 +21,19 @@ describe("JWT service", () => {
 
   beforeAll(async () => {
     process.env.DUMMY_JWKS = localParams.Parameters.DUMMY_JWKS;
-    privateKey = await importPKCS8(localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY, "ES256");
+    privateKey = await importPKCS8(
+      localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY,
+      "ES256"
+    );
     claims = createMockClaims();
     wrongPrivateKey = await getWrongPrivateKey();
-    validJwt = await createJwt(
-      createMockClaims(),
-      privateKey
-    );
+    validJwt = await createJwt(createMockClaims(), privateKey);
     mockEnvVariableSetup();
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-  })
+  });
 
   describe("Validate claims", () => {
     it("should return payload from valid JWT", async () => {
