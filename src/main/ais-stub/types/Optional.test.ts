@@ -32,7 +32,7 @@ describe("Optional tests", () => {
     ).not.toThrow();
 
     expect(() => opt.getValue()).not.toThrow();
-    expect(opt.getValue()).toStrictEqual("Hello");
+    expect(opt.getValue()).toBe("Hello");
   });
 
   it("accessing empty optional should throw", () => {
