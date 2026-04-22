@@ -27,7 +27,7 @@ npm run build:ipv && npm run start:local:ipv
 Once this is done, you can then hit the `/authorize` endpoint with a valid request object. To create a valid request object you can run this command:
 
 ```bash
-npm run createRequestObject
+npm run createIpvRequestObject
 ```
 
 This will use the local keys in the `parameters.json` file to create a valid signed and encrypted request object. You can then run through the stub and be redirected to `https://oidc.local.account.gov.uk/ipv-callback` with an auth code
