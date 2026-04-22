@@ -8,7 +8,8 @@ type EnvVar =
   | "ORCH_TO_AUTH_CLIENT_ID"
   | "LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"
   | "ENVIRONMENT"
-  | "AUTH_JWKS_URL";
+  | "AUTH_JWKS_URL"
+  | "DUMMY_JWKS";
 
 export const getEnv = (key: EnvVar, throwIfMissing = true): string => {
   const envVar = process.env[key];

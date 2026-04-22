@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import { getAuthJwksUrl } from "./key-helpers.ts";
+import { getAuthJwks } from "./key-helpers.ts";
 import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config.ts";
 import { CodedError } from "../../helper/result-helper.ts";
 
@@ -23,7 +23,7 @@ export const validateClaims = async (jwt: string): Promise<Claims> => {
 };
 
 const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
-  const jwks = jose.createRemoteJWKSet(new URL(getAuthJwksUrl()));
+  const jwks = getAuthJwks();
 
   const result = await jose.jwtVerify(jwt, jwks, {
     requiredClaims: requiredClaimsKeys,

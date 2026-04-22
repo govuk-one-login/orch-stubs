@@ -1,7 +1,12 @@
 import { logger } from "../../logger.ts";
 import { CodedError } from "../../helper/result-helper.ts";
 import { getAuthCodeStore } from "../services/auth-code-dynamodb-service.ts";
-import { createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
+import {
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  decodeJwt,
+  jwtVerify,
+} from "jose";
 
 export const validateAuthCode = async (authCode: string | undefined) => {
   if (!authCode) {
@@ -75,7 +80,7 @@ export const ensureClientAssertionType = (body: Record<string, string>) => {
 
 export const verifyClientAssertion = async (
   body: Record<string, string>,
-  jwks: ReturnType<typeof createRemoteJWKSet>
+  jwks: ReturnType<typeof createRemoteJWKSet | typeof createLocalJWKSet>
 ) => {
   const clientAssertion = body.client_assertion;
   if (!clientAssertion) {

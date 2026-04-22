@@ -97,7 +97,7 @@ Resources:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           # These will always be over-written when running locally in parameters.json
           LOCALSTACK_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
-          DUMMY_ORCH_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DUMMY_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
       Events:
         Get:
           Type: Api
