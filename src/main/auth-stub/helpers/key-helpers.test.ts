@@ -74,6 +74,40 @@ describe("Key helpers tests", () => {
     expect(decryptedKey.toString()).toBe(cekValue);
   });
 
+  describe("get auth JWKS tests", () => {
+    beforeEach(() => {
+      process.env.DUMMY_JWKS = "";
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it("should use dummy JWKS data if present", () => {
+      const localJwkSetSpy = vi.spyOn(jose, "createLocalJWKSet");
+      process.env.DUMMY_JWKS = localParams.Parameters.DUMMY_JWKS;
+      getAuthJwks();
+
+      expect(localJwkSetSpy).toHaveBeenCalledWith(
+        JSON.parse(localParams.Parameters.DUMMY_JWKS)
+      );
+    });
+
+    it("should use JWKS URL if dummy data not present", () => {
+      const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
+      process.env.AUTH_JWKS_URL =
+        "http://test.example.com/.well-known/jwks.json";
+      getAuthJwks();
+
+      expect(mockedCreateRemoteJWKSet).toHaveBeenCalledWith(
+        new URL("http://test.example.com/.well-known/jwks.json"),
+        {
+          timeoutDuration: 10 * 1000,
+        }
+      );
+    });
+  });
+
   function base64Encode(value: string): string {
     const rawData = Buffer.from(value, "utf-8");
     return rawData.toString("base64");

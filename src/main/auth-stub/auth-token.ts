@@ -16,8 +16,7 @@ import {
   verifyClientAssertion,
 } from "./helpers/token-validation-helper.ts";
 import { getOrchToAuthExpectedClientId } from "./helpers/config.ts";
-import { createRemoteJWKSet } from "jose";
-import { getAuthJwksUrl } from "./helpers/key-helpers.ts";
+import { getAuthJwks } from "./helpers/key-helpers.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -50,7 +49,7 @@ async function post(
     // Since its in Auth's code we have replicated the validation in the stub as well.
     validatePlainTextParameters("", getOrchToAuthExpectedClientId(), body);
     ensureClientAssertionType(body);
-    const jwks = createRemoteJWKSet(new URL(getAuthJwksUrl()));
+    const jwks = getAuthJwks();
     await verifyClientAssertion(body, jwks);
   } catch (error) {
     throw new CodedError(

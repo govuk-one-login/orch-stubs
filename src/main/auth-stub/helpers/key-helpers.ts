@@ -15,6 +15,12 @@ import {
   constants,
   KeyObject,
 } from "node:crypto";
+import * as jose from "jose";
+
+type JWKSVerifier = (
+  protectedHeader?: jose.JWSHeaderParameters,
+  token?: jose.FlattenedJWSInput
+) => Promise<jose.KeyLike>;
 
 export const getContentEncryptionKey = async (
   encryptedKey: string
@@ -27,8 +33,18 @@ export const getContentEncryptionKey = async (
   }
 };
 
-export const getAuthJwksUrl = (): string => {
-  return getEnv("AUTH_JWKS_URL");
+export const getAuthJwks = (): JWKSVerifier => {
+  const localJwks = getEnv("DUMMY_JWKS", false);
+  if (localJwks) {
+    logger.info("Found DUMMY_JWKS env variable. Using value as JWKS source");
+    return jose.createLocalJWKSet(JSON.parse(localJwks));
+  } else {
+    const urlString = getEnv("AUTH_JWKS_URL");
+    logger.info("Fetching JWKS from URL " + urlString);
+    return jose.createRemoteJWKSet(new URL(urlString), {
+      timeoutDuration: 10 * 1000, //10 seconds
+    });
+  }
 };
 
 async function decryptUsingLocalPrivateKey(encryptedKey: string) {

@@ -5,14 +5,14 @@ import localParams from "../../../../parameters.json" with { type: "json" };
 describe("Key helpers tests", () => {
   describe("get orch JWKS tests", () => {
     beforeEach(() => {
-      process.env["DUMMY_ORCH_JWKS"] = "";
+      process.env.DUMMY_JWKS = "";
     });
     it("should use dummy JWKS data if present", () => {
       const localJwkSetSpy = jest.spyOn(jose, "createLocalJWKSet");
-      process.env["DUMMY_ORCH_JWKS"] = localParams.Parameters.DUMMY_ORCH_JWKS;
+      process.env.DUMMY_JWKS = localParams.Parameters.DUMMY_JWKS;
       getOrchJwks();
       expect(localJwkSetSpy).toHaveBeenCalledWith(
-        JSON.parse(localParams.Parameters.DUMMY_ORCH_JWKS)
+        JSON.parse(localParams.Parameters.DUMMY_JWKS)
       );
     });
     it("should use JWKS URL if dummy data not present", () => {
