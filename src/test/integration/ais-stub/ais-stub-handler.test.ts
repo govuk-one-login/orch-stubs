@@ -95,7 +95,7 @@ describe("AIS stub handler", () => {
       );
 
       expect(interventionResponse.statusCode).toBe(405);
-      expect(interventionResponse.body).toStrictEqual("Method not allowed");
+      expect(interventionResponse.body).toBe("Method not allowed");
     }
   );
 
@@ -111,7 +111,7 @@ describe("AIS stub handler", () => {
     );
 
     expect(interventionResponse.statusCode).toBe(400);
-    expect(interventionResponse.body).toStrictEqual(
+    expect(interventionResponse.body).toBe(
       "No internalPairwiseId in path parameters"
     );
   });

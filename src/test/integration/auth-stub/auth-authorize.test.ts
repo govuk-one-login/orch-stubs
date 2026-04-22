@@ -1,7 +1,7 @@
 import { createApiGatewayEvent } from "../util.ts";
 import { handler } from "../../../main/auth-stub/auth-authorize.ts";
 import { Claims } from "../../../main/auth-stub/helpers/claims-config.ts";
-import { mockEnvVariableSetupWithKey } from "./helpers/test-setup.ts";
+import { mockEnvVariableSetup } from "./helpers/test-setup.ts";
 import * as decryptionHelper from "../../../main/auth-stub/helpers/decryption-helper.ts";
 import {
   addUserProfile,
@@ -9,25 +9,23 @@ import {
   resetUserProfile,
 } from "./helpers/dynamo-helper.ts";
 import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
-import { generateKeyPair, CryptoKey, SignJWT } from "jose";
+import { SignJWT, importPKCS8 } from "jose";
+import localParams from "../../../../parameters.json";
 
 describe("Auth Authorize", () => {
   const EMAIL = "dummy.email@mail.com";
-  let privateKey: CryptoKey;
 
   beforeEach(async () => {
-    const ecKeyPair = await generateKeyPair("ES256");
-    privateKey = ecKeyPair.privateKey;
-
-    mockEnvVariableSetupWithKey(ecKeyPair.publicKey);
-    const jwt = await createJwt(createMockClaims(), privateKey);
-    jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
+    mockEnvVariableSetup();
+    const jwt = await createJwt(createMockClaims());
+    vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
     await addUserProfile(createUserPofile(EMAIL));
   });
 
   afterEach(async () => {
     await resetAuthCodeStore();
     await resetUserProfile();
+    vi.clearAllMocks();
   });
 
   it("should return 200 for valid GET request", async () => {
@@ -77,10 +75,11 @@ describe("Auth Authorize", () => {
     );
 
     expect(response.statusCode).toBe(302);
-    expect(response.headers["Location"]).toContain(
+    expect(response.headers.Location).toContain(
       "https://oidc.local.account.gov.uk/orchestration-redirect?code="
     );
   });
+
   it("should return 302 for POST request with error and update Dynamo", async () => {
     const response = await handler(
       createApiGatewayEvent(
@@ -96,7 +95,7 @@ describe("Auth Authorize", () => {
     );
 
     expect(response.statusCode).toBe(302);
-    expect(response.headers["Location"]).toStrictEqual(
+    expect(response.headers.Location).toBe(
       "https://oidc.local.account.gov.uk/orchestration-redirect?error=test-error-code"
     );
   });
@@ -110,7 +109,7 @@ describe("Auth Authorize", () => {
       authRequest: JSON.stringify(generateAuthRequest()),
     };
     if (error) {
-      formObject["error"] = error;
+      formObject.error = error;
     }
     return new URLSearchParams(formObject).toString();
   }
@@ -172,12 +171,15 @@ describe("Auth Authorize", () => {
 
   async function createJwt(
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    jwtObject: any,
-    privateKey: CryptoKey
+    jwtObject: any
   ): Promise<string> {
+    const key = await importPKCS8(
+      localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY,
+      "ES256"
+    );
     const jwt = await new SignJWT(jwtObject)
       .setProtectedHeader({ alg: "ES256" })
-      .sign(privateKey);
+      .sign(key);
     return jwt;
   }
 });

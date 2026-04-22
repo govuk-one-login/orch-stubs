@@ -6,9 +6,9 @@ import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.t
 import { handler } from "../../../main/ipv-stub/ipv-user-identity.ts";
 import { createApiGatewayEvent } from "../util.ts";
 
-describe("IPV User Identity", () => {
-  const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
+const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
 
+describe("IPV User Identity", () => {
   beforeEach(async () => {
     await setUpUserIdentity();
   });
@@ -25,6 +25,7 @@ describe("IPV User Identity", () => {
       null!,
       null!
     );
+
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toMatchObject(USER_IDENTITY);
   });
@@ -37,6 +38,7 @@ describe("IPV User Identity", () => {
       null!,
       null!
     );
+
     expect(response.statusCode).toBe(405);
   });
 

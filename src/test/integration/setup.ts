@@ -18,7 +18,7 @@ const waitForLocalStack = async () => {
   }
 };
 
-module.exports = async () => {
+export default async () => {
   Object.entries(localParams.Parameters)
     // Ignore the sam local localstack endpoint
     //for running the tests
