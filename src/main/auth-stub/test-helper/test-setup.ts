@@ -1,6 +1,6 @@
 import * as config from "../helpers/config.ts";
 import * as keyHelper from "../helpers/key-helpers.ts";
-import { generateKeyPair, KeyLike } from "jose";
+import { createRemoteJWKSet, generateKeyPair, CryptoKey, SignJWT } from "jose";
 import * as jose from "jose";
 
 export const mockEnvVariableSetup = async () => {
@@ -8,7 +8,7 @@ export const mockEnvVariableSetup = async () => {
     (await generateKeyPair("ES256")).publicKey
   );
 };
-export const mockEnvVariableSetupWithKey = async (authPublicKey: KeyLike) => {
+export const mockEnvVariableSetupWithKey = async (authPublicKey: CryptoKey) => {
   process.env.AUTH_JWKS_URL = "http://localhost/.well-known/auth-jwks.json";
   process.env.ORCH_TO_AUTH_CLIENT_ID = "orchestrationAuth";
   jest
@@ -27,15 +27,15 @@ export const mockEnvVariableSetupWithKey = async (authPublicKey: KeyLike) => {
   jest
     .spyOn(jose, "createRemoteJWKSet")
     .mockReturnValue((() => Promise.resolve(authPublicKey)) as ReturnType<
-      typeof jose.createRemoteJWKSet
+      typeof createRemoteJWKSet
     >);
 };
 
 export const createSignedJwt = async (
   claims: Record<string, string>,
-  privateKey: KeyLike
+  privateKey: CryptoKey
 ) => {
-  return await new jose.SignJWT(claims)
+  return await new SignJWT(claims)
     .setProtectedHeader({
       alg: "ES256",
     })

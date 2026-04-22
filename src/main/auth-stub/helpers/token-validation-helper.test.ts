@@ -11,8 +11,7 @@ import {
   verifyClientAssertion,
 } from "./token-validation-helper.ts";
 import * as authCodeDynamoDbService from "../services/auth-code-dynamodb-service.ts";
-import { generateKeyPairSync, KeyPairKeyObjectResult } from "crypto";
-import { createRemoteJWKSet, KeyLike, SignJWT } from "jose";
+import { createRemoteJWKSet, CryptoKey, generateKeyPair, SignJWT } from "jose";
 
 describe("Token Validation Helper", () => {
   describe("validate auth-code", () => {
@@ -196,11 +195,11 @@ describe("Token Validation Helper", () => {
     const clientId = "testClientId";
     const payload = { sub: clientId };
 
-    let ecKeyPair: KeyPairKeyObjectResult;
+    let ecKeyPair: CryptoKeyPair;
     let signPayload: string;
 
     beforeEach(async () => {
-      ecKeyPair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+      ecKeyPair = await generateKeyPair("ES256");
       signPayload = await new SignJWT(payload)
         .setProtectedHeader({
           alg: "ES256",
@@ -254,14 +253,12 @@ describe("Token Validation Helper", () => {
     });
 
     it("should error when the jwt fails verification from an incorrect signature", async () => {
-      const incorrectPublicKey = generateKeyPairSync("ec", {
-        namedCurve: "P-256",
-      }).publicKey;
+      const { publicKey } = await generateKeyPair("ES256");
 
       const action = async () =>
         verifyClientAssertion(
           { client_assertion: signPayload, client_id: clientId },
-          jwksReturningKey(incorrectPublicKey)
+          jwksReturningKey(publicKey)
         );
 
       await expect(action).rejects.toThrow("JWT verificaiton failed");
@@ -279,7 +276,7 @@ describe("Token Validation Helper", () => {
   });
 });
 
-const jwksReturningKey = (publicKey: KeyLike) => {
+const jwksReturningKey = (publicKey: CryptoKey) => {
   return (() => Promise.resolve(publicKey)) as ReturnType<
     typeof createRemoteJWKSet
   >;
