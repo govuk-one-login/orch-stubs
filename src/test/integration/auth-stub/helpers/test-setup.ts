@@ -1,7 +1,7 @@
 import * as config from "../../../../main/auth-stub/helpers/config.ts";
 import * as keyHelper from "../../../../main/auth-stub/helpers/key-helpers.ts";
 import * as jose from "jose";
-import { generateKeyPair, KeyLike } from "jose";
+import { createRemoteJWKSet, generateKeyPair, CryptoKey } from "jose";
 
 export const orchToAuthExpectedClientId = "orchestrationAuth";
 export const mockEnvVariableSetup = async () => {
@@ -9,7 +9,7 @@ export const mockEnvVariableSetup = async () => {
     (await generateKeyPair("ES256")).publicKey
   );
 };
-export const mockEnvVariableSetupWithKey = async (authPublicKey: KeyLike) => {
+export const mockEnvVariableSetupWithKey = async (authPublicKey: CryptoKey) => {
   jest
     .spyOn(config, "getOrchToAuthExpectedAudience")
     .mockReturnValue("testURL");
@@ -26,7 +26,7 @@ export const mockEnvVariableSetupWithKey = async (authPublicKey: KeyLike) => {
   jest
     .spyOn(jose, "createRemoteJWKSet")
     .mockReturnValue((() => Promise.resolve(authPublicKey)) as ReturnType<
-      typeof jose.createRemoteJWKSet
+      typeof createRemoteJWKSet
     >);
   process.env.AUTH_JWKS_URL = "http://localhost";
 };

@@ -15,11 +15,10 @@ import {
   mockEnvVariableSetupWithKey,
 } from "./test-helper/test-setup.ts";
 import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
-import * as jose from "jose";
-import { generateKeyPair } from "jose";
+import { generateKeyPair, GenerateKeyPairResult } from "jose";
 
 describe("Auth Authorize", () => {
-  let authSigningKeyPair: jose.GenerateKeyPairResult;
+  let authSigningKeyPair: GenerateKeyPairResult;
   beforeEach(async () => {
     authSigningKeyPair = await generateKeyPair("ES256");
   });

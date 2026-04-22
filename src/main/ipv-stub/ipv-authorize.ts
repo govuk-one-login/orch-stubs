@@ -56,7 +56,7 @@ async function get(
   const ipvPrivateKey = await getIpvPrivateKey();
 
   const { plaintext } = await compactDecrypt(requestObject, ipvPrivateKey);
-  const encodedJwt = plaintext.toString();
+  const encodedJwt = new TextDecoder().decode(plaintext);
 
   const parts = encodedJwt.split(".");
   if (parts.length !== 3) {
