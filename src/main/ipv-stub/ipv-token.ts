@@ -19,6 +19,8 @@ import {
 import { randomBytes } from "crypto";
 import { logger } from "../logger.ts";
 import { getOrchJwks } from "./helper/key-helpers.ts";
+import { getHeaderValueFromHeaders } from "../util/request-header-helper.ts";
+
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -67,7 +69,7 @@ async function post(
 }
 
 function validateHeadersOrThrow(headers: APIGatewayProxyEventHeaders): void {
-  const contentType = headers["Content-Type"];
+  const contentType = getHeaderValueFromHeaders(headers, "Content-Type");
   if (!contentType?.match(/x-www-form-urlencoded/)) {
     throw new CodedError(400, `Unexpected content type header ${contentType}`);
   }

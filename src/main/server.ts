@@ -12,6 +12,7 @@ import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dyn
 import { warmUp as authCodeWarmUp } from "./auth-stub/services/auth-code-dynamodb-service.ts";
 import { warmUp as accessTokenWarmUp } from "./auth-stub/services/access-token-dynamodb-service.ts";
 import { warmUp as userProfileWarmUp } from "./auth-stub/services/user-profile-dynamodb-service.ts";
+import { warmUp as userIdentityWarmUp } from "./ipv-stub/service/dynamodb-form-response-service.ts";
 
 const initialise = async (): Promise<void> => {
   const PORT = process.env.PORT || 4401;
@@ -38,7 +39,7 @@ const initialise = async (): Promise<void> => {
   app.all("/ipv-stub/user-identity", apiGatewayRoute(ipvUserIdentity));
 
   // AIS stub
-  app.all("/ais-stub/*", apiGatewayRoute(aisStub));
+  app.all("/ais-stub/{*path}", apiGatewayRoute(aisStub));
 
   // SPOT stub
   // TODO: Add queue listener logic
@@ -47,10 +48,11 @@ const initialise = async (): Promise<void> => {
     res.status(404).send("Not found");
   });
 
-  authCodeWarmUp();
-  accessTokenWarmUp();
-  userProfileWarmUp();
-  aisInterventionWarmUp();
+  await authCodeWarmUp();
+  await accessTokenWarmUp();
+  await userProfileWarmUp();
+  await userIdentityWarmUp();
+  await aisInterventionWarmUp();
 
   const server = app.listen(PORT, () => console.log(`listening on ${PORT}`));
 

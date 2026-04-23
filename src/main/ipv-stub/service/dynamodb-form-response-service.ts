@@ -1,4 +1,9 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import {
+  CreateTableCommand,
+  DescribeTableCommand,
+  DynamoDBClient,
+  ResourceNotFoundException,
+} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface.ts";
 
@@ -11,6 +16,40 @@ const dynamoClient = new DynamoDBClient({
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
+
+export const warmUp = async (): Promise<void> => {
+  try {
+    await dynamoClient.send(
+      new DescribeTableCommand({
+        TableName: tableName,
+      })
+    );
+  } catch (err) {
+    if (
+      err instanceof ResourceNotFoundException &&
+      process.env.ENVIRONMENT === "local"
+    ) {
+      await dynamoClient.send(
+        new CreateTableCommand({
+          TableName: tableName,
+          KeySchema: [
+            {
+              AttributeName: "UserIdentityId",
+              KeyType: "HASH",
+            },
+          ],
+          AttributeDefinitions: [
+            {
+              AttributeName: "UserIdentityId",
+              AttributeType: "S",
+            },
+          ],
+          BillingMode: "PAY_PER_REQUEST",
+        })
+      );
+    }
+  }
+};
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string

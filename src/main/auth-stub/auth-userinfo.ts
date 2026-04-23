@@ -7,7 +7,7 @@ import { CodedError, handleErrors } from "../helper/result-helper.ts";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,
-} from "./helpers/request-header-helper.ts";
+} from "../util/request-header-helper.ts";
 import { AccessTokenStore } from "./interfaces/access-token-store-interface.ts";
 import {
   getAccessTokenStore,
