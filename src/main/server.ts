@@ -7,12 +7,14 @@ import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
 import { handler as ipvToken } from "./ipv-stub/ipv-token.ts";
 import { handler as ipvUserIdentity } from "./ipv-stub/ipv-user-identity.ts";
+import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";
 import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dynamo-service.ts";
 import { warmUp as authCodeWarmUp } from "./auth-stub/services/auth-code-dynamodb-service.ts";
 import { warmUp as accessTokenWarmUp } from "./auth-stub/services/access-token-dynamodb-service.ts";
 import { warmUp as userProfileWarmUp } from "./auth-stub/services/user-profile-dynamodb-service.ts";
 import { warmUp as userIdentityWarmUp } from "./ipv-stub/service/dynamodb-form-response-service.ts";
+import { startPoll } from "./helper/sqs-listener.ts";
 
 const initialise = async (): Promise<void> => {
   const PORT = process.env.PORT || 4401;
@@ -42,7 +44,8 @@ const initialise = async (): Promise<void> => {
   app.all("/ais-stub/{*path}", apiGatewayRoute(aisStub));
 
   // SPOT stub
-  // TODO: Add queue listener logic
+  // TODO: look up from name, or use queue URL?
+  const stopSpot = await startPoll(process.env.SOURCE_QUEUE_URL!, spotHandler);
 
   app.use((req, res) => {
     res.status(404).send("Not found");
@@ -55,6 +58,8 @@ const initialise = async (): Promise<void> => {
   await aisInterventionWarmUp();
 
   const server = app.listen(PORT, () => console.log(`listening on ${PORT}`));
+
+  server.on("close", stopSpot);
 
   process.on("SIGTERM", server.close);
   process.on("SIGINT", server.close);
