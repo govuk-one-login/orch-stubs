@@ -3,7 +3,11 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { CodedError, handleErrors } from "../helper/result-helper.ts";
+import {
+  CodedError,
+  createJsonResult,
+  handleErrors,
+} from "../helper/result-helper.ts";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,
@@ -25,12 +29,9 @@ export const handler: Handler = async (
       case "GET":
         return await get(event);
       default:
-        return {
-          statusCode: 405,
-          body: JSON.stringify({
-            message: "Method not allowed",
-          }),
-        };
+        return createJsonResult(405, {
+          message: "Method not allowed",
+        });
     }
   });
 };
@@ -83,14 +84,7 @@ async function get(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(userInfoClaims),
-    headers: {
-      // TODO: add to all paths?
-      "Content-Type": "application/json",
-    },
-  };
+  return createJsonResult(200, userInfoClaims);
 }
 
 const isAccessStoreValid = (accessTokenStore: AccessTokenStore) => {

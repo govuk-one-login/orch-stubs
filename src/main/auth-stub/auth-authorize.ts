@@ -17,8 +17,8 @@ import { Claims } from "./helpers/claims-config.ts";
 import {
   CodedError,
   handleErrors,
-  successfulHtmlResult,
-  successfulJsonResult,
+  createHtmlResult,
+  createJsonResult,
 } from "../helper/result-helper.ts";
 import { ROOT_URI } from "./data/auth-dummy-constants.ts";
 import { createUserPofile } from "./helpers/mock-token-data-helper.ts";
@@ -39,12 +39,9 @@ export const handler: Handler = async (
       case "POST":
         return post(event);
       default:
-        return {
-          statusCode: 405,
-          body: JSON.stringify({
-            message: "Method not allowed",
-          }),
-        };
+        return createJsonResult(405, {
+          message: "Method not allowed",
+        });
     }
   });
 };
@@ -101,7 +98,7 @@ async function get(
     claims: claims,
   };
 
-  return successfulHtmlResult(
+  return createHtmlResult(
     200,
     renderAuthAuthorize(authRequest, AUTHORIZE_ERRORS)
   );
@@ -115,7 +112,7 @@ async function post(
   const bodyUrlParams = new URLSearchParams(event.body!);
   const body = Object.fromEntries(bodyUrlParams);
   if (body.error) {
-    return successfulJsonResult(
+    return createJsonResult(
       302,
       {},
       {
@@ -161,7 +158,7 @@ async function post(
   url.searchParams.append("code", authCode);
   url.searchParams.append("state", authRequest.claims.state);
 
-  return successfulJsonResult(
+  return createJsonResult(
     302,
     {
       message: `Redirecting to ${url.toString()}`,

@@ -1,7 +1,6 @@
 import { APIGatewayProxyResult } from "aws-lambda";
 import { logger } from "../logger.ts";
 
-type SuccessCode = 200 | 302;
 type ErrorCode = 400 | 401 | 405 | 500;
 type JsonEntity =
   | string
@@ -22,8 +21,8 @@ export class CodedError extends Error {
   }
 }
 
-export function successfulJsonResult(
-  code: SuccessCode,
+export function createJsonResult(
+  code: number,
   body: JsonEntity,
   headers?: Headers
 ): APIGatewayProxyResult {
@@ -34,8 +33,8 @@ export function successfulJsonResult(
   };
 }
 
-export function successfulHtmlResult(
-  code: SuccessCode,
+export function createHtmlResult(
+  code: number,
   body: string,
   headers?: Headers
 ): APIGatewayProxyResult {
@@ -58,22 +57,16 @@ export async function handleErrors(
   } catch (error) {
     if (error instanceof CodedError) {
       logger.error(error.message);
-      return {
-        statusCode: error.code,
-        body: JSON.stringify({
-          message: error.message,
-        }),
-      };
+      return createJsonResult(error.code, {
+        message: error.message,
+      });
     }
 
     const errorStr =
       error instanceof Error ? error.message : JSON.stringify(error);
     logger.error(errorStr);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: `Encountered an unhandled exception: ${errorStr}`,
-      }),
-    };
+    return createJsonResult(500, {
+      message: `Encountered an unhandled exception: ${errorStr}`,
+    });
   }
 }

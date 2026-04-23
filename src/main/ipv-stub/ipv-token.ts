@@ -10,7 +10,7 @@ import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-  successfulJsonResult,
+  createJsonResult,
 } from "../helper/result-helper.ts";
 import {
   getUserIdentityWithAuthCode,
@@ -61,7 +61,7 @@ async function post(
     throw new CodedError(500, "Auth code not found in DB, or is expired");
   }
   await putUserIdentityWithToken(accessToken, userIdentity);
-  return successfulJsonResult(200, {
+  return createJsonResult(200, {
     access_token: accessToken,
     token_type: "Bearer",
     expires_in: 3600,

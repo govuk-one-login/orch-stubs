@@ -7,7 +7,7 @@ import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-  successfulJsonResult,
+  createJsonResult,
 } from "../helper/result-helper";
 import { getUserIdentityWithToken } from "./service/dynamodb-form-response-service.ts";
 import {
@@ -56,5 +56,5 @@ async function get(
   if (userIdentity == null) {
     throw new CodedError(500, "Access token not found in DB, or is expired");
   }
-  return successfulJsonResult(200, userIdentity);
+  return createJsonResult(200, userIdentity);
 }

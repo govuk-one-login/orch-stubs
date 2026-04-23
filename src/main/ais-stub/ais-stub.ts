@@ -5,6 +5,7 @@ import {
   defaultIntervention,
   defaultState,
 } from "./data/default-intervention-response.ts";
+import { createJsonResult } from "../helper/result-helper.ts";
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -46,18 +47,15 @@ export const handler = async (
     const { blocked, reproveIdentity, suspended, resetPassword } =
       stubInterventionsData;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        intervention: defaultIntervention(),
-        state: {
-          blocked: blocked ?? false,
-          reproveIdentity: reproveIdentity ?? false,
-          suspended: suspended ?? false,
-          resetPassword: resetPassword ?? false,
-        },
-      }),
-    };
+    return createJsonResult(200, {
+      intervention: defaultIntervention(),
+      state: {
+        blocked: blocked ?? false,
+        reproveIdentity: reproveIdentity ?? false,
+        suspended: suspended ?? false,
+        resetPassword: resetPassword ?? false,
+      },
+    });
   } catch (err) {
     logger.error(
       "Stub interventions handler threw unexpected error: " +
