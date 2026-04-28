@@ -5,22 +5,20 @@ import {
   importPKCS8,
   importSPKI,
   JWSHeaderParameters,
-  KeyLike,
+  CryptoKey,
 } from "jose";
-import { logger } from "../../../main/logger";
-import { getEnv } from "./env-helper";
-import { CodedError } from "../../helper/result-helper";
+import { logger } from "../../../main/logger.ts";
+import { getEnv } from "./env-helper.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 
 type JWKSVerifier = (
   protectedHeader?: JWSHeaderParameters,
   token?: FlattenedJWSInput
-) => Promise<KeyLike>;
+) => Promise<CryptoKey>;
 export const getOrchJwks = (): JWKSVerifier => {
-  const localJwks = getEnv("DUMMY_ORCH_JWKS", false);
+  const localJwks = getEnv("DUMMY_JWKS", false);
   if (localJwks) {
-    logger.info(
-      "Found DUMMY_ORCH_JWKS env variable. Using value as JWKS source"
-    );
+    logger.info("Found DUMMY_JWKS env variable. Using value as JWKS source");
     return createLocalJWKSet(JSON.parse(localJwks));
   } else {
     const urlString = getEnv("ORCH_PUBLIC_SIGNING_JWKS_URL");
@@ -31,7 +29,7 @@ export const getOrchJwks = (): JWKSVerifier => {
   }
 };
 
-export const getIpvPrivateKey = async (): Promise<KeyLike> => {
+export const getIpvPrivateKey = async (): Promise<CryptoKey> => {
   const ipvPrivateKeyPem = getEnv("IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY");
   try {
     return importPKCS8(ipvPrivateKeyPem, "RSA-OAEP-256");
@@ -43,7 +41,7 @@ export const getIpvPrivateKey = async (): Promise<KeyLike> => {
   }
 };
 
-export const getIpvPublicKey = async (): Promise<KeyLike> => {
+export const getIpvPublicKey = async (): Promise<CryptoKey> => {
   const ipvPublicKeyPem = getEnv("IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY");
   try {
     return importSPKI(ipvPublicKeyPem, "RSA-OAEP-256");

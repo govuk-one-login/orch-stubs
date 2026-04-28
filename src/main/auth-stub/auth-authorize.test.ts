@@ -3,47 +3,71 @@ import {
   APIGatewayProxyResult,
   Context,
 } from "aws-lambda";
-import { handler } from "./auth-authorize";
-import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
-import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service";
-import * as decryptionHelper from "./helpers/decryption-helper";
-import * as jwtHelper from "./helpers/jwt-helper";
+import { handler } from "./auth-authorize.ts";
+import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service.ts";
+import * as userProfileDynamoDbService from "./services/user-profile-dynamodb-service.ts";
+import * as decryptionHelper from "./helpers/decryption-helper.ts";
+import * as jwtHelper from "./helpers/jwt-helper.ts";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { createMockClaims } from "./test-helper/test-data";
+import { createMockClaims } from "./test-helper/test-data.ts";
 import {
   createSignedJwt,
-  mockEnvVariableSetupWithKey,
-} from "./test-helper/test-setup";
-import { createUserProfile } from "./test-helper/mock-user-profile-data-helper";
-import * as jose from "jose";
-import { generateKeyPair } from "jose";
+  mockEnvVariableSetup,
+} from "./test-helper/test-setup.ts";
+import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
+import {
+  createRemoteJWKSet,
+  generateKeyPair,
+  GenerateKeyPairResult,
+} from "jose";
+import { MockInstance } from "vitest";
+
+vi.mock(import("jose"), async (importActual) => {
+  const actual = await importActual<typeof import("jose")>();
+  return {
+    ...actual,
+    createRemoteJWKSet: vi.fn(),
+  };
+});
 
 describe("Auth Authorize", () => {
-  let authSigningKeyPair: jose.GenerateKeyPairResult;
+  let authSigningKeyPair: GenerateKeyPairResult;
+
   beforeEach(async () => {
     authSigningKeyPair = await generateKeyPair("ES256");
   });
+
   describe("GET endpoint", () => {
-    let addUserProfileSpy: jest.SpyInstance;
+    let addUserProfileSpy: MockInstance;
     let mockDynamoDbReponse: PutCommandOutput;
 
     beforeEach(async () => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
-      addUserProfileSpy = jest
+      addUserProfileSpy = vi
         .spyOn(userProfileDynamoDbService, "addUserProfile")
         .mockResolvedValue(mockDynamoDbReponse);
-      jest.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
-        createSignedJwt(
+      vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
+        await createSignedJwt(
           {
             aud: "test",
           },
           authSigningKeyPair.privateKey
         )
       );
-      jest
-        .spyOn(jwtHelper, "validateClaims")
-        .mockResolvedValue(createMockClaims());
-      mockEnvVariableSetupWithKey(authSigningKeyPair.publicKey);
+      vi.spyOn(jwtHelper, "validateClaims").mockResolvedValue(
+        createMockClaims()
+      );
+      mockEnvVariableSetup();
+
+      const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
+      mockedCreateRemoteJWKSet.mockReturnValue((() =>
+        Promise.resolve(authSigningKeyPair.publicKey)) as unknown as ReturnType<
+        typeof createRemoteJWKSet
+      >);
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
     });
 
     it("should try add a user-profile", async () => {
@@ -51,6 +75,7 @@ describe("Auth Authorize", () => {
 
       expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
     });
+
     it("should return a 400 error when queryParameters are not given", async () => {
       const response = await handler(
         {
@@ -65,6 +90,7 @@ describe("Auth Authorize", () => {
         "Missing query parameters"
       );
     });
+
     it("should return a 400 error when response_type is not given", async () => {
       const response = await handler(
         {
@@ -104,6 +130,7 @@ describe("Auth Authorize", () => {
         "Client ID value is incorrect"
       );
     });
+
     it("should return a 400 error when request is not given", async () => {
       const response = await handler(
         {
@@ -124,9 +151,9 @@ describe("Auth Authorize", () => {
     });
 
     it("should return a 400 error when validateClaim fails", async () => {
-      jest
-        .spyOn(jwtHelper, "validateClaims")
-        .mockRejectedValueOnce(new Error("Invalid claims"));
+      vi.spyOn(jwtHelper, "validateClaims").mockRejectedValueOnce(
+        new Error("Invalid claims")
+      );
 
       const response = await handler(
         createValidAuthorizeRequest(),
@@ -139,9 +166,9 @@ describe("Auth Authorize", () => {
     });
 
     it("should return a 400 error when decrypt fails", async () => {
-      jest
-        .spyOn(decryptionHelper, "decrypt")
-        .mockRejectedValueOnce(new Error("Decryption failed"));
+      vi.spyOn(decryptionHelper, "decrypt").mockRejectedValueOnce(
+        new Error("Decryption failed")
+      );
 
       const response = await handler(
         createValidAuthorizeRequest(),
@@ -154,7 +181,7 @@ describe("Auth Authorize", () => {
     });
 
     it("should return a 500 when failing to get user-profile", async () => {
-      addUserProfileSpy = jest
+      addUserProfileSpy = vi
         .spyOn(userProfileDynamoDbService, "addUserProfile")
         .mockImplementation(() => {
           throw new Error();
@@ -185,27 +212,35 @@ describe("Auth Authorize", () => {
   });
 
   describe("POST Endpoint", () => {
-    let addAuthCodeStoreSpy: jest.SpyInstance;
-    let getUserProfileByEmailSpy: jest.SpyInstance;
+    let addAuthCodeStoreSpy: MockInstance;
+    let getUserProfileByEmailSpy: MockInstance;
     let mockDynamoDbReponse: PutCommandOutput;
 
     beforeEach(() => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
-      addAuthCodeStoreSpy = jest
+      addAuthCodeStoreSpy = vi
         .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
         .mockResolvedValue(mockDynamoDbReponse);
-      getUserProfileByEmailSpy = jest
+      getUserProfileByEmailSpy = vi
         .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
         .mockResolvedValue(createUserProfile("testEmail", "testSubjectId"));
-      jest
-        .spyOn(decryptionHelper, "decrypt")
-        .mockResolvedValue(
-          "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
-        );
-      jest
-        .spyOn(jwtHelper, "validateClaims")
-        .mockResolvedValue(createMockClaims());
-      mockEnvVariableSetupWithKey(authSigningKeyPair.publicKey);
+      vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
+        "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
+      );
+      vi.spyOn(jwtHelper, "validateClaims").mockResolvedValue(
+        createMockClaims()
+      );
+      mockEnvVariableSetup();
+
+      const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
+      mockedCreateRemoteJWKSet.mockReturnValue((() =>
+        Promise.resolve(authSigningKeyPair.publicKey)) as unknown as ReturnType<
+        typeof createRemoteJWKSet
+      >);
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
     });
 
     it("should return a 302 without error code when valid post request sent", async () => {
@@ -216,9 +251,10 @@ describe("Auth Authorize", () => {
       );
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers!["Location"]).toContain("?code=");
-      expect(response.headers!["Location"]).not.toContain("error=");
+      expect(response.headers!.Location).toContain("?code=");
+      expect(response.headers!.Location).not.toContain("error=");
     });
+
     it("should return a 302 with error code when post request with error is sent", async () => {
       const response = (await handler(
         createPostRequestWithErrorCode("test-error-code"),
@@ -227,12 +263,12 @@ describe("Auth Authorize", () => {
       )) as APIGatewayProxyResult;
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers!["Location"]).toContain("?error=test-error-code");
+      expect(response.headers!.Location).toContain("?error=test-error-code");
     });
 
     describe("accessing dynamoDb", () => {
       it("should return a 500 when failing to get user-profile", async () => {
-        getUserProfileByEmailSpy = jest
+        getUserProfileByEmailSpy = vi
           .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
           .mockImplementation(() => {
             throw new Error();
@@ -256,7 +292,7 @@ describe("Auth Authorize", () => {
       });
 
       it("should return a 500 error when failing to add an access token to dynamoDb", async () => {
-        addAuthCodeStoreSpy = jest
+        addAuthCodeStoreSpy = vi
           .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
           .mockImplementation(() => {
             throw new Error();
@@ -292,7 +328,7 @@ describe("Auth Authorize", () => {
         authRequest: JSON.stringify(generateAuthRequest()),
       };
       if (error) {
-        formObject["error"] = error;
+        formObject.error = error;
       }
       return new URLSearchParams(formObject).toString();
     }

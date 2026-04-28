@@ -1,4 +1,4 @@
-import localParams from "./../../../parameters.json";
+import localParams from "./../../../parameters.json" with { type: "json" };
 const waitForLocalStack = async () => {
   let polls = 0;
 
@@ -18,7 +18,7 @@ const waitForLocalStack = async () => {
   }
 };
 
-module.exports = async () => {
+export default async () => {
   Object.entries(localParams.Parameters)
     // Ignore the sam local localstack endpoint
     //for running the tests

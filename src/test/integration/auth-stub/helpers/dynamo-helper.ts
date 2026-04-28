@@ -1,11 +1,11 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
-import { AccessTokenStore } from "src/main/auth-stub/interfaces/access-token-store-interface";
+import { AccessTokenStore } from "src/main/auth-stub/interfaces/access-token-store-interface.ts";
 import {
   AuthCodeStore,
   AuthCodeStoreInput,
-} from "src/main/auth-stub/interfaces/auth-code-store-interface";
-import { UserProfile } from "src/main/auth-stub/interfaces/user-profile-interface";
+} from "src/main/auth-stub/interfaces/auth-code-store-interface.ts";
+import { UserProfile } from "src/main/auth-stub/interfaces/user-profile-interface.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",

@@ -1,14 +1,14 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { randomBytes } from "crypto";
-import { handler } from "../../../main/ais-stub/ais-stub";
-import { StubInterventionData } from "../../../main/ais-stub/types/StubInterventionData";
-import { getEnv } from "../../../main/util/getEnv";
-import { createApiGatewayEvent } from "../util";
+import { handler } from "../../../main/ais-stub/ais-stub.ts";
+import { StubInterventionData } from "../../../main/ais-stub/types/StubInterventionData.ts";
+import { getEnv } from "../../../main/util/getEnv.ts";
+import { createApiGatewayEvent } from "../util.ts";
 import {
   defaultIntervention,
   defaultState,
-} from "../../../main/ais-stub/data/default-intervention-response";
+} from "../../../main/ais-stub/data/default-intervention-response.ts";
 
 describe("AIS stub handler", () => {
   const invalidHttpMethods = ["POST", "PUT", "PATCH", "HEAD", "DELETE"];
@@ -95,7 +95,7 @@ describe("AIS stub handler", () => {
       );
 
       expect(interventionResponse.statusCode).toBe(405);
-      expect(interventionResponse.body).toStrictEqual("Method not allowed");
+      expect(interventionResponse.body).toBe("Method not allowed");
     }
   );
 
@@ -111,7 +111,7 @@ describe("AIS stub handler", () => {
     );
 
     expect(interventionResponse.statusCode).toBe(400);
-    expect(interventionResponse.body).toStrictEqual(
+    expect(interventionResponse.body).toBe(
       "No internalPairwiseId in path parameters"
     );
   });

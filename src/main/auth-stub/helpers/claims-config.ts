@@ -1,9 +1,9 @@
 import {
   getOrchToAuthExpectedClientId,
   getOrchToAuthExpectedAudience,
-} from "./config";
+} from "./config.ts";
 
-export type Claims = {
+export interface Claims {
   iss: string;
   aud: string;
   exp: number;
@@ -34,7 +34,7 @@ export type Claims = {
   scope: string;
   requested_level_of_confidence?: string;
   requested_credential_strength: string;
-};
+}
 
 export const requiredClaimsKeys = [
   "iss",
@@ -57,9 +57,7 @@ export const requiredClaimsKeys = [
   "requested_credential_strength",
 ];
 
-export const getKnownClaims = (): {
-  [key: string]: string | boolean | number;
-} => {
+export const getKnownClaims = (): Record<string, string | boolean | number> => {
   return {
     client_id: getOrchToAuthExpectedClientId(),
     aud: getOrchToAuthExpectedAudience(),

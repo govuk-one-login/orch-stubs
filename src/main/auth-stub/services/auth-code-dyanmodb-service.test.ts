@@ -2,24 +2,24 @@ import {
   addAuthCodeStore,
   getAuthCodeStore,
   updateHasBeenUsedAuthCodeStore,
-} from "./auth-code-dynamodb-service";
+} from "./auth-code-dynamodb-service.ts";
 import {
   createAuthCodeStore,
   createAuthCodeStoreInput,
-} from "../test-helper/mock-auth-code-data-helper";
+} from "../test-helper/mock-auth-code-data-helper.ts";
 
 const TEST_AUTH_CODE = "testAuthCode";
 
-jest.mock("@aws-sdk/lib-dynamodb", () => {
+vi.mock("@aws-sdk/lib-dynamodb", () => {
   return {
     DynamoDBDocument: {
-      from: jest.fn().mockImplementation(() => {
+      from: vi.fn().mockImplementation(() => {
         return {
-          get: jest.fn(() =>
+          get: vi.fn(() =>
             Promise.resolve({ Item: createAuthCodeStore(TEST_AUTH_CODE) })
           ),
-          put: jest.fn(() => Promise.resolve("SUCCESS")),
-          update: jest.fn(() => Promise.resolve("SUCCESS")),
+          put: vi.fn(() => Promise.resolve("SUCCESS")),
+          update: vi.fn(() => Promise.resolve("SUCCESS")),
         };
       }),
     },
@@ -28,13 +28,13 @@ jest.mock("@aws-sdk/lib-dynamodb", () => {
 
 describe("Auth Code DynamoDb Service", () => {
   afterAll(() => {
-    jest.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should return an auth-code-store object when given an auth-code to get auth-code-store", async () => {
     const authCodeStore = await getAuthCodeStore(TEST_AUTH_CODE);
 
-    expect(authCodeStore).toEqual(createAuthCodeStore(TEST_AUTH_CODE));
+    expect(authCodeStore).toStrictEqual(createAuthCodeStore(TEST_AUTH_CODE));
   });
 
   it("should return a success response when given an auth-code-store object to add to the auth-code-store", async () => {

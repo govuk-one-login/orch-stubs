@@ -2,7 +2,7 @@ import { APIGatewayProxyEventHeaders } from "aws-lambda";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,
-} from "./request-header-helper";
+} from "./request-header-helper.ts";
 
 describe("Request header helper", () => {
   describe("getHeaderValueFromHeaders tests", () => {
@@ -19,7 +19,7 @@ describe("Request header helper", () => {
 
       const headerValue = getHeaderValueFromHeaders(headers, "new-header");
 
-      expect(headerValue).toBe(null);
+      expect(headerValue).toBeNull();
     });
 
     describe("matchCase tests", () => {
@@ -36,7 +36,7 @@ describe("Request header helper", () => {
 
         const headerValue = getHeaderValueFromHeaders(headers, "HEADER", false);
 
-        expect(headerValue).toBe(null);
+        expect(headerValue).toBeNull();
       });
     });
   });

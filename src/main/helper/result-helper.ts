@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from "aws-lambda";
-import { logger } from "../logger";
+import { logger } from "../logger.ts";
 
 type SuccessCode = 200 | 302;
 type ErrorCode = 400 | 401 | 405 | 500;
@@ -11,7 +11,7 @@ type JsonEntity =
   | undefined
   | object
   | JsonEntity[];
-type Headers = { [header: string]: boolean | number | string };
+type Headers = Record<string, boolean | number | string>;
 
 export class CodedError extends Error {
   public code: ErrorCode;
@@ -25,7 +25,7 @@ export class CodedError extends Error {
 export function successfulJsonResult(
   code: SuccessCode,
   body: JsonEntity,
-  headers?: Headers | undefined
+  headers?: Headers
 ): APIGatewayProxyResult {
   return {
     statusCode: code,
@@ -37,7 +37,7 @@ export function successfulJsonResult(
 export function successfulHtmlResult(
   code: SuccessCode,
   body: string,
-  headers?: Headers | undefined
+  headers?: Headers
 ): APIGatewayProxyResult {
   return {
     statusCode: code,

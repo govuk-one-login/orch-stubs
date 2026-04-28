@@ -1,10 +1,10 @@
-import * as jose from "jose";
-import { getAuthJwksUrl } from "./key-helpers";
-import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config";
-import { CodedError } from "../../helper/result-helper";
+import { getAuthJwks } from "./key-helpers.ts";
+import { Claims, getKnownClaims, requiredClaimsKeys } from "./claims-config.ts";
+import { CodedError } from "../../helper/result-helper.ts";
+import { JWTPayload, jwtVerify } from "jose";
 
 export const validateClaims = async (jwt: string): Promise<Claims> => {
-  let claims: jose.JWTPayload;
+  let claims: JWTPayload;
 
   try {
     claims = await validateUsingKey(jwt);
@@ -15,17 +15,17 @@ export const validateClaims = async (jwt: string): Promise<Claims> => {
     );
   }
 
-  if (claims["claim"] !== undefined) {
-    validateClaimObject(claims["claim"] as string);
+  if (claims.claim !== undefined) {
+    validateClaimObject(claims.claim as string);
   }
 
   return validateCustomClaims(claims);
 };
 
-const validateUsingKey = async (jwt: string): Promise<jose.JWTPayload> => {
-  const jwks = jose.createRemoteJWKSet(new URL(getAuthJwksUrl()));
+const validateUsingKey = async (jwt: string): Promise<JWTPayload> => {
+  const jwks = getAuthJwks();
 
-  const result = await jose.jwtVerify(jwt, jwks, {
+  const result = await jwtVerify(jwt, jwks, {
     requiredClaims: requiredClaimsKeys,
     clockTolerance: 30,
   });

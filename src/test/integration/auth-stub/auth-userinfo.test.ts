@@ -1,23 +1,23 @@
-import { createApiGatewayEvent } from "../util";
-import { handler } from "../../../main/auth-stub/auth-userinfo";
+import { createApiGatewayEvent } from "../util.ts";
+import { handler } from "../../../main/auth-stub/auth-userinfo.ts";
 import {
   addUserProfile,
   getAccessTokenStore,
   resetAccessTokenStore,
   resetUserProfile,
-} from "./helpers/dynamo-helper";
+} from "./helpers/dynamo-helper.ts";
 import {
   addAccessTokenStore,
   addCustomAccessTokenStore,
-} from "../../../main/auth-stub/test-helper/test-access-token-dynamodb-service";
+} from "../../../main/auth-stub/test-helper/test-access-token-dynamodb-service.ts";
 import {
   AccessTokenStoreOptions,
   createAccessTokenStoreInput,
   createCustomAccessTokenStore,
   createUserPofile,
-} from "../../../main/auth-stub/test-helper/mock-token-data-helper";
-import { UserProfile } from "../../../main/auth-stub/interfaces/user-profile-interface";
-import { UserInfoClaims } from "src/main/auth-stub/interfaces/user-info-claim-interface";
+} from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
+import { UserProfile } from "../../../main/auth-stub/interfaces/user-profile-interface.ts";
+import { UserInfoClaims } from "src/main/auth-stub/interfaces/user-info-claim-interface.ts";
 
 describe("Auth User Info", () => {
   const EMAIL = "dummy_user_info@mail.com";
@@ -53,13 +53,17 @@ describe("Auth User Info", () => {
     );
 
     expect(response.statusCode).toBe(200);
+
     const authUserInfoResponse: UserInfoClaims = JSON.parse(response.body);
+
     expect(authUserInfoResponse.email).toBe(userProfileMock.email);
     expect(authUserInfoResponse.local_account_id).toBe(
       userProfileMock.subjectId
     );
+
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);
-    expect(accessTokenStore.hasBeenUsed).toBeTruthy();
+
+    expect(accessTokenStore.hasBeenUsed).toBe(true);
   });
 
   it("should return a 401 error when headers is not given", async () => {

@@ -1,14 +1,14 @@
 import {
   putUserIdentity,
   resetUserIdentityTable,
-} from "./helper/dynamo-helper";
-import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants";
-import { handler } from "../../../main/ipv-stub/ipv-user-identity";
-import { createApiGatewayEvent } from "../util";
+} from "./helper/dynamo-helper.ts";
+import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
+import { handler } from "../../../main/ipv-stub/ipv-user-identity.ts";
+import { createApiGatewayEvent } from "../util.ts";
+
+const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
 
 describe("IPV User Identity", () => {
-  const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
-
   beforeEach(async () => {
     await setUpUserIdentity();
   });
@@ -25,6 +25,7 @@ describe("IPV User Identity", () => {
       null!,
       null!
     );
+
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toMatchObject(USER_IDENTITY);
   });
@@ -37,6 +38,7 @@ describe("IPV User Identity", () => {
       null!,
       null!
     );
+
     expect(response.statusCode).toBe(405);
   });
 

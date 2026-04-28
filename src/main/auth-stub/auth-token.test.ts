@@ -1,41 +1,61 @@
 import { Context } from "aws-lambda";
-import { handler } from "./auth-token";
-import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service";
-import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service";
-import * as tokenValidationHelper from "./helpers/token-validation-helper";
+import { handler } from "./auth-token.ts";
+import * as accessTokenDynamoDbService from "./services/access-token-dynamodb-service.ts";
+import * as authCodeDynamoDbService from "./services/auth-code-dynamodb-service.ts";
+import * as tokenValidationHelper from "./helpers/token-validation-helper.ts";
 import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { mockEnvVariableSetup } from "./test-helper/test-setup";
+import { mockEnvVariableSetup } from "./test-helper/test-setup.ts";
+import { MockInstance } from "vitest";
+import { createRemoteJWKSet, generateKeyPair } from "jose";
+
+vi.mock(import("jose"), async (importActual) => {
+  const actual = await importActual<typeof import("jose")>();
+  return {
+    ...actual,
+    createRemoteJWKSet: vi.fn(),
+  };
+});
+const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
+const authSigningKeyPair = await generateKeyPair("ES256");
 
 describe("Auth Token", () => {
-  let addAccessTokenStoreSpy: jest.SpyInstance;
-  let updateHasBeenUsedAuthCodeStoreSpy: jest.SpyInstance;
-  let validateAuthCodeSpy: jest.SpyInstance;
-  let validatePlainTextParametersSpy: jest.SpyInstance;
-  let ensureClientAssertionTypeSpy: jest.SpyInstance;
-  let verifyClientAssertionSpy: jest.SpyInstance;
+  let addAccessTokenStoreSpy: MockInstance;
+  let updateHasBeenUsedAuthCodeStoreSpy: MockInstance;
+  let validateAuthCodeSpy: MockInstance;
+  let validatePlainTextParametersSpy: MockInstance;
+  let ensureClientAssertionTypeSpy: MockInstance;
+  let verifyClientAssertionSpy: MockInstance;
   let mockDynamoDbReponse: PutCommandOutput;
 
   beforeEach(async () => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 200 } };
-    addAccessTokenStoreSpy = jest
+    addAccessTokenStoreSpy = vi
       .spyOn(accessTokenDynamoDbService, "addAccessTokenStore")
       .mockResolvedValue(mockDynamoDbReponse);
-    updateHasBeenUsedAuthCodeStoreSpy = jest
+    updateHasBeenUsedAuthCodeStoreSpy = vi
       .spyOn(authCodeDynamoDbService, "updateHasBeenUsedAuthCodeStore")
       .mockResolvedValue(mockDynamoDbReponse);
-    validateAuthCodeSpy = jest
+    validateAuthCodeSpy = vi
       .spyOn(tokenValidationHelper, "validateAuthCode")
       .mockResolvedValue(undefined);
-    validatePlainTextParametersSpy = jest
+    validatePlainTextParametersSpy = vi
       .spyOn(tokenValidationHelper, "validatePlainTextParameters")
       .mockReturnValue(undefined);
-    ensureClientAssertionTypeSpy = jest
+    ensureClientAssertionTypeSpy = vi
       .spyOn(tokenValidationHelper, "ensureClientAssertionType")
       .mockReturnValue(undefined);
-    verifyClientAssertionSpy = jest
+    verifyClientAssertionSpy = vi
       .spyOn(tokenValidationHelper, "verifyClientAssertion")
       .mockResolvedValue(undefined);
     await mockEnvVariableSetup();
+    mockedCreateRemoteJWKSet.mockReturnValue((() =>
+      Promise.resolve(authSigningKeyPair.publicKey)) as unknown as ReturnType<
+      typeof createRemoteJWKSet
+    >);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it("should return an access token when given an auth code", async () => {
@@ -52,7 +72,7 @@ describe("Auth Token", () => {
   describe("validation of request parameters", () => {
     it("should error if auth-code validation fails", async () => {
       const authCodeValidationFailureMessage = "Auth Code validation failed";
-      validateAuthCodeSpy = jest
+      validateAuthCodeSpy = vi
         .spyOn(tokenValidationHelper, "validateAuthCode")
         .mockRejectedValueOnce(new Error(authCodeValidationFailureMessage));
 
@@ -69,7 +89,7 @@ describe("Auth Token", () => {
     it("should error if plain-text-parameters validation fails", async () => {
       const plainTextParamsValidationFailureMessage =
         "Plain text parameters validation failed";
-      validatePlainTextParametersSpy = jest
+      validatePlainTextParametersSpy = vi
         .spyOn(tokenValidationHelper, "validatePlainTextParameters")
         .mockImplementation(() => {
           throw new Error(plainTextParamsValidationFailureMessage);
@@ -88,7 +108,7 @@ describe("Auth Token", () => {
     it("should error if ensure-client-assertion-type validation fails", async () => {
       const ensureClientAssertionFailureMessage =
         "Plain text parameters validation failed";
-      ensureClientAssertionTypeSpy = jest
+      ensureClientAssertionTypeSpy = vi
         .spyOn(tokenValidationHelper, "ensureClientAssertionType")
         .mockImplementation(() => {
           throw new Error(ensureClientAssertionFailureMessage);
@@ -107,7 +127,7 @@ describe("Auth Token", () => {
     it("should error if verify-client-assertion validation fails", async () => {
       const verifyClientAssertionFailureMessage =
         "Plain text parameters validation failed";
-      verifyClientAssertionSpy = jest
+      verifyClientAssertionSpy = vi
         .spyOn(tokenValidationHelper, "verifyClientAssertion")
         .mockImplementation(() => {
           throw new Error(verifyClientAssertionFailureMessage);
@@ -138,7 +158,7 @@ describe("Auth Token", () => {
     });
 
     it("should return a 500 error when failing to add an access token to dynamoDb", async () => {
-      addAccessTokenStoreSpy = jest
+      addAccessTokenStoreSpy = vi
         .spyOn(accessTokenDynamoDbService, "addAccessTokenStore")
         .mockImplementation(() => {
           throw new Error();
@@ -154,7 +174,7 @@ describe("Auth Token", () => {
     });
 
     it("should return a 500 error when failing to update the auth code to hasBeenUsed in dynamoD", async () => {
-      updateHasBeenUsedAuthCodeStoreSpy = jest
+      updateHasBeenUsedAuthCodeStoreSpy = vi
         .spyOn(authCodeDynamoDbService, "updateHasBeenUsedAuthCodeStore")
         .mockImplementation(() => {
           throw new Error();

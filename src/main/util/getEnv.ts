@@ -1,4 +1,4 @@
-import { AisStubEnvVar } from "../ais-stub/types/AisStubEnvVar";
+import { AisStubEnvVar } from "../ais-stub/types/AisStubEnvVar.ts";
 
 export type BaseEnvVar = "ENVIRONMENT" | "LOCALSTACK_ENDPOINT";
 

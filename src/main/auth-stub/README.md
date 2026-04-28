@@ -14,7 +14,7 @@ You can run the authstub locally for development purposes by following these ste
 - Start localstack using `npm localstack:up`
 - Run the authstub locally using `npm start:local:auth` in the root of this project.
     - Note that sometimes if you make code changes, you need to force a rebuild using `npm clean:auth && npm:build:auth` for the changes to come through
-- Generate a signed and encrypted JWT using `npm createAuthRequestObject`. It should output something along the lines of `Here's your request object: <JWE>`
+- Generate a signed and encrypted JWT using `npm run createAuthRequestObject`. It should output something along the lines of `Here's your request object: <JWE>`
     - This command points to the script here: `scripts/createAuthRequestObject.mjs`. You can update the claims set in the JWT there if needed.
 - Make a request to `http://127.0.0.1:3001/authorize?client_id=orchestrationAuth&response_type=code&request=<JWE>`
 

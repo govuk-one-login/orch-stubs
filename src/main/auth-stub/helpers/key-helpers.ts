@@ -1,24 +1,36 @@
-import { getEnv } from "./env-helper";
+import { getEnv } from "./env-helper.ts";
 import {
   DecryptCommandInput,
   DecryptCommandOutput,
   EncryptionAlgorithmSpec,
   KMS,
 } from "@aws-sdk/client-kms";
-import { base64DecodeToUint8Array } from "./encoding";
-import { getAwsRegion, getKmsKeyId } from "./config";
-import { logger } from "../..//logger";
-import { CodedError } from "../../helper/result-helper";
+import { base64DecodeToUint8Array } from "./encoding.ts";
+import { getAwsRegion, getKmsKeyId } from "./config.ts";
+import { logger } from "../..//logger.ts";
+import { CodedError } from "../../helper/result-helper.ts";
 import {
   createPrivateKey,
   privateDecrypt,
   constants,
   KeyObject,
 } from "node:crypto";
+import {
+  FlattenedJWSInput,
+  CryptoKey,
+  JWSHeaderParameters,
+  createLocalJWKSet,
+  createRemoteJWKSet,
+} from "jose";
+
+type JWKSVerifier = (
+  protectedHeader?: JWSHeaderParameters,
+  token?: FlattenedJWSInput
+) => Promise<CryptoKey>;
 
 export const getContentEncryptionKey = async (
   encryptedKey: string
-): Promise<Uint8Array<ArrayBufferLike>> => {
+): Promise<Uint8Array> => {
   const environment = getEnv("ENVIRONMENT");
   if (environment === "local") {
     return await decryptUsingLocalPrivateKey(encryptedKey);
@@ -27,8 +39,18 @@ export const getContentEncryptionKey = async (
   }
 };
 
-export const getAuthJwksUrl = (): string => {
-  return getEnv("AUTH_JWKS_URL");
+export const getAuthJwks = (): JWKSVerifier => {
+  const localJwks = getEnv("DUMMY_JWKS", false);
+  if (localJwks) {
+    logger.info("Found DUMMY_JWKS env variable. Using value as JWKS source");
+    return createLocalJWKSet(JSON.parse(localJwks));
+  } else {
+    const urlString = getEnv("AUTH_JWKS_URL");
+    logger.info("Fetching JWKS from URL " + urlString);
+    return createRemoteJWKSet(new URL(urlString), {
+      timeoutDuration: 10 * 1000, //10 seconds
+    });
+  }
 };
 
 async function decryptUsingLocalPrivateKey(encryptedKey: string) {

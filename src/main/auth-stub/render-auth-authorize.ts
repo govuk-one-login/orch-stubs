@@ -1,5 +1,5 @@
-import { renderPage } from "../template";
-import { AuthRequestBody } from "./interfaces/auth-request-body-interface";
+import { renderPage } from "../template.ts";
+import { AuthRequestBody } from "./interfaces/auth-request-body-interface.ts";
 
 export default function renderAuthAuthorize(
   authRequest: AuthRequestBody,

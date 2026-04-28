@@ -1,35 +1,46 @@
+import * as jose from "jose";
 import { generateKeyPairSync, publicEncrypt } from "crypto";
-import { getContentEncryptionKey } from "./key-helpers";
+import { getAuthJwks, getContentEncryptionKey } from "./key-helpers.ts";
 import { RSA_PKCS1_OAEP_PADDING } from "constants";
+import localParams from "../../../../parameters.json" with { type: "json" };
+import { createRemoteJWKSet } from "jose";
+
+vi.mock("@aws-sdk/client-kms", async (importActual) => {
+  const actual = await importActual<typeof import("@aws-sdk/client-kms")>();
+
+  return {
+    ...actual,
+    KMS: vi.fn().mockImplementation(function () {
+      return { decrypt: mockKmsDecrypt };
+    }),
+  };
+});
+
+vi.mock(import("jose"), async (importActual) => {
+  const actual = await importActual<typeof import("jose")>();
+  return {
+    ...actual,
+    createRemoteJWKSet: vi.fn(),
+  };
+});
 
 const cekValue = "test";
 const kmsKeyId = "test-key-id";
 
-const mockKmsDecrypt = jest.fn().mockImplementation((_DecryptCommandInput) => {
-  return Promise.resolve({ Plaintext: cekValue });
-});
-jest.mock("@aws-sdk/client-kms", () => ({
-  ...jest.requireActual("@aws-sdk/client-kms"),
-  KMS: jest.fn().mockImplementation(() => {
-    return { decrypt: mockKmsDecrypt };
-  }),
-}));
+const mockKmsDecrypt = vi.fn().mockResolvedValue({ Plaintext: cekValue });
 
 describe("Key helpers tests", () => {
   let encryptedKey: string;
 
   beforeEach(() => {
-    process.env["AWS_REGION"] = "eu-west-2";
-    process.env["ENCRYPTION_KEY_ID"] = kmsKeyId;
+    vi.clearAllMocks();
+    process.env.AWS_REGION = "eu-west-2";
+    process.env.ENCRYPTION_KEY_ID = kmsKeyId;
     encryptedKey = "test-enc-value";
   });
 
-  afterEach(() => {
-    jest.resetModules();
-  });
-
   it("should decrypt CEK using KMS when ENVIRONMENT is not local", async () => {
-    process.env["ENVIRONMENT"] = "dev";
+    process.env.ENVIRONMENT = "dev";
 
     const decryptedKey = await getContentEncryptionKey(
       base64Encode(encryptedKey)
@@ -63,8 +74,8 @@ describe("Key helpers tests", () => {
       },
       Buffer.from(cekValue, "utf-8")
     );
-    process.env["ENVIRONMENT"] = "local";
-    process.env["LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"] = privateKey;
+    process.env.ENVIRONMENT = "local";
+    process.env.LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY = privateKey;
 
     const decryptedKey = await getContentEncryptionKey(
       encryptedCek.toString("base64")
@@ -72,6 +83,40 @@ describe("Key helpers tests", () => {
 
     expect(mockKmsDecrypt).not.toHaveBeenCalled();
     expect(decryptedKey.toString()).toBe(cekValue);
+  });
+
+  describe("get auth JWKS tests", () => {
+    beforeEach(() => {
+      process.env.DUMMY_JWKS = "";
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it("should use dummy JWKS data if present", () => {
+      const localJwkSetSpy = vi.spyOn(jose, "createLocalJWKSet");
+      process.env.DUMMY_JWKS = localParams.Parameters.DUMMY_JWKS;
+      getAuthJwks();
+
+      expect(localJwkSetSpy).toHaveBeenCalledWith(
+        JSON.parse(localParams.Parameters.DUMMY_JWKS)
+      );
+    });
+
+    it("should use JWKS URL if dummy data not present", () => {
+      const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
+      process.env.AUTH_JWKS_URL =
+        "http://test.example.com/.well-known/jwks.json";
+      getAuthJwks();
+
+      expect(mockedCreateRemoteJWKSet).toHaveBeenCalledWith(
+        new URL("http://test.example.com/.well-known/jwks.json"),
+        {
+          timeoutDuration: 10 * 1000,
+        }
+      );
+    });
   });
 
   function base64Encode(value: string): string {

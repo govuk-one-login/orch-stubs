@@ -3,12 +3,12 @@ import {
   getUserIdentity,
   resetUserIdentityTable,
 } from "./helper/dynamo-helper";
-import { CompactEncrypt, importPKCS8, SignJWT } from "jose";
-import formConfig from "../../../main/ipv-stub/config/config";
-import localParams from "../../../../parameters.json";
-import { createPublicKey, randomUUID } from "crypto";
-import { handler } from "./../../../main/ipv-stub/ipv-authorize";
-import { createApiGatewayEvent } from "../util";
+import { CompactEncrypt, importPKCS8, importSPKI, SignJWT } from "jose";
+import formConfig from "../../../main/ipv-stub/config/config.ts";
+import localParams from "../../../../parameters.json" with { type: "json" };
+import { randomUUID } from "crypto";
+import { handler } from "./../../../main/ipv-stub/ipv-authorize.ts";
+import { createApiGatewayEvent } from "../util.ts";
 import { Context } from "aws-lambda";
 
 const STATE = "test-state";
@@ -33,12 +33,17 @@ describe("IPV Authorize", () => {
       {} as Context,
       () => {}
     );
+
     expect(response.statusCode).toBe(200);
+
     const htmlRegex =
       /<input type="hidden" name="authCode" value=(?<authCode>[A-Za-z0-9+/\-_]+)>/;
+
     expect(response.body).toMatch(htmlRegex);
+
     const { authCode } = htmlRegex.exec(response.body)!.groups!;
     const state = await getState(authCode);
+
     expect(state).toBe(STATE);
   });
 
@@ -57,6 +62,7 @@ describe("IPV Authorize", () => {
       {} as Context,
       () => {}
     );
+
     expect(response.statusCode).toBe(302);
     expect(response.headers.Location).toBe(
       `https://oidc.local.account.gov.uk/ipv-callback?${new URLSearchParams({
@@ -72,6 +78,7 @@ describe("IPV Authorize", () => {
       {} as Context,
       () => {}
     );
+
     expect(response.statusCode).toBe(302);
     expect(response.headers.Location).toBe(
       `https://oidc.local.account.gov.uk/ipv-callback?code=${AUTH_CODE}`
@@ -91,6 +98,7 @@ describe("IPV Authorize", () => {
       "https://vocab.account.gov.uk/v1/returnCode": formConfig.returnCode,
     };
     const actualUserIdentity = await getUserIdentity(AUTH_CODE);
+
     expect(actualUserIdentity).toMatchObject(expectedUserIdentity);
   });
 
@@ -100,6 +108,7 @@ describe("IPV Authorize", () => {
       {} as Context,
       () => {}
     );
+
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body).message).toBe(
       "Query string parameters are null"
@@ -113,6 +122,7 @@ describe("IPV Authorize", () => {
       {} as Context,
       () => {}
     );
+
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body).message).toBe(
       "Encountered an unhandled exception: Invalid Compact JWE"
@@ -134,77 +144,78 @@ describe("IPV Authorize", () => {
     );
 
     expect(response.statusCode).toBe(500);
-    expect(JSON.parse(response.body).message).toEqual(
+    expect(JSON.parse(response.body).message).toBe(
       "Signature verification failed"
     );
   });
-});
 
-async function generateJwt(): Promise<string> {
-  const key = await importPKCS8(
-    localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY,
-    "ES256"
-  );
-  return await new SignJWT({
-    sub: "urn:fdc:gov.uk:2022:Js1eJ0BbwPJEZIVV8DtXeLs-BSWHhKL-qHOjpnY7R-w",
-    response_type: "code",
-    govuk_signin_journey_id: "jAWCpUMvz6x7kTJTXTgC2OeldWM",
-    aud: "https://ipvstub.oidc.local.account.gov.uk",
-    vtr: ["P2"],
-    scope: "openid email phone",
-    state: STATE,
-    jti: randomUUID(),
-    claims: {
-      userinfo: {
-        "https://vocab.account.gov.uk/v1/storageAccessToken": {
-          values: "storageAccessToken",
-        },
-        "https://vocab.account.gov.uk/v1/passport": {
-          essential: true,
-        },
-        "https://vocab.account.gov.uk/v1/socialSecurityRecord": {
-          essential: true,
-        },
-        "https://vocab.account.gov.uk/v1/drivingPermit": {
-          essential: true,
-        },
-        "https://vocab.account.gov.uk/v1/coreIdentityJWT": {
-          essential: true,
-        },
-        "https://vocab.account.gov.uk/v1/address": {
-          essential: true,
-        },
-        "https://vocab.account.gov.uk/v1/returnCode": {
-          essential: true,
+  async function generateJwt(): Promise<string> {
+    const key = await importPKCS8(
+      localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY,
+      "ES256"
+    );
+    return await new SignJWT({
+      sub: "urn:fdc:gov.uk:2022:Js1eJ0BbwPJEZIVV8DtXeLs-BSWHhKL-qHOjpnY7R-w",
+      response_type: "code",
+      govuk_signin_journey_id: "jAWCpUMvz6x7kTJTXTgC2OeldWM",
+      aud: "https://ipvstub.oidc.local.account.gov.uk",
+      vtr: ["P2"],
+      scope: "openid email phone",
+      state: STATE,
+      jti: randomUUID(),
+      claims: {
+        userinfo: {
+          "https://vocab.account.gov.uk/v1/storageAccessToken": {
+            values: "storageAccessToken",
+          },
+          "https://vocab.account.gov.uk/v1/passport": {
+            essential: true,
+          },
+          "https://vocab.account.gov.uk/v1/socialSecurityRecord": {
+            essential: true,
+          },
+          "https://vocab.account.gov.uk/v1/drivingPermit": {
+            essential: true,
+          },
+          "https://vocab.account.gov.uk/v1/coreIdentityJWT": {
+            essential: true,
+          },
+          "https://vocab.account.gov.uk/v1/address": {
+            essential: true,
+          },
+          "https://vocab.account.gov.uk/v1/returnCode": {
+            essential: true,
+          },
         },
       },
-    },
-  })
-    .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
-    .sign(key);
-}
+    })
+      .setProtectedHeader({ alg: "ES256", kid: "test-key-id" })
+      .sign(key);
+  }
 
-async function generateJwe(): Promise<string> {
-  const publicEncryptionKey = createPublicKey(
-    localParams.Parameters.IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY
-  );
-  const jwt = await generateJwt();
-  return new CompactEncrypt(new TextEncoder().encode(jwt))
-    .setProtectedHeader({ cty: "JWT", enc: "A256GCM", alg: "RSA-OAEP-256" })
-    .encrypt(publicEncryptionKey);
-}
+  async function generateJwe(): Promise<string> {
+    const publicEncryptionKey = await importSPKI(
+      localParams.Parameters.IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY,
+      "RSA-OAEP-256"
+    );
+    const jwt = await generateJwt();
+    return new CompactEncrypt(new TextEncoder().encode(jwt))
+      .setProtectedHeader({ cty: "JWT", enc: "A256GCM", alg: "RSA-OAEP-256" })
+      .encrypt(publicEncryptionKey);
+  }
 
-function generateFormBody(): string {
-  return new URLSearchParams({
-    authCode: AUTH_CODE,
-    sub: formConfig.coreIdentityJWT.sub,
-    vot: formConfig.coreIdentityJWT.vot,
-    vtm: formConfig.coreIdentityJWT.vtm,
-    identity_claim: JSON.stringify(formConfig.coreIdentityJWT.vc),
-    address_claim: JSON.stringify(formConfig.address),
-    passport_claim: JSON.stringify(formConfig.passport),
-    driving_permit_claim: JSON.stringify(formConfig.drivingPermit),
-    nino_claim: JSON.stringify(formConfig.socialSecurityRecord),
-    return_code_claim: JSON.stringify(formConfig.returnCode),
-  } as Record<string, string>).toString();
-}
+  function generateFormBody(): string {
+    return new URLSearchParams({
+      authCode: AUTH_CODE,
+      sub: formConfig.coreIdentityJWT.sub,
+      vot: formConfig.coreIdentityJWT.vot,
+      vtm: formConfig.coreIdentityJWT.vtm,
+      identity_claim: JSON.stringify(formConfig.coreIdentityJWT.vc),
+      address_claim: JSON.stringify(formConfig.address),
+      passport_claim: JSON.stringify(formConfig.passport),
+      driving_permit_claim: JSON.stringify(formConfig.drivingPermit),
+      nino_claim: JSON.stringify(formConfig.socialSecurityRecord),
+      return_code_claim: JSON.stringify(formConfig.returnCode),
+    } as Record<string, string>).toString();
+  }
+});

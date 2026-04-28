@@ -3,19 +3,19 @@ import {
   APIGatewayProxyResult,
   Handler,
 } from "aws-lambda";
-import { CodedError, handleErrors } from "../helper/result-helper";
+import { CodedError, handleErrors } from "../helper/result-helper.ts";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,
-} from "./helpers/request-header-helper";
-import { AccessTokenStore } from "./interfaces/access-token-store-interface";
+} from "./helpers/request-header-helper.ts";
+import { AccessTokenStore } from "./interfaces/access-token-store-interface.ts";
 import {
   getAccessTokenStore,
   updateHasBeenUsedAccessTokenStore,
-} from "./services/access-token-dynamodb-service";
-import { UserInfoClaims } from "./interfaces/user-info-claim-interface";
-import { getUserProfileBySubjectId } from "./services/user-profile-dynamodb-service";
-import { logger } from "../logger";
+} from "./services/access-token-dynamodb-service.ts";
+import { UserInfoClaims } from "./interfaces/user-info-claim-interface.ts";
+import { getUserProfileBySubjectId } from "./services/user-profile-dynamodb-service.ts";
+import { logger } from "../logger.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent

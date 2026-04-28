@@ -1,15 +1,16 @@
 import { createPublicKey, randomUUID } from "crypto";
-import localParams from "../parameters.json" assert { type: "json" };
+import localParams from "../parameters.json" with { type: "json" };
 import { CompactEncrypt, importPKCS8, SignJWT } from "jose";
 
 const publicEncryptionKey = createPublicKey(
   localParams.Parameters.LOCAL_AUTH_AUTHORIZE_PRIVATE_ENCRYPTION_KEY
 );
 const privateSigningPem =
-  localParams.Parameters.LOCAL_AUTH_AUTHORIZE_PRIVATE_SIGNING_KEY;
+  localParams.Parameters.DUMMY_PRIVATE_SIGNING_KEY;
 
 const main = async () => {
   const privateSigningKey = await importPKCS8(privateSigningPem, "ES256");
+  const timestamp = Math.floor(new Date().getTime() / 1000);
   const signedJwt = await new SignJWT({
     sub: "urn:fdc:gov.uk:2022:Js1eJ0BbwPJEZIVV8DtXeLs-BSWHhKL-qHOjpnY7R-w",
     response_type: "code",
@@ -21,7 +22,7 @@ const main = async () => {
     jti: randomUUID(),
     requested_credential_strength: "Cl.Cm",
     iss: "https://authstub.oidc.local.account.gov.uk",
-    exp: 1768723848,
+    exp: timestamp + 1000,
     iat: 123456789,
     nbf: 123456789,
     client_name: "Orch",
