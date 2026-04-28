@@ -71,7 +71,7 @@ export default {
   },
   address: [
     {
-      uprn: "10022812929",
+      uprn: 10022812929,
       subBuildingName: "FLAT 5",
       buildingName: "WEST LEA",
       buildingNumber: "16",
@@ -85,7 +85,7 @@ export default {
       validFrom: "2022-01-01",
     },
     {
-      uprn: "10002345923",
+      uprn: 10002345923,
       buildingName: "SAWLEY MARINA",
       streetName: "INGWORTH ROAD",
       dependentAddressLocality: "LONG EATON",
