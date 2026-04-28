@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.981.0",
-    "@aws-sdk/client-kms": "^3.981.0",
+    "@aws-sdk/client-kms": "^3.1033.0",
     "@aws-sdk/client-sqs": "^3.981.0",
     "@aws-sdk/lib-dynamodb": "^3.981.0",
     "@types/node-jose": "^1.1.13",
