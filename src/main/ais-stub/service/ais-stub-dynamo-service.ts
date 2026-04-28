@@ -1,13 +1,9 @@
-import {
-  CreateTableCommand,
-  DescribeTableCommand,
-  DynamoDBClient,
-  ResourceNotFoundException,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { StubInterventionData } from "../types/StubInterventionData.ts";
 import { Optional } from "../types/Optional.ts";
 import { getEnv } from "../../../main/util/getEnv.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = DynamoDBDocument.from(
   new DynamoDBClient({
@@ -20,39 +16,10 @@ const dynamoClient = DynamoDBDocument.from(
 
 const tableName = getEnv("STUB_AIS_TABLE_NAME");
 
-export const warmUp = async (): Promise<void> => {
-  try {
-    await dynamoClient.send(
-      new DescribeTableCommand({
-        TableName: tableName,
-      })
-    );
-  } catch (err) {
-    if (
-      err instanceof ResourceNotFoundException &&
-      process.env.ENVIRONMENT === "local"
-    ) {
-      await dynamoClient.send(
-        new CreateTableCommand({
-          TableName: tableName,
-          KeySchema: [
-            {
-              AttributeName: "pairwiseId",
-              KeyType: "HASH",
-            },
-          ],
-          AttributeDefinitions: [
-            {
-              AttributeName: "pairwiseId",
-              AttributeType: "S",
-            },
-          ],
-          BillingMode: "PAY_PER_REQUEST",
-        })
-      );
-    }
-  }
-};
+const primaryKey = "pairwiseId";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getStubIntervention = async (
   internalPairwiseId: string

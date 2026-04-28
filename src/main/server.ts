@@ -21,6 +21,7 @@ const initialise = async (): Promise<void> => {
 
   const app = express();
 
+  app.disable("x-powered-by");
   app.use(express.text({ type: "*/*" }));
 
   // Auth stub
@@ -44,7 +45,6 @@ const initialise = async (): Promise<void> => {
   app.all("/ais-stub/{*path}", apiGatewayRoute(aisStub));
 
   // SPOT stub
-  // TODO: look up from name, or use queue URL?
   const stopSpot = await startPoll(process.env.SOURCE_QUEUE_URL!, spotHandler);
 
   app.use((req, res) => {
@@ -65,4 +65,4 @@ const initialise = async (): Promise<void> => {
   process.on("SIGINT", server.close);
 };
 
-initialise().catch((err) => console.error(err));
+await initialise();

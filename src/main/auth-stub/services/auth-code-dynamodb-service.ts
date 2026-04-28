@@ -1,14 +1,10 @@
-import {
-  CreateTableCommand,
-  DescribeTableCommand,
-  DynamoDBClient,
-  ResourceNotFoundException,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   AuthCodeStore,
   AuthCodeStoreInput,
 } from "../interfaces/auth-code-store-interface.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
@@ -20,39 +16,10 @@ const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-AuthStub-AuthCode`;
 
-export const warmUp = async (): Promise<void> => {
-  try {
-    await dynamoClient.send(
-      new DescribeTableCommand({
-        TableName: tableName,
-      })
-    );
-  } catch (err) {
-    if (
-      err instanceof ResourceNotFoundException &&
-      process.env.ENVIRONMENT === "local"
-    ) {
-      await dynamoClient.send(
-        new CreateTableCommand({
-          TableName: tableName,
-          KeySchema: [
-            {
-              AttributeName: "authCode",
-              KeyType: "HASH",
-            },
-          ],
-          AttributeDefinitions: [
-            {
-              AttributeName: "authCode",
-              AttributeType: "S",
-            },
-          ],
-          BillingMode: "PAY_PER_REQUEST",
-        })
-      );
-    }
-  }
-};
+const primaryKey = "authCode";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getAuthCodeStore = async (
   authCode: string

@@ -1,14 +1,10 @@
-import {
-  CreateTableCommand,
-  DescribeTableCommand,
-  DynamoDBClient,
-  ResourceNotFoundException,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   AccessTokenStore,
   AccessTokenStoreInput,
 } from "../interfaces/access-token-store-interface.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
@@ -20,39 +16,10 @@ const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-AuthStub-AccessToken`;
 
-export const warmUp = async (): Promise<void> => {
-  try {
-    await dynamoClient.send(
-      new DescribeTableCommand({
-        TableName: tableName,
-      })
-    );
-  } catch (err) {
-    if (
-      err instanceof ResourceNotFoundException &&
-      process.env.ENVIRONMENT === "local"
-    ) {
-      await dynamoClient.send(
-        new CreateTableCommand({
-          TableName: tableName,
-          KeySchema: [
-            {
-              AttributeName: "accessToken",
-              KeyType: "HASH",
-            },
-          ],
-          AttributeDefinitions: [
-            {
-              AttributeName: "accessToken",
-              AttributeType: "S",
-            },
-          ],
-          BillingMode: "PAY_PER_REQUEST",
-        })
-      );
-    }
-  }
-};
+const primaryKey = "accessToken";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getAccessTokenStore = async (
   accessToken: string
