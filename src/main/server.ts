@@ -65,4 +65,4 @@ const initialise = async (): Promise<void> => {
   process.on("SIGINT", server.close);
 };
 
-await initialise();
+initialise().catch((err) => console.error(err));
