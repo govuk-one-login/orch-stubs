@@ -59,7 +59,7 @@
     "jiti": "^2.6.1",
     "jose": "^6.2.2",
     "pino": "^9.12.0",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
