@@ -14,4 +14,5 @@ export interface UserInfoClaims {
   verified_mfa_method_type: string;
   uplift_required: string;
   achieved_credential_strength: string;
+  account_data_api_access_token?: string;
 }

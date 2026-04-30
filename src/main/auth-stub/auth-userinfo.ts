@@ -120,5 +120,6 @@ const populateUserInfo = async (
     verified_mfa_method_type: "",
     uplift_required: "",
     achieved_credential_strength: "MEDIUM_LEVEL",
+    account_data_api_access_token: "account-data-api-access-token",
   };
 };
