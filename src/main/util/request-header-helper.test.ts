@@ -19,25 +19,15 @@ describe("Request header helper", () => {
 
       const headerValue = getHeaderValueFromHeaders(headers, "new-header");
 
-      expect(headerValue).toBeNull();
+      expect(headerValue).toBeUndefined();
     });
 
-    describe("matchCase tests", () => {
-      it("should return header value from header with matchCase set to true", () => {
-        const headers: APIGatewayProxyEventHeaders = { header: "header value" };
+    it("should return header value from header with matchCase set to true", () => {
+      const headers: APIGatewayProxyEventHeaders = { header: "header value" };
 
-        const headerValue = getHeaderValueFromHeaders(headers, "HEADER", true);
+      const headerValue = getHeaderValueFromHeaders(headers, "HEADER");
 
-        expect(headerValue).toBe("header value");
-      });
-
-      it("should return null when matchCase set to false", () => {
-        const headers: APIGatewayProxyEventHeaders = { header: "header value" };
-
-        const headerValue = getHeaderValueFromHeaders(headers, "HEADER", false);
-
-        expect(headerValue).toBeNull();
-      });
+      expect(headerValue).toBe("header value");
     });
   });
 

@@ -3,7 +3,7 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
-  endpoint: process.env.LOCALSTACK_ENDPOINT!,
+  endpoint: process.env.DYNAMO_ENDPOINT!,
 });
 
 const getUserIdentityTableName = `${process.env.ENVIRONMENT ?? "local"}-IpvStub-UserIdentity`;

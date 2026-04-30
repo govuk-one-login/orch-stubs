@@ -11,8 +11,8 @@ import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-  successfulHtmlResult,
-  successfulJsonResult,
+  createHtmlResult,
+  createJsonResult,
 } from "../helper/result-helper.ts";
 import {
   getStateWithAuthCode,
@@ -83,10 +83,7 @@ async function get(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return successfulHtmlResult(
-    200,
-    renderIPVAuthorize(header, payload, authCode)
-  );
+  return createHtmlResult(200, renderIPVAuthorize(header, payload, authCode));
 }
 
 async function post(
@@ -119,7 +116,7 @@ async function post(
       "error_description",
       parsedBody.oAuthErrorDescription
     );
-    return successfulJsonResult(
+    return createJsonResult(
       302,
       {
         message: `Redirecting to ${url.toString()}`,
@@ -140,7 +137,7 @@ async function post(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return successfulJsonResult(
+  return createJsonResult(
     302,
     {
       message: `Redirecting to ${url.toString()}`,

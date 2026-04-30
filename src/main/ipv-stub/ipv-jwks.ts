@@ -7,6 +7,7 @@ import {
 import { getIpvPublicKey } from "./helper/key-helpers.ts";
 import {
   CodedError,
+  createJsonResult,
   handleErrors,
   methodNotAllowedError,
 } from "../helper/result-helper.ts";
@@ -28,20 +29,16 @@ export const handler: Handler = async (
 async function get(): Promise<APIGatewayProxyResult> {
   try {
     const jwk = await exportJWK(await getIpvPublicKey());
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        keys: [
-          {
-            ...jwk,
-            kid: jwk.n ? generateKid(jwk.n) : "n/a",
-            use: "enc",
-            alg: "RS256",
-          },
-        ],
-      }),
-    };
+    return createJsonResult(200, {
+      keys: [
+        {
+          ...jwk,
+          kid: jwk.n ? generateKid(jwk.n) : "n/a",
+          use: "enc",
+          alg: "RS256",
+        },
+      ],
+    });
   } catch (error) {
     throw new CodedError(
       500,

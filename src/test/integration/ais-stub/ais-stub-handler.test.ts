@@ -16,7 +16,7 @@ describe("AIS stub handler", () => {
   const localStackDynamoClient = DynamoDBDocument.from(
     new DynamoDBClient({
       region: "eu-west-2",
-      endpoint: getEnv("LOCALSTACK_ENDPOINT"),
+      endpoint: getEnv("DYNAMO_ENDPOINT"),
     })
   );
 

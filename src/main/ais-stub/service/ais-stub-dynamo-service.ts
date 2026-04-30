@@ -3,15 +3,23 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { StubInterventionData } from "../types/StubInterventionData.ts";
 import { Optional } from "../types/Optional.ts";
 import { getEnv } from "../../../main/util/getEnv.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = DynamoDBDocument.from(
   new DynamoDBClient({
     region: "eu-west-2",
-    ...(process.env.LOCALSTACK_ENDPOINT && {
-      endpoint: process.env.LOCALSTACK_ENDPOINT,
+    ...(process.env.DYNAMO_ENDPOINT && {
+      endpoint: process.env.DYNAMO_ENDPOINT,
     }),
   })
 );
+
+const tableName = getEnv("STUB_AIS_TABLE_NAME");
+
+const primaryKey = "pairwiseId";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getStubIntervention = async (
   internalPairwiseId: string
@@ -22,7 +30,7 @@ export const getStubIntervention = async (
     interventionOpt = Optional.of(
       (
         await dynamoClient.get({
-          TableName: getEnv("STUB_AIS_TABLE_NAME"),
+          TableName: tableName,
           Key: {
             pairwiseId: internalPairwiseId,
           },

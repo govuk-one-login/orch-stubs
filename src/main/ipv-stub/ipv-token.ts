@@ -10,7 +10,7 @@ import {
   CodedError,
   handleErrors,
   methodNotAllowedError,
-  successfulJsonResult,
+  createJsonResult,
 } from "../helper/result-helper.ts";
 import {
   getUserIdentityWithAuthCode,
@@ -19,6 +19,8 @@ import {
 import { randomBytes } from "crypto";
 import { logger } from "../logger.ts";
 import { getOrchJwks } from "./helper/key-helpers.ts";
+import { getHeaderValueFromHeaders } from "../util/request-header-helper.ts";
+
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -59,7 +61,7 @@ async function post(
     throw new CodedError(500, "Auth code not found in DB, or is expired");
   }
   await putUserIdentityWithToken(accessToken, userIdentity);
-  return successfulJsonResult(200, {
+  return createJsonResult(200, {
     access_token: accessToken,
     token_type: "Bearer",
     expires_in: 3600,
@@ -67,7 +69,7 @@ async function post(
 }
 
 function validateHeadersOrThrow(headers: APIGatewayProxyEventHeaders): void {
-  const contentType = headers["Content-Type"];
+  const contentType = getHeaderValueFromHeaders(headers, "Content-Type");
   if (!contentType?.match(/x-www-form-urlencoded/)) {
     throw new CodedError(400, `Unexpected content type header ${contentType}`);
   }

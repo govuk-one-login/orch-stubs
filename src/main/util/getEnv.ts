@@ -1,8 +1,4 @@
-import { AisStubEnvVar } from "../ais-stub/types/AisStubEnvVar.ts";
-
-export type BaseEnvVar = "ENVIRONMENT" | "LOCALSTACK_ENDPOINT";
-
-export const getEnv = (name: BaseEnvVar | AisStubEnvVar): string => {
+export const getEnv = (name: string): string => {
   if (!process.env[name]) {
     throw new Error("Unset environment variable: " + name);
   }

@@ -1,20 +1,16 @@
 import { APIGatewayProxyEventHeaders } from "aws-lambda";
-import { CodedError } from "../../helper/result-helper.ts";
+import { CodedError } from "../helper/result-helper.ts";
 
+// Headers are case-insensitive
 export function getHeaderValueFromHeaders(
   headers: APIGatewayProxyEventHeaders,
-  headerName: string,
-  matchLowerCase = true
-) {
-  if (!headers) {
-    return null;
-  } else if (headers[headerName]) {
-    return headers[headerName];
-  } else if (matchLowerCase && headers[headerName.toLowerCase()]) {
-    return headers[headerName.toLowerCase()];
-  } else {
-    return null;
-  }
+  headerName: string
+): string | undefined {
+  const header = Object.entries(headers || {}).find(
+    ([k, _]) => k.toLowerCase() === headerName.toLowerCase()
+  );
+
+  return header?.[1];
 }
 
 export const getAccessTokenFromAuthorizationHeader = (

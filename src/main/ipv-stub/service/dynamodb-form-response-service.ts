@@ -1,16 +1,22 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { UserIdentity } from "../interfaces/user-identity-interface.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
-  ...(process.env.LOCALSTACK_ENDPOINT && {
-    endpoint: process.env.LOCALSTACK_ENDPOINT,
+  ...(process.env.DYNAMO_ENDPOINT && {
+    endpoint: process.env.DYNAMO_ENDPOINT,
   }),
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-IpvStub-UserIdentity`;
+
+const primaryKey = "UserIdentityId";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string

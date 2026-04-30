@@ -7,7 +7,11 @@ import { addAccessTokenStore } from "./services/access-token-dynamodb-service.ts
 import { createAccessTokenStoreInput } from "./helpers/mock-token-data-helper.ts";
 import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-service.ts";
 import { createBearerAccessToken } from "./helpers/create-token-helper.ts";
-import { CodedError, handleErrors } from "../helper/result-helper.ts";
+import {
+  CodedError,
+  createJsonResult,
+  handleErrors,
+} from "../helper/result-helper.ts";
 import { logger } from "../logger.ts";
 import {
   ensureClientAssertionType,
@@ -26,12 +30,9 @@ export const handler: Handler = async (
       case "POST":
         return await post(event);
       default:
-        return {
-          statusCode: 405,
-          body: JSON.stringify({
-            message: "Method not allowed",
-          }),
-        };
+        return createJsonResult(405, {
+          message: "Method not allowed",
+        });
     }
   });
 };
@@ -69,10 +70,7 @@ async function post(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(accessToken),
-  };
+  return createJsonResult(200, accessToken);
 }
 
 function getBody(event: APIGatewayProxyEvent) {

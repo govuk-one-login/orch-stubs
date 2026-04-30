@@ -4,16 +4,22 @@ import {
   AccessTokenStore,
   AccessTokenStoreInput,
 } from "../interfaces/access-token-store-interface.ts";
+import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
 const dynamoClient = new DynamoDBClient({
   region: "eu-west-2",
-  ...(process.env.LOCALSTACK_ENDPOINT && {
-    endpoint: process.env.LOCALSTACK_ENDPOINT,
+  ...(process.env.DYNAMO_ENDPOINT && {
+    endpoint: process.env.DYNAMO_ENDPOINT,
   }),
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = `${process.env.ENVIRONMENT}-AuthStub-AccessToken`;
+
+const primaryKey = "accessToken";
+
+export const warmUp = async (): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
 
 export const getAccessTokenStore = async (
   accessToken: string

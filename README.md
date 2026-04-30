@@ -8,7 +8,9 @@ There are three stubs:
 
 This will allow Orchestration to exercise different journeys, write Orchestration specific acceptance tests, execute Orchestration performance tests, and test IPV in lower environments.
 
-#### Prerequisites
+## Setup
+
+### Prerequisites
 
 A version of SAM CLI (v1.130.0+) that supports Node.js version 22. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
@@ -29,6 +31,12 @@ npm run build && npm run start:local
 ```
 
 There may be requirements for each stub to run so check the README for each stub.
+
+### As part of Orchestration local running
+
+When using Orchestration local running, an express server runs all the stubs in a single container.
+
+See: `src/main/server.ts`, which must be updated when new endpoints are added.
 
 #### Clean Build
 
