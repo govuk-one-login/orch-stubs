@@ -15,6 +15,8 @@ import { warmUp as accessTokenWarmUp } from "./auth-stub/services/access-token-d
 import { warmUp as userProfileWarmUp } from "./auth-stub/services/user-profile-dynamodb-service.ts";
 import { warmUp as userIdentityWarmUp } from "./ipv-stub/service/dynamodb-form-response-service.ts";
 import { startPoll } from "./helper/sqs-listener.ts";
+import renderAuthError from "./auth-stub/render-auth-error.ts";
+import renderAuthLogout from "./auth-stub/render-auth-logout.ts";
 
 const initialise = async (): Promise<void> => {
   const PORT = process.env.PORT || 4401;
@@ -29,10 +31,10 @@ const initialise = async (): Promise<void> => {
   app.all("/auth-stub/token", apiGatewayRoute(authToken));
   app.all("/auth-stub/userinfo", apiGatewayRoute(authUserinfo));
   app.all("/auth-stub/error", (req, res) =>
-    res.send("Something went wrong! Look at the Orchestration logs")
+    res.send(renderAuthError(process.env.RP_STUB_URL))
   );
   app.all("/auth-stub/signed-out", (req, res) =>
-    res.send("You have signed out")
+    res.send(renderAuthLogout(process.env.RP_STUB_URL))
   );
 
   // IPV stub
