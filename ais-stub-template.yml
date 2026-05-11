@@ -118,7 +118,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ais-stub/ais-stub.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
