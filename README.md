@@ -12,7 +12,7 @@ This will allow Orchestration to exercise different journeys, write Orchestratio
 
 ### Prerequisites
 
-A version of SAM CLI (v1.130.0+) that supports Node.js version 22. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
+A version of SAM CLI (v1.130.0+) that supports Node.js version 24. See the AWS SAM CLI [installation guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
 #### Build
 
