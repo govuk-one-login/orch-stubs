@@ -1,4 +1,4 @@
-FROM node:22.20.0-alpine@sha256:cb3143549582cc5f74f26f0992cdef4a422b22128cb517f94173a5f910fa4ee7 AS builder
+FROM node:24.15.0-alpine@sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f AS builder
 
 WORKDIR /app
 COPY package.json ./
@@ -10,7 +10,7 @@ COPY ./src ./src
 RUN npm run build:bundle
 RUN npm ci --omit=dev --ignore-scripts
 
-FROM node:22.20.0-alpine@sha256:cb3143549582cc5f74f26f0992cdef4a422b22128cb517f94173a5f910fa4ee7 AS final
+FROM node:24.15.0-alpine@sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f AS final
 
 WORKDIR /app
 COPY --chown=node:node --from=builder /app/build/* ./

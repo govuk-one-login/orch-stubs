@@ -50,7 +50,7 @@ Resources:
       FunctionName: !Sub ${Environment}-spot-stub
       CodeUri: .
       Handler: src/main/spot-stub/spot.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Events:

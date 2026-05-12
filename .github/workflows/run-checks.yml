@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: "22.x"
+          node-version: "24.x"
       - name: Install dependencies
         run: npm ci
       - name: Run lint
@@ -35,7 +35,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: "22.x"
+          node-version: "24.x"
       - name: Install dependencies
         run: npm ci
       - name: Build
@@ -46,7 +46,7 @@ jobs:
         run: npm run start:local:warm & (until curl --silent 127.0.0.1:3000/authorize; do sleep 1; done && npm run test:ci; exit 0)
       - name: SonarCloud Scan
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: sonarsource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
+        uses: sonarsource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432 # v8.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -61,12 +61,12 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up SAM cli
-        uses: aws-actions/setup-sam@d78e1a4a9656d3b223e59b80676a797f20093133 # v2
+        uses: aws-actions/setup-sam@89ddb14d60e682855e3fea4be85b3c56485de310 # v3
         with:
           use-installer: true
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           role-to-assume: ${{ secrets.SAM_APP_VALIDATE_ROLE_ARN }}
           aws-region: eu-west-2

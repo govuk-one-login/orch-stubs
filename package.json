@@ -6,6 +6,9 @@
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": "24.15.x"
+  },
   "scripts": {
     "build": "(trap 'kill 0' INT; npm run build:auth & npm run build:ipv & npm run build:spot & npm run build:ais & wait)",
     "build:auth": "sam build --template auth-stub-template.yml --build-dir build/auth",

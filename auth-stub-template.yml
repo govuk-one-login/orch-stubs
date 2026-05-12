@@ -130,7 +130,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-authorize.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
@@ -187,7 +187,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-token.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
@@ -232,7 +232,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/auth-stub/auth-userinfo.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:

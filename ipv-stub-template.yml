@@ -86,7 +86,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-authorize.handler
       LoggingConfig:
         LogGroup: !Ref IPVAuthorizeLambdaLogGroup
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
@@ -149,7 +149,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-token.handler
       LoggingConfig:
         LogGroup: !Ref IPVTokenLambdaLogGroup
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
@@ -209,7 +209,7 @@ Resources:
       Handler: src/main/ipv-stub/ipv-user-identity.handler
       LoggingConfig:
         LogGroup: !Ref IPVUserIdentityLambdaLogGroup
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
@@ -248,7 +248,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ipv-stub/ipv-jwks.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - arm64
       Environment:
