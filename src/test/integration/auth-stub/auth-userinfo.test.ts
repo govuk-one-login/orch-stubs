@@ -2,9 +2,9 @@ import { createApiGatewayEvent } from "../util.ts";
 import { handler } from "../../../main/auth-stub/auth-userinfo.ts";
 import {
   addUserProfile,
+  deleteAccessToken,
+  deleteUserProfile,
   getAccessTokenStore,
-  resetAccessTokenStore,
-  resetUserProfile,
 } from "./helpers/dynamo-helper.ts";
 import {
   addAccessTokenStore,
@@ -22,7 +22,7 @@ import { UserInfoClaims } from "src/main/auth-stub/interfaces/user-info-claim-in
 describe("Auth User Info", () => {
   const EMAIL = "dummy_user_info@mail.com";
   const SUBJECT_ID = "authUserInfoSubjectId";
-  const ACCESS_TOKEN = "12345";
+  const ACCESS_TOKEN = "123456";
 
   let userProfileMock: UserProfile;
 
@@ -33,8 +33,8 @@ describe("Auth User Info", () => {
   });
 
   afterEach(async () => {
-    await resetAccessTokenStore();
-    await resetUserProfile();
+    await deleteAccessToken(ACCESS_TOKEN);
+    await deleteUserProfile(userProfileMock);
   });
 
   it("should return 200 for valid GET request and update Dynamo", async () => {
@@ -108,9 +108,9 @@ describe("Auth User Info", () => {
   });
 
   it("should return a 401 error when access token has been used", async () => {
-    await resetAccessTokenStore();
+    const USED_ACCESS_TOKEN = "888888";
     await setUpCustomAccessToken({
-      accessToken: ACCESS_TOKEN,
+      accessToken: USED_ACCESS_TOKEN,
       hasBeenUsed: true,
     });
 
@@ -121,7 +121,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${USED_ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -132,12 +132,14 @@ describe("Auth User Info", () => {
     expect(response.multiValueHeaders["WWW-Authenticate"]).toStrictEqual([
       `Bearer error="invalid_token", error_description="Error: Invalid bearer token"`,
     ]);
+
+    await deleteAccessToken(USED_ACCESS_TOKEN);
   });
 
   it("should return a 401 error when access token has expired", async () => {
-    await resetAccessTokenStore();
+    const EXPIRED_ACCESS_TOKEN = "999999";
     await setUpCustomAccessToken({
-      accessToken: ACCESS_TOKEN,
+      accessToken: EXPIRED_ACCESS_TOKEN,
       ttl: Math.floor(Date.now() / 1000) - 180,
     });
 
@@ -148,7 +150,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${EXPIRED_ACCESS_TOKEN}`,
         }
       ),
       null!,
@@ -159,11 +161,12 @@ describe("Auth User Info", () => {
     expect(response.multiValueHeaders["WWW-Authenticate"]).toStrictEqual([
       `Bearer error="invalid_token", error_description="Error: Invalid bearer token"`,
     ]);
+
+    await deleteAccessToken(EXPIRED_ACCESS_TOKEN);
   });
 
   it("should return a 401 error when access token dynamo errors", async () => {
-    await resetAccessTokenStore();
-
+    const INVALID_ACCESS_TOKEN = "invalid-access-token";
     const response = await handler(
       createApiGatewayEvent(
         "GET",
@@ -171,7 +174,7 @@ describe("Auth User Info", () => {
         {},
         {
           "Content-Type": "x-www-form-urlencoded",
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${INVALID_ACCESS_TOKEN}`,
         }
       ),
       null!,

@@ -5,26 +5,32 @@ import { mockEnvVariableSetup } from "./helpers/test-setup.ts";
 import * as decryptionHelper from "../../../main/auth-stub/helpers/decryption-helper.ts";
 import {
   addUserProfile,
-  resetAuthCodeStore,
-  resetUserProfile,
+  deleteAuthCode,
+  deleteUserProfile,
 } from "./helpers/dynamo-helper.ts";
 import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
 import { SignJWT, importPKCS8 } from "jose";
 import localParams from "../../../../parameters.json";
 
+vi.mock("node:crypto", () => {
+  return { getRandomValues: vi.fn(() => Buffer.from("test")) };
+});
+const AUTH_CODE = Buffer.from("test").toString("base64url");
+
 describe("Auth Authorize", () => {
   const EMAIL = "dummy.email@mail.com";
+  const USER_PROFILE = createUserPofile(EMAIL);
 
   beforeEach(async () => {
     mockEnvVariableSetup();
     const jwt = await createJwt(createMockClaims());
     vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(jwt);
-    await addUserProfile(createUserPofile(EMAIL));
+    await addUserProfile(USER_PROFILE);
   });
 
   afterEach(async () => {
-    await resetAuthCodeStore();
-    await resetUserProfile();
+    await deleteAuthCode(AUTH_CODE);
+    await deleteUserProfile(USER_PROFILE);
     vi.clearAllMocks();
   });
 

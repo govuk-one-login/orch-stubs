@@ -2,10 +2,10 @@ import { createApiGatewayEvent } from "../util.ts";
 import { handler } from "../../../main/auth-stub/auth-token.ts";
 import {
   addAuthCodeStore,
+  deleteAccessToken,
+  deleteAuthCode,
   getAccessTokenStore,
   getAuthCodeStore,
-  resetAccessTokenStore,
-  resetAuthCodeStore,
 } from "./helpers/dynamo-helper.ts";
 import {
   createAuthCodeStoreInput,
@@ -22,6 +22,15 @@ interface AuthTokenResponse {
   access_token: string;
   token_type: string;
 }
+const ACCESS_TOKEN = "dGVzdC1hY2Nlc3MtdG9rZW4";
+vi.mock("jose", async () => {
+  return {
+    ...(await vi.importActual("jose")),
+    base64url: {
+      encode: vi.fn(() => ACCESS_TOKEN),
+    },
+  };
+});
 
 describe("Auth Token", () => {
   const AUTH_CODE = "12345";
@@ -32,8 +41,8 @@ describe("Auth Token", () => {
   });
 
   afterEach(async () => {
-    await resetAccessTokenStore();
-    await resetAuthCodeStore();
+    await deleteAccessToken(ACCESS_TOKEN);
+    await deleteAuthCode(AUTH_CODE);
     vi.clearAllMocks();
   });
 
