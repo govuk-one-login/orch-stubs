@@ -37,7 +37,7 @@
     "test:coverage": "vitest run --coverage",
     "test:localstack:integration": "npm run localstack:up && (vitest run --config=./vitest.integration.config.ts && e=0) || e=1 && npm run localstack:down && exit $e",
     "test:integration": "vitest run --config=./vitest.integration.config.ts",
-    "test:ci": "tsc --noEmit && npm run localstack:up && (vitest run --passWithNoTests --config=./vitest.ci.config.ts && e=0) || e=1 && npm run localstack:down && exit $e",
+    "test:ci": "tsc --noEmit && npm run localstack:up && (npm run test:unit && e=0) && (npm run test:integration && e=0) || e=1 && npm run localstack:down && exit $e",
     "localstack:up": "docker compose -f docker-compose.local.yml up -d",
     "localstack:down": "docker compose -f docker-compose.local.yml down",
     "prepare": "husky",
