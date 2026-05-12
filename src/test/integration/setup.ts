@@ -5,10 +5,15 @@ const waitForLocalStack = async () => {
 
   do {
     try {
-      const res = await fetch("http://127.0.0.1:4566/_localstack/health");
+      const res = await fetch("http://127.0.0.1:4566/_localstack/init/ready");
 
       if (res.ok && res.status === 200) {
-        break;
+        const json = await res.json();
+        if (json.completed === true) {
+          break;
+        } else {
+          console.log(`Still creating tables (attempt ${polls}/20)`);
+        }
       }
     } catch (err) {
       console.error((err as Error).message);
