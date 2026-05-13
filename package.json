@@ -61,7 +61,7 @@
     "pino": "^10.3.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^10.0.1",
     "@types/aws-lambda": "^8.10.160",
     "@types/express": "^5.0.3",
     "@types/node": "^22.12.0",
