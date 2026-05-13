@@ -17,7 +17,7 @@ import {
   createUserPofile,
 } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
 import { UserProfile } from "../../../main/auth-stub/interfaces/user-profile-interface.ts";
-import { UserInfoClaims } from "src/main/auth-stub/interfaces/user-info-claim-interface.ts";
+import { UserInfoClaims } from "../../../main/auth-stub/interfaces/user-info-claim-interface.ts";
 
 describe("Auth User Info", () => {
   const EMAIL = "dummy_user_info@mail.com";
