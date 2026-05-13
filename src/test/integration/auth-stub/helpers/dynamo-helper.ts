@@ -17,60 +17,6 @@ const authCodeTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-AuthCo
 const accessTokenTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-AccessToken`;
 const userProfileTableName = `${process.env.ENVIRONMENT ?? "local"}-AuthStub-UserProfile`;
 
-export async function resetAuthCodeStore() {
-  const result = await dynamo.scan({
-    TableName: authCodeTableName,
-    ConsistentRead: true,
-  });
-
-  if (result.Items) {
-    for (const item of result.Items) {
-      await dynamo.delete({
-        TableName: authCodeTableName,
-        Key: {
-          authCode: item.authCode,
-        },
-      });
-    }
-  }
-}
-
-export async function resetAccessTokenStore() {
-  const result = await dynamo.scan({
-    TableName: accessTokenTableName,
-    ConsistentRead: true,
-  });
-
-  if (result.Items) {
-    for (const item of result.Items) {
-      await dynamo.delete({
-        TableName: accessTokenTableName,
-        Key: {
-          accessToken: item.accessToken,
-        },
-      });
-    }
-  }
-}
-
-export async function resetUserProfile() {
-  const result = await dynamo.scan({
-    TableName: userProfileTableName,
-    ConsistentRead: true,
-  });
-
-  if (result.Items) {
-    for (const item of result.Items) {
-      await dynamo.delete({
-        TableName: userProfileTableName,
-        Key: {
-          email: item.email,
-        },
-      });
-    }
-  }
-}
-
 export async function getAuthCodeStore(
   authCode: string
 ): Promise<AuthCodeStore> {
@@ -133,6 +79,30 @@ export const addUserProfile = async (userProfile: UserProfile) => {
   });
 };
 
+export async function deleteAuthCode(authCode: string) {
+  await dynamo.delete({
+    TableName: authCodeTableName,
+    Key: {
+      authCode,
+    },
+  });
+}
+export async function deleteAccessToken(accessToken: string) {
+  await dynamo.delete({
+    TableName: accessTokenTableName,
+    Key: {
+      accessToken,
+    },
+  });
+}
+export async function deleteUserProfile(userProfile: UserProfile) {
+  await dynamo.delete({
+    TableName: userProfileTableName,
+    Key: {
+      email: userProfile.email,
+    },
+  });
+}
 function oneHourFromNow() {
   return Math.floor(Date.now() / 1000) + 3600;
 }
