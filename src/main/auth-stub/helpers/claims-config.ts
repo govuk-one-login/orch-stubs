@@ -34,6 +34,7 @@ export interface Claims {
   scope: string;
   requested_level_of_confidence?: string;
   requested_credential_strength: string;
+  account_data_api_access_token?: string;
 }
 
 export const requiredClaimsKeys = [
