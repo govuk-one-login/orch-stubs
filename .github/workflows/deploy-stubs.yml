@@ -54,7 +54,7 @@ jobs:
         run: npm run build
 
       - name: Deploy SAM app
-        uses: govuk-one-login/devplatform-upload-action@5879c30205266ad61e8299a4fcea76364530c9c1 # v3.14.0
+        uses: govuk-one-login/devplatform-upload-action@245bad4dc21702a5e665f1ca615108f6e70546d2 # v4.0.0
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
