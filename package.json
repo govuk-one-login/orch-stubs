@@ -68,7 +68,7 @@
     "@types/node-jose": "^1.1.13",
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/eslint-plugin": "^1.6.16",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "eslint": "^10.2.1",
     "express": "^5.1.0",
     "globals": "^17.6.0",
