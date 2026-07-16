@@ -27,7 +27,7 @@ Parameters:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      ipvStubDomainName: ipvstub.oidc.authdev3.dev.account.gov.uk
+      ipvStubDomainName: ipvstub.oidc.dev.account.gov.uk
       orchJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/ipv-jwks.json
     build:
       ipvStubDomainName: ipvstub.oidc.build.account.gov.uk
@@ -351,6 +351,48 @@ Resources:
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
+
+  IpvStubCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+          HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      ValidationMethod: DNS
+
+  IpvStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    DependsOn:
+      - ApiGatewayStage # Needs to await stage creation
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref IpvStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  IpvStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      RestApiId: !Ref ApiGateway
+      Stage: Live
+    DependsOn:
+      - IpvStubApiDomain
+
+  IpvStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
+      HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      AliasTarget:
+        DNSName: !GetAtt IpvStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt IpvStubApiDomain.RegionalHostedZoneId
 
 Outputs:
   IpvHostedZoneId:
