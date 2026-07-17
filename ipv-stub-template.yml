@@ -303,17 +303,6 @@ Resources:
               - dynamodb:PutItem
             Resource: !GetAtt UserIdentityTable.Arn
 
-  PublicHostedZone:
-    Type: AWS::Route53::HostedZone
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-    Properties:
-      Name:
-        !FindInMap [
-          EnvironmentConfiguration,
-          !Ref Environment,
-          ipvStubDomainName,
-        ]
 
   HttpsEgressSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -395,10 +384,6 @@ Resources:
         HostedZoneId: !GetAtt IpvStubApiDomain.RegionalHostedZoneId
 
 Outputs:
-  IpvHostedZoneId:
-    Value: !GetAtt PublicHostedZone.Id
-    Export:
-      Name: IpvHostedZoneId
   IpvApiGatewayId:
     Value: !Ref ApiGateway
     Export:

@@ -380,18 +380,6 @@ Resources:
       PendingWindowInDays: 30
       KeyUsage: ENCRYPT_DECRYPT
       KeySpec: RSA_2048
-
-  PublicHostedZone:
-    Type: AWS::Route53::HostedZone
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-    Properties:
-      Name:
-        !FindInMap [
-          EnvironmentConfiguration,
-          !Ref Environment,
-          authStubDomainName,
-        ]
   
   AuthStubCertificate:
     Type: AWS::CertificateManager::Certificate
@@ -436,10 +424,6 @@ Resources:
         HostedZoneId: !GetAtt AuthStubApiDomain.RegionalHostedZoneId
 
 Outputs:
-  AuthHostedZoneId:
-    Value: !GetAtt PublicHostedZone.Id
-    Export:
-      Name: AuthHostedZoneId
   AuthApiGatewayId:
     Value: !Ref ApiGateway
     Export:
