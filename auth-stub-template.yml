@@ -394,8 +394,6 @@ Resources:
 
   AuthStubApiDomain:
     Type: AWS::ApiGateway::DomainName
-    DependsOn:
-      - ApiGatewayStage # Needs to await stage creation
     Properties:
       DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
       SecurityPolicy: TLS_1_2
