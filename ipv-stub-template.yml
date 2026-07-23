@@ -354,8 +354,6 @@ Resources:
 
   IpvStubApiDomain:
     Type: AWS::ApiGateway::DomainName
-    DependsOn:
-      - ApiGatewayStage # Needs to await stage creation
     Properties:
       DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, ipvStubDomainName ]
       SecurityPolicy: TLS_1_2
