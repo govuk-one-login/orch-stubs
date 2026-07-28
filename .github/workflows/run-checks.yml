@@ -79,3 +79,9 @@ jobs:
 
       - name: SAM validate SPOT
         run: sam validate -t spot-stub-template.yml
+
+      - name: SAM validate AIS
+        run: sam validate -t ais-stub-template.yml
+
+      - name: SAM validate SIS
+        run: sam validate -t sis-stub-template.yml
