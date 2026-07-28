@@ -28,6 +28,13 @@ Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
 
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      sisStubDomainName: sisstub.oidc.dev.account.gov.uk
+    build:
+      sisStubDomainName: sisstub.oidc.build.account.gov.uk
+
 Globals:
   Function:
     CodeSigningConfigArn: !If
@@ -40,6 +47,17 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
+
+  SISApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}-ApiGateway
+      StageName: Live
+      AlwaysDeploy: true
+      Tags:
+        FMSRegionalPolicy: false
+        CustomPolicy: true
+
   SISAuthorizeLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -51,6 +69,13 @@ Resources:
       Architectures:
         - arm64
       Timeout: 10
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SISApiGateway
+            Path: /authorize
+            Method: get
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -69,3 +94,49 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-authorize-lambda
       RetentionInDays: 30
+
+  SISStubCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
+          HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      ValidationMethod: DNS
+
+  SISStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref SISStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  SISStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
+      RestApiId: !Ref SISApiGateway
+      Stage: Live
+    DependsOn:
+      - SISStubApiDomain
+
+  SISStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
+      HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      AliasTarget:
+        DNSName: !GetAtt SISStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt SISStubApiDomain.RegionalHostedZoneId
+
+Outputs:
+  SISApiGatewayId:
+    Value: !Ref SISApiGateway
+    Export:
+      Name: SISApiGatewayId
