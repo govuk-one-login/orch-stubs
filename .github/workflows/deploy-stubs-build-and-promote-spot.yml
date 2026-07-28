@@ -1,4 +1,4 @@
-name: Deploy Stubs Build and Promote IPV
+name: Deploy Stubs Build and Promote SPOT
 
 permissions:
   id-token: write
