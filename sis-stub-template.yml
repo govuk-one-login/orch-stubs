@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: SIS stub
+
+#      Tags:
+#        Service: Authentication, IPV and SPOT stubs
+#        Source: govuk-one-login/orch-stubs
+#        Owner: di-orchestration@digital.cabinet-office.gov.uk
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+    Default: none
+  CodeSigningConfigArn:
+    Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+  VpcStackName:
+    Type: String
+    Description: The name of the stack used to create the VPC
+
+Conditions:
+  UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
+  UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+
+Globals:
+  Function:
+    CodeSigningConfigArn: !If
+      - UseCodeSigning
+      - !Ref CodeSigningConfigArn
+      - !Ref AWS::NoValue
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
+Resources:
+  SISAuthorizeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/sis-stub/dummy-handler.handler
+      LoggingConfig:
+        LogGroup: !Ref SISAuthorizeLambdaLogGroup
+      Runtime: nodejs24.x
+      Architectures:
+        - arm64
+      Timeout: 10
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/sis-stub/dummy-handler.ts
+        Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
+        Sourcemap: true
+        Target: es2022
+        UseNpmCi: True
+
+  SISAuthorizeLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-authorize-lambda
+      RetentionInDays: 30

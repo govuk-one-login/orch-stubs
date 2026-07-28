@@ -12,6 +12,7 @@ on:
       - "**ipv-stub**"
       - "**spot-stub**"
       - "**ais-stub**"
+      - "**sis-stub**"
 
 jobs:
   run-checks:
