@@ -15,7 +15,7 @@ Login into AWS with SSO on the browser. Choose an account, and select `Command l
 terminal, run `aws configure sso` and enter the start URL and region from AWS on your browser. This will create a
 profile that you can set as an environment variable, by running `export AWS_PROFILE=<profile>`.
 
-After this you can then run the below, replacing `<environment>`with one
+After this you can then run the below, replacing `<environment>` with one
 of `dev`:
 
 ```shell
