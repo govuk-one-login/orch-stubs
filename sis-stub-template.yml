@@ -95,6 +95,35 @@ Resources:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-authorize-lambda
       RetentionInDays: 30
 
+  SISJwksLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/sis-stub/sis-jwks.handler
+      Runtime: nodejs24.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          SIS_AUTHORIZE_PUBLIC_ENCRYPTION_KEY: "{{resolve:ssm:/orch-stubs/sis-public-encryption-key}}"
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SISApiGateway
+            Path: /.well-known/jwks.json
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/sis-stub/sis-jwks.ts
+        Minify: true
+        Sourcemap: true
+        Target: es2022
+        UseNpmCi: True
+
   SISStubCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
