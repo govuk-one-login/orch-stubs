@@ -17,6 +17,7 @@ import {
   getOrchJwks,
   getPrivateKey,
 } from "../shared-identity/helper/key-helpers";
+import renderSISAuthorize from "./render-sis-authorize";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -66,7 +67,7 @@ async function get(
     throw new CodedError(500, "Signature verification failed");
   }
 
-  const _header = jwt.protectedHeader;
+  const header = jwt.protectedHeader;
   const payload = jwt.payload;
 
   const authCode = base64url.encode(randomBytes(32));
@@ -76,7 +77,7 @@ async function get(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
-  return createHtmlResult(200, "Authorize get successful");
+  return createHtmlResult(200, renderSISAuthorize(header, payload, authCode));
 }
 
 const getSisOrchJwks = () => getOrchJwks("DUMMY_JWKS", "ORCH_SIS_JWKS_URL");
