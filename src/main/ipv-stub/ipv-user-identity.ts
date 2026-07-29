@@ -9,7 +9,7 @@ import {
   methodNotAllowedError,
   createJsonResult,
 } from "../helper/result-helper";
-import { getUserIdentityWithToken } from "./service/dynamodb-form-response-service.ts";
+import { getUserIdentityWithToken } from "./../shared-identity/service/dynamodb-form-response-service.ts";
 import {
   getAccessTokenFromAuthorizationHeader,
   getHeaderValueFromHeaders,

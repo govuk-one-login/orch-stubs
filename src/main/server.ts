@@ -13,7 +13,6 @@ import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dyn
 import { warmUp as authCodeWarmUp } from "./auth-stub/services/auth-code-dynamodb-service.ts";
 import { warmUp as accessTokenWarmUp } from "./auth-stub/services/access-token-dynamodb-service.ts";
 import { warmUp as userProfileWarmUp } from "./auth-stub/services/user-profile-dynamodb-service.ts";
-import { warmUp as userIdentityWarmUp } from "./ipv-stub/service/dynamodb-form-response-service.ts";
 import { startPoll } from "./helper/sqs-listener.ts";
 import renderAuthError from "./auth-stub/render-auth-error.ts";
 import renderAuthLogout from "./auth-stub/render-auth-logout.ts";
@@ -56,7 +55,6 @@ const initialise = async (): Promise<void> => {
   await authCodeWarmUp();
   await accessTokenWarmUp();
   await userProfileWarmUp();
-  await userIdentityWarmUp();
   await aisInterventionWarmUp();
 
   const server = app.listen(PORT, () => console.log(`listening on ${PORT}`));
