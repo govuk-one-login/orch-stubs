@@ -13,6 +13,7 @@ import { createApiGatewayEvent } from "../util.ts";
 describe("IPV Token", () => {
   const AUTH_CODE = "12345";
   let privateKey: CryptoKey;
+  vi.stubEnv("IDENTITY_STUB", "IpvStub");
 
   beforeAll(async () => {
     privateKey = await importPKCS8(

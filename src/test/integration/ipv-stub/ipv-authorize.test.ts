@@ -15,6 +15,8 @@ const STATE = "test-state";
 const AUTH_CODE = "test-auth-code";
 
 describe("IPV Authorize", () => {
+  vi.stubEnv("IDENTITY_STUB", "IpvStub");
+
   beforeEach(async () => {
     await resetUserIdentityTable();
   });

@@ -11,18 +11,19 @@ const dynamoClient = new DynamoDBClient({
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
-const tableName = `${process.env.ENVIRONMENT}-${process.env.IDENTITY_STUB}-UserIdentity`;
+const tableName = () =>
+  `${process.env.ENVIRONMENT}-${process.env.IDENTITY_STUB}-UserIdentity`;
 
 const primaryKey = "UserIdentityId";
 
 export const warmUp = async (): Promise<void> =>
-  warmSimpleKeyTable(dynamoClient, tableName, primaryKey);
+  warmSimpleKeyTable(dynamoClient, tableName(), primaryKey);
 
 export const getUserIdentityWithAuthCode = async (
   authCode: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: tableName(),
     Key: { UserIdentityId: authCode },
   });
   if (response.Item) {
@@ -38,7 +39,7 @@ export const putUserIdentityWithAuthCode = async (
   userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: tableName(),
     Item: {
       UserIdentityId: authCode,
       userIdentity,
@@ -51,7 +52,7 @@ export const getUserIdentityWithToken = async (
   token: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: tableName(),
     Key: { UserIdentityId: token },
   });
   if (response.Item) {
@@ -67,7 +68,7 @@ export const putUserIdentityWithToken = async (
   userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: tableName(),
     Item: {
       UserIdentityId: token,
       userIdentity,
@@ -80,7 +81,7 @@ export const getStateWithAuthCode = async (
   authCode: string
 ): Promise<string> => {
   const response = await dynamo.get({
-    TableName: tableName,
+    TableName: tableName(),
     Key: { UserIdentityId: authCode + "-state" },
   });
 
@@ -89,7 +90,7 @@ export const getStateWithAuthCode = async (
 
 export const putStateWithAuthCode = async (authCode: string, state: string) => {
   return await dynamo.put({
-    TableName: tableName,
+    TableName: tableName(),
     Item: {
       UserIdentityId: authCode + "-state",
       state,
