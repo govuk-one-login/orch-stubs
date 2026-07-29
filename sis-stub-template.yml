@@ -105,7 +105,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/sis-stub/dummy-handler.handler
+      Handler: src/main/sis-stub/sis-authorize.handler
       LoggingConfig:
         LogGroup: !Ref SISAuthorizeLambdaLogGroup
       Runtime: nodejs24.x
@@ -123,7 +123,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/main/sis-stub/dummy-handler.ts
+          - src/main/sis-stub/sis-authorize.ts
         Minify: true
         External:
           - "@aws-sdk/client-dynamodb"
