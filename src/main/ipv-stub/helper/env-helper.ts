@@ -4,7 +4,7 @@ import { CodedError } from "../../helper/result-helper.ts";
 type EnvVar =
   | "IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY"
   | "IPV_AUTHORIZE_PUBLIC_ENCRYPTION_KEY"
-  | "ORCH_PUBLIC_SIGNING_JWKS_URL"
+  | "ORCH_IPV_JWKS_URL"
   | "DUMMY_JWKS"
   | "ENVIRONMENT";
 

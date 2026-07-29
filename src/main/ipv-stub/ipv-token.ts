@@ -18,7 +18,7 @@ import {
 } from "../shared-identity/service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
 import { logger } from "../logger.ts";
-import { getOrchJwks } from "./helper/key-helpers.ts";
+import { getIpvOrchJwks } from "./helper/key-helpers.ts";
 import { getHeaderValueFromHeaders } from "../util/request-header-helper.ts";
 
 export const handler: Handler = async (
@@ -41,7 +41,7 @@ async function post(
   const body = getValidBodyOrThrow(event.body);
   const clientAssertionJwt = body.client_assertion as string;
   try {
-    await jwtVerify(clientAssertionJwt, getOrchJwks());
+    await jwtVerify(clientAssertionJwt, getIpvOrchJwks());
   } catch (error) {
     logger.error(
       `Failed to verify client_assertion from orchestration: ${(error as Error).message}`

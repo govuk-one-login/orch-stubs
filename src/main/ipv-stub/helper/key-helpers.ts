@@ -15,13 +15,13 @@ type JWKSVerifier = (
   protectedHeader?: JWSHeaderParameters,
   token?: FlattenedJWSInput
 ) => Promise<CryptoKey>;
-export const getOrchJwks = (): JWKSVerifier => {
+export const getIpvOrchJwks = (): JWKSVerifier => {
   const localJwks = getEnv("DUMMY_JWKS", false);
   if (localJwks) {
     logger.info("Found DUMMY_JWKS env variable. Using value as JWKS source");
     return createLocalJWKSet(JSON.parse(localJwks));
   } else {
-    const urlString = getEnv("ORCH_PUBLIC_SIGNING_JWKS_URL");
+    const urlString = getEnv("ORCH_IPV_JWKS_URL");
     logger.info("Fetching JWKS from URL " + urlString);
     return createRemoteJWKSet(new URL(urlString), {
       timeoutDuration: 10 * 1000, //10 seconds

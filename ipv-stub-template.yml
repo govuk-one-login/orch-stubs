@@ -93,7 +93,7 @@ Resources:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
           IPV_AUTHORIZE_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/ipv-private-encryption-key:SecretString}}"
-          ORCH_PUBLIC_SIGNING_JWKS_URL:
+          ORCH_IPV_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           # These will always be over-written when running locally in parameters.json
           DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
@@ -156,7 +156,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_PUBLIC_SIGNING_JWKS_URL:
+          ORCH_IPV_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !Sub https://identity.${Environment}.account.gov.uk/
           IDENTITY_STUB: "IpvStub"

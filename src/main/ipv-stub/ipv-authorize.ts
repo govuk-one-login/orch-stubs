@@ -21,7 +21,7 @@ import {
 } from "../shared-identity/service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
 import { UserIdentity } from "../shared-identity/interfaces/user-identity-interface.ts";
-import { getIpvPrivateKey, getOrchJwks } from "./helper/key-helpers.ts";
+import { getIpvPrivateKey, getIpvOrchJwks } from "./helper/key-helpers.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -52,7 +52,7 @@ async function get(
     throw new CodedError(400, "Request query string parameter not found");
   }
 
-  const orchJwks = getOrchJwks();
+  const orchJwks = getIpvOrchJwks();
   const ipvPrivateKey = await getIpvPrivateKey();
 
   const { plaintext } = await compactDecrypt(requestObject, ipvPrivateKey);
