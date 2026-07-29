@@ -47,6 +47,49 @@ Globals:
       - !Ref AWS::NoValue
 
 Resources:
+  SISUserIdentityTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Environment}-SisStub-UserIdentity
+      KeySchema:
+        - AttributeName: UserIdentityId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: UserIdentityId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      Tags:
+        - Key: Name
+          Value: UserIdentity
+
+
+  SISUserIdentityTableReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: !GetAtt SISUserIdentityTable.Arn
+
+  SISUserIdentityTableWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowUserIdentityTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: !GetAtt SISUserIdentityTable.Arn
 
   SISApiGateway:
     Type: AWS::Serverless::Api
