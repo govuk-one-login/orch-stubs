@@ -1,4 +1,4 @@
-name: Deploy Stubs Build and Promote SPOT
+name: Deploy Stubs Build and Promote SIS
 
 permissions:
   id-token: write
@@ -12,7 +12,7 @@ on:
       - "**auth-stub**"
       - "**ipv-stub**"
       - "**ais-stub**"
-      - "**sis-stub**"
+      - "**spot-stub**"
 
 jobs:
   run-checks:
@@ -24,7 +24,7 @@ jobs:
     uses: ./.github/workflows/deploy-stubs.yml
     needs: run-checks
     secrets:
-      GH_ACTIONS_ROLE_ARN: ${{ secrets.SPOT_STUB_GH_ACTIONS_ROLE_ARN }}
-      ARTIFACT_BUCKET_NAME: ${{ secrets.SPOT_STUB_ARTIFACT_BUCKET_NAME }}
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.SIS_STUB_GH_ACTIONS_ROLE_ARN }}
+      ARTIFACT_BUCKET_NAME: ${{ secrets.SIS_STUB_ARTIFACT_BUCKET_NAME }}
       SIGNING_PROFILE_NAME: ${{ secrets.ORCH_STUBS_SIGNING_PROFILE_NAME }}
-      WORKING_DIRECTORY: build/spot
+      WORKING_DIRECTORY: build/sis
