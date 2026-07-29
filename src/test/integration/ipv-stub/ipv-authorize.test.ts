@@ -4,7 +4,7 @@ import {
   resetUserIdentityTable,
 } from "./helper/dynamo-helper";
 import { CompactEncrypt, importPKCS8, importSPKI, SignJWT } from "jose";
-import formConfig from "../../../main/ipv-stub/config/config.ts";
+import formConfig from "../../../main/shared-identity/config/config.ts";
 import localParams from "../../../../parameters.json" with { type: "json" };
 import { randomUUID } from "crypto";
 import { handler } from "./../../../main/ipv-stub/ipv-authorize.ts";
