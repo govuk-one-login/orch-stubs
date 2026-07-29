@@ -1,0 +1,91 @@
+default_language_version:
+  golang: 1.24.5
+exclude: |
+  (?x)^(
+      .*/test/.*/.*\.approved.json|
+      .*/docs(/.*)?$|
+      .*/standards(/.*)?$
+  )$
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: mixed-line-ending
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: destroyed-symlinks
+
+  - repo: local
+    hooks:
+      - id: sam-validate-auth
+        name: SAM validate with lint (Auth)
+        entry: bash
+        args:
+          - -c
+          - export GITHUB_WORKSPACE=$(pwd) && sam validate --lint -t auth-stub-template.yml
+        language: system
+        pass_filenames: false
+        files: "^auth-stub-template.yml$"
+  - repo: local
+    hooks:
+      - id: sam-validate-ais
+        name: SAM validate with lint (AIS)
+        entry: bash
+        args:
+          - -c
+          - export GITHUB_WORKSPACE=$(pwd) && sam validate --lint -t ais-stub-template.yml
+        language: system
+        pass_filenames: false
+        files: "^ais-stub-template.yml$"
+  - repo: local
+    hooks:
+      - id: sam-validate-ipv
+        name: SAM validate with lint (IPV)
+        entry: bash
+        args:
+          - -c
+          - export GITHUB_WORKSPACE=$(pwd) && sam validate --lint -t ipv-stub-template.yml
+        language: system
+        pass_filenames: false
+        files: "^ipv-stub-template.yml$"
+  - repo: local
+    hooks:
+      - id: sam-validate-sis
+        name: SAM validate with lint (SIS)
+        entry: bash
+        args:
+          - -c
+          - export GITHUB_WORKSPACE=$(pwd) && sam validate --lint -t sis-stub-template.yml
+        language: system
+        pass_filenames: false
+        files: "^sis-stub-template.yml$"
+  - repo: local
+    hooks:
+      - id: sam-validate-spot
+        name: SAM validate with lint (SPOT)
+        entry: bash
+        args:
+          - -c
+          - export GITHUB_WORKSPACE=$(pwd) && sam validate --lint -t spot-stub-template.yml
+        language: system
+        pass_filenames: false
+        files: "^spot-stub-template.yml$"
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        exclude: package.lock.json
+  - repo: local
+    hooks:
+      - id: lint-fix
+        name: lint-fix
+        entry: bash
+        args:
+          - -c
+          - npm run fix:lint && npm run fix:prettier
+        language: system
+        pass_filenames: false
+        files: ^.*\.ts$
