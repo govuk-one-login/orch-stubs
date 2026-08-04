@@ -15,7 +15,7 @@ import {
 import {
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
-} from "./service/dynamodb-form-response-service.ts";
+} from "../shared-identity/service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
 import { logger } from "../logger.ts";
 import { getOrchJwks } from "./helper/key-helpers.ts";

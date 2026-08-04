@@ -9,6 +9,8 @@ import { createApiGatewayEvent } from "../util.ts";
 const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
 
 describe("IPV User Identity", () => {
+  vi.stubEnv("IDENTITY_STUB", "IpvStub");
+
   beforeEach(async () => {
     await setUpUserIdentity();
   });

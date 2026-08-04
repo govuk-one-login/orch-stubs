@@ -18,9 +18,9 @@ import {
   getStateWithAuthCode,
   putStateWithAuthCode,
   putUserIdentityWithAuthCode,
-} from "./service/dynamodb-form-response-service.ts";
+} from "../shared-identity/service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
-import { UserIdentity } from "./interfaces/user-identity-interface.ts";
+import { UserIdentity } from "../shared-identity/interfaces/user-identity-interface.ts";
 import { getIpvPrivateKey, getOrchJwks } from "./helper/key-helpers.ts";
 
 export const handler: Handler = async (
