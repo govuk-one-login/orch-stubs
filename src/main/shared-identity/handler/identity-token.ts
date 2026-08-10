@@ -21,6 +21,19 @@ import { logger } from "../../logger.ts";
 import { getHeaderValueFromHeaders } from "../../util/request-header-helper.ts";
 import { getOrchJwks } from "../helper/key-helpers.ts";
 
+// This is only used by local running
+export const createHandler = (jwksEnvVar: string): Handler => {
+  return (event) => {
+    handleErrors(async () => {
+      if (event.httpMethod === "POST") {
+          return await post(event, jwksEnvVar);
+      } else {
+          throw methodNotAllowedError(event.httpMethod);
+      }
+    });
+  };
+};
+
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
