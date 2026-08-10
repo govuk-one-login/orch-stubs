@@ -1,20 +1,14 @@
-import {
-  getState,
-  getUserIdentity,
-  resetUserIdentityTable,
-} from "../helper/dynamo-helper.ts";
-import formConfig from "../../../main/shared-identity/config/config.ts";
-import { handler } from "./../../../main/ipv-stub/ipv-authorize.ts";
+import { getState, resetUserIdentityTable } from "../helper/dynamo-helper";
+import { handler } from "./../../../main/sis-stub/sis-authorize.ts";
 import { createApiGatewayEvent } from "../util.ts";
 import { Context } from "aws-lambda";
 import { generateJwe } from "../helper/identity-helper.ts";
 
 const STATE = "test-state";
-const AUTH_CODE = "test-auth-code";
-const AUDIENCE = "https://ipvstub.oidc.local.account.gov.uk";
+const AUDIENCE = "https://sisstub.oidc.local.account.gov.uk";
 
-describe("IPV Authorize", () => {
-  vi.stubEnv("IDENTITY_STUB", "IpvStub");
+describe("SIS Authorize", () => {
+  vi.stubEnv("IDENTITY_STUB", "SisStub");
 
   beforeEach(async () => {
     await resetUserIdentityTable();
@@ -46,61 +40,6 @@ describe("IPV Authorize", () => {
     const state = await getState(authCode);
 
     expect(state).toBe(STATE);
-  });
-
-  it("should return a 302 with the specified oauth error and not update dynamo", async () => {
-    const response = await handler(
-      createApiGatewayEvent(
-        "POST",
-        new URLSearchParams({
-          "oAuth-error-yes": "yes",
-          oAuthError: "session_invalidated",
-          oAuthErrorDescription: "access denied",
-        }).toString(),
-        {},
-        {}
-      ),
-      {} as Context,
-      () => {}
-    );
-
-    expect(response.statusCode).toBe(302);
-    expect(response.headers.Location).toBe(
-      `https://oidc.local.account.gov.uk/ipv-callback?${new URLSearchParams({
-        error: "session_invalidated",
-        error_description: "access denied",
-      }).toString()}`
-    );
-  });
-
-  it("should return 302 for valid POST request and update Dynamo", async () => {
-    const response = await handler(
-      createApiGatewayEvent("POST", generateFormBody(), {}, {}),
-      {} as Context,
-      () => {}
-    );
-
-    expect(response.statusCode).toBe(302);
-    expect(response.headers.Location).toBe(
-      `https://oidc.local.account.gov.uk/ipv-callback?code=${AUTH_CODE}`
-    );
-
-    const expectedUserIdentity = {
-      sub: formConfig.coreIdentityJWT.sub,
-      vot: formConfig.coreIdentityJWT.vot,
-      vtm: formConfig.coreIdentityJWT.vtm,
-      "https://vocab.account.gov.uk/v1/coreIdentity":
-        formConfig.coreIdentityJWT.vc,
-      "https://vocab.account.gov.uk/v1/address": formConfig.address,
-      "https://vocab.account.gov.uk/v1/drivingPermit": formConfig.drivingPermit,
-      "https://vocab.account.gov.uk/v1/socialSecurityRecord":
-        formConfig.socialSecurityRecord,
-      "https://vocab.account.gov.uk/v1/passport": formConfig.passport,
-      "https://vocab.account.gov.uk/v1/returnCode": formConfig.returnCode,
-    };
-    const actualUserIdentity = await getUserIdentity(AUTH_CODE);
-
-    expect(actualUserIdentity).toMatchObject(expectedUserIdentity);
   });
 
   it("should return 400 if token is not present in authorize request", async () => {
@@ -149,19 +88,4 @@ describe("IPV Authorize", () => {
       "Signature verification failed"
     );
   });
-
-  function generateFormBody(): string {
-    return new URLSearchParams({
-      authCode: AUTH_CODE,
-      sub: formConfig.coreIdentityJWT.sub,
-      vot: formConfig.coreIdentityJWT.vot,
-      vtm: formConfig.coreIdentityJWT.vtm,
-      identity_claim: JSON.stringify(formConfig.coreIdentityJWT.vc),
-      address_claim: JSON.stringify(formConfig.address),
-      passport_claim: JSON.stringify(formConfig.passport),
-      driving_permit_claim: JSON.stringify(formConfig.drivingPermit),
-      nino_claim: JSON.stringify(formConfig.socialSecurityRecord),
-      return_code_claim: JSON.stringify(formConfig.returnCode),
-    } as Record<string, string>).toString();
-  }
 });

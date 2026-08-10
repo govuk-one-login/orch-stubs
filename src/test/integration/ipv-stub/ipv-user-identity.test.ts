@@ -1,12 +1,12 @@
 import {
   putUserIdentity,
   resetUserIdentityTable,
-} from "./helper/dynamo-helper.ts";
+} from "../helper/dynamo-helper.ts";
 import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
 import { handler } from "../../../main/ipv-stub/ipv-user-identity.ts";
 import { createApiGatewayEvent } from "../util.ts";
 
-const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9";
+const TOKEN = "SEGyn3duzJCo5GezC4XZQKJsMek8X749Foc5V3XpK4KHsA_9"; // pragma: allowlist secret
 
 describe("IPV User Identity", () => {
   vi.stubEnv("IDENTITY_STUB", "IpvStub");

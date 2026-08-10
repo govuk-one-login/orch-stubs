@@ -4,7 +4,7 @@ import {
   getUserIdentity,
   putUserIdentity,
   resetUserIdentityTable,
-} from "./helper/dynamo-helper.ts";
+} from "../helper/dynamo-helper.ts";
 import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
 import localParams from "../../../../parameters.json";
 import { handler } from "../../../main/ipv-stub/ipv-token.ts";

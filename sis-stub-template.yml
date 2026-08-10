@@ -27,13 +27,16 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
+  IsLocalEnv: !Equals [!Ref Environment, local]
 
 Mappings:
   EnvironmentConfiguration:
     dev:
       sisStubDomainName: sisstub.oidc.dev.account.gov.uk
+      orchJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/sis-jwks.json
     build:
       sisStubDomainName: sisstub.oidc.build.account.gov.uk
+      orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/sis-jwks.json
 
 Globals:
   Function:
@@ -105,7 +108,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/sis-stub/dummy-handler.handler
+      Handler: src/main/sis-stub/sis-authorize.handler
       LoggingConfig:
         LogGroup: !Ref SISAuthorizeLambdaLogGroup
       Runtime: nodejs24.x
@@ -119,11 +122,23 @@ Resources:
             RestApiId: !Ref SISApiGateway
             Path: /authorize
             Method: get
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          SIS_PRIVATE_ENCRYPTION_KEY: "{{resolve:secretsmanager:/orch-stubs/sis-private-encryption-key:SecretString}}"
+          ORCH_SIS_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
+          DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          DUMMY_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          IDENTITY_STUB: "SisStub"
+      Policies:
+        - !Ref SISUserIdentityTableReadAccessPolicy
+        - !Ref SISUserIdentityTableWriteAccessPolicy
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/main/sis-stub/dummy-handler.ts
+          - src/main/sis-stub/sis-authorize.ts
         Minify: true
         External:
           - "@aws-sdk/client-dynamodb"
@@ -170,10 +185,10 @@ Resources:
   SISStubCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName:  
+      DomainName:
         !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
       DomainValidationOptions:
-        - DomainName: 
+        - DomainName:
             !FindInMap [ EnvironmentConfiguration, !Ref Environment, sisStubDomainName ]
           HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
       ValidationMethod: DNS

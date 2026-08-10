@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import { getOrchJwks } from "./key-helpers.ts";
+import { getIpvOrchJwks } from "./key-helpers.ts";
 import localParams from "../../../../parameters.json" with { type: "json" };
 import { createRemoteJWKSet } from "jose";
 
@@ -24,7 +24,7 @@ describe("Key helpers tests", () => {
     it("should use dummy JWKS data if present", () => {
       const localJwkSetSpy = vi.spyOn(jose, "createLocalJWKSet");
       process.env.DUMMY_JWKS = localParams.Parameters.DUMMY_JWKS;
-      getOrchJwks();
+      getIpvOrchJwks();
 
       expect(localJwkSetSpy).toHaveBeenCalledWith(
         JSON.parse(localParams.Parameters.DUMMY_JWKS)
@@ -33,9 +33,9 @@ describe("Key helpers tests", () => {
 
     it("should use JWKS URL if dummy data not present", () => {
       const mockedCreateRemoteJWKSet = vi.mocked(createRemoteJWKSet);
-      process.env.ORCH_PUBLIC_SIGNING_JWKS_URL =
+      process.env.ORCH_IPV_JWKS_URL =
         "http://test.example.com/.well-known/jwks.json";
-      getOrchJwks();
+      getIpvOrchJwks();
 
       expect(mockedCreateRemoteJWKSet).toHaveBeenCalledWith(
         new URL("http://test.example.com/.well-known/jwks.json"),

@@ -2,7 +2,7 @@ import { JWTPayload, ProtectedHeaderParameters } from "jose";
 import { renderPage } from "../template.ts";
 import config, { getTrustmarkUri } from "../shared-identity/config/config.ts";
 
-export default function renderIPVAuthorize(
+export default function renderSISAuthorize(
   decodedHeader: ProtectedHeaderParameters,
   decodedPayload: JWTPayload,
   authCode: string
@@ -24,8 +24,8 @@ export default function renderIPVAuthorize(
   ).values;
 
   return renderPage(
-    "IPV Stub Form",
-    `<h1 class="govuk-heading-l">IPV stub</h1>
+    "SIS Stub Form",
+    `<h1 class="govuk-heading-l">SIS stub</h1>
     <details class="govuk-details">
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
@@ -73,28 +73,46 @@ export default function renderIPVAuthorize(
     </dd>
   </div>
   </dl>
-  
+
 </details>
-  
+
   <h3 class="govuk-heading-s">Form:</h3>
-  <p class="govuk-body">Use this form to configure the required IPV user identity response. On submit a POST request will be sent to /authorize and the IPV OAuth 2.0 flow will be initiated.</p>
+  <p class="govuk-body">Use this form to configure the required SIS user identity response. On submit a POST request will be sent to /authorize and the SIS OAuth 2.0 flow will be initiated.</p>
 
   <form method="post">
    <input type="hidden" name="authCode" value=${authCode}>
 
   <dl class="govuk-summary-list">
 
-<div class="govuk-summary-list__row" id="oAuth-error-checkbox">
+<div class="govuk-summary-list__row" id="oAuth-error-radios">
 <dt class="govuk-summary-list__key">
 Return an oAuth error
 </dt>
 <dd class="govuk-summary-list__value" id="oAuthError">
-<div class="govuk-checkboxes__item">
-<input class="govuk-checkboxes__input" id="oAuth-error-yes" name="oAuth-error-yes" type="checkbox" value="yes">
-<label class="govuk-label govuk-checkboxes__label" for="oAuth-error-yes">
-  Yes
-</label>
-</div>
+  <div class="govuk-radios__item">
+    <input class="govuk-radios__input" id="oAuth-no-error" name="oAuth-error" type="radio" value="no-error" checked>
+    <label class="govuk-label govuk-radios__label" for="oAuth-no-error">
+      No error
+    </label>
+  </div>
+  <div class="govuk-radios__item">
+    <input class="govuk-radios__input" id="oAuth-error-access-denied" name="oAuth-error" type="radio" value="access_denied">
+    <label class="govuk-label govuk-radios__label" for="oAuth-error-access-denied">
+      Access Denied
+    </label>
+  </div>
+  <div class="govuk-radios__item">
+    <input class="govuk-radios__input" id="oAuth-error-update-identity" name="oAuth-error" type="radio" value="update_identity">
+    <label class="govuk-label govuk-radios__label" for="oAuth-error-update-identity">
+      Access Denied (with update-identity claim)
+    </label>
+  </div>
+  <div class="govuk-radios__item">
+    <input class="govuk-radios__input" id="oAuth-generic-error" name="oAuth-error" type="radio" value="generic_error">
+    <label class="govuk-label govuk-radios__label" for="oAuth-generic-error">
+      Generic Error
+    </label>
+  </div>
 </dd>
 </div>
 
@@ -172,7 +190,7 @@ Trustmark claim (vtm)
     </div>`
       : ""
   }
-  
+
   ${
     claimKeys.includes("https://vocab.account.gov.uk/v1/socialSecurityRecord")
       ? ` <div class="govuk-summary-list__row" id="social-security-record-row">
@@ -185,7 +203,7 @@ Trustmark claim (vtm)
     </div>`
       : ""
   }
- 
+
   <div class="govuk-summary-list__row" id="return-code-row">
     <dt class="govuk-summary-list__key">
         Return Code Claim
@@ -194,65 +212,8 @@ Trustmark claim (vtm)
     <textarea class="govuk-textarea" rows="8" id="return_code_claim" name="return_code_claim" type="text">${JSON.stringify(config.returnCode, null, 2)}</textarea>
     </dd>
     </div>
-
-    <div class="govuk-summary-list__row" id="oAuthErrorRow">
-    <dt class="govuk-summary-list__key">
-        oAuth Error
-    </dt>
-    <dd class="govuk-summary-list__value" id="oAuthError">
-    <textarea class="govuk-textarea" rows="2" id="oAuthErrorCode" name="oAuthError" type="text"></textarea>
-    </dd>
-      </div>
-
-    <div class="govuk-summary-list__row" id="oAuthErrorDescriptionRow">
-    <dt class="govuk-summary-list__key">
-        oAuth Error Description
-    </dt>
-    <dd class="govuk-summary-list__value" id="oAuthErrorDescriptionId">
-    <textarea class="govuk-textarea" rows="2" id="oAuthErrorDescription" name="oAuthErrorDescription" type="text"></textarea>
-    </dd>
-  </div>
     <button name="continue" value="continue" class="govuk-button">Continue</button>
-  </form>`,
-    `
-  const dropdown = document.getElementById("oAuth-error-yes")
-  const oAuthErrorInput = document.getElementById("oAuthErrorRow")
-  const oAuthErrorDesc = document.getElementById("oAuthErrorDescriptionRow")
-  const claim_values= ["sub-claim-row",
-  "vtr-claim-row",
-  "vtm-claim-row", 
-  "identity-claim-row", 
-  "passport-claim-row", 
-  "address-claim-row",
-  "driving-permit-record-row",
-  "social-security-record-row",
-  "return-code-row"
-   ]
-
-    oAuthErrorInput.classList.add("hidden")
-    oAuthErrorDesc.classList.add("hidden")
-
-
-  dropdown.addEventListener("change", (event) => {
-     if (event.currentTarget.checked){
-      claim_values.forEach(claimField => {
-        const claimElement = document.getElementById(claimField)
-        claimElement?.classList?.add("hidden")
-      })
-
-      oAuthErrorInput.classList.remove("hidden")
-      oAuthErrorDesc.classList.remove("hidden")
-
-      document.getElementById("oAuthErrorCode").value = "";
-      document.getElementById("oAuthErrorDescription").value  = "";
-    } else {
-      oAuthErrorInput.classList.add("hidden")
-      oAuthErrorDesc.classList.add("hidden")
-      claim_values.forEach(claimField => {
-        const claimElement = document.getElementById(claimField)
-        claimElement?.classList?.remove("hidden")
-      })
-    }
-  })`
+  </div>
+  </form>`
   );
 }
