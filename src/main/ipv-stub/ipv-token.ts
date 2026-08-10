@@ -18,8 +18,8 @@ import {
 } from "../shared-identity/service/dynamodb-form-response-service.ts";
 import { randomBytes } from "crypto";
 import { logger } from "../logger.ts";
-import { getIpvOrchJwks } from "./helper/key-helpers.ts";
 import { getHeaderValueFromHeaders } from "../util/request-header-helper.ts";
+import { getOrchJwks } from "../shared-identity/helper/key-helpers.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -27,7 +27,7 @@ export const handler: Handler = async (
   return handleErrors(async () => {
     switch (event.httpMethod) {
       case "POST":
-        return await post(event);
+        return await post(event, "ORCH_IDENTITY_JWKS_URL");
       default:
         throw methodNotAllowedError(event.httpMethod);
     }
@@ -35,13 +35,14 @@ export const handler: Handler = async (
 };
 
 async function post(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
+  jwksEnvVar: string
 ): Promise<APIGatewayProxyResult> {
   validateHeadersOrThrow(event.headers);
   const body = getValidBodyOrThrow(event.body);
   const clientAssertionJwt = body.client_assertion as string;
   try {
-    await jwtVerify(clientAssertionJwt, getIpvOrchJwks());
+    await jwtVerify(clientAssertionJwt, getOrchJwks("DUMMY_JWKS", jwksEnvVar));
   } catch (error) {
     logger.error(
       `Failed to verify client_assertion from orchestration: ${(error as Error).message}`

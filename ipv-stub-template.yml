@@ -37,7 +37,6 @@ Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
   IsLocalEnv: !Equals [!Ref Environment, local]
-  IsDev: !Equals [!Ref Environment, dev]
 
 Globals:
   Function:
