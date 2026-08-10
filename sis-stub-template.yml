@@ -159,7 +159,53 @@ Resources:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-authorize-lambda
       RetentionInDays: 30
 
-  IPVUserIdentityLambda:
+  SISTokenLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/shared-identity/handler/identity-token.handler
+      LoggingConfig:
+        LogGroup: !Ref SISTokenLambdaLogGroup
+      Runtime: nodejs24.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          ORCH_IDENTITY_JWKS_URL:
+            !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
+          IDENTITY_STUB: "SisStub"
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SISApiGateway
+            Path: /token
+            Method: post
+      Policies:
+        - !Ref SISUserIdentityTableReadAccessPolicy
+        - !Ref SISUserIdentityTableWriteAccessPolicy
+      Timeout: 11
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/shared-identity/handler/identity-token.ts
+        Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
+        Sourcemap: true
+        Target: es2022
+        UseNpmCi: True
+
+  SISTokenLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-token-lambda
+      RetentionInDays: 30
+
+  SISUserIdentityLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
