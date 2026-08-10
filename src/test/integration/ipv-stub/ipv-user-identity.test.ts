@@ -2,7 +2,7 @@ import {
   putUserIdentity,
   resetUserIdentityTable,
 } from "../helper/dynamo-helper.ts";
-import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
+import { USER_IDENTITY } from "../../../main/shared-identity/data/identity-dummy-constants.ts";
 import { handler } from "../../../main/ipv-stub/ipv-user-identity.ts";
 import { createApiGatewayEvent } from "../util.ts";
 
