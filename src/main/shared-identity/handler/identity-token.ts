@@ -26,9 +26,9 @@ export const createHandler = (jwksEnvVar: string): Handler => {
   return (event) => {
     handleErrors(async () => {
       if (event.httpMethod === "POST") {
-          return await post(event, jwksEnvVar);
+        return await post(event, jwksEnvVar);
       } else {
-          throw methodNotAllowedError(event.httpMethod);
+        throw methodNotAllowedError(event.httpMethod);
       }
     });
   };
@@ -39,9 +39,9 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResult> => {
   return handleErrors(async () => {
     if (event.httpMethod === "POST") {
-        return await post(event, "ORCH_IDENTITY_JWKS_URL");
+      return await post(event, "ORCH_IDENTITY_JWKS_URL");
     } else {
-        throw methodNotAllowedError(event.httpMethod);
+      throw methodNotAllowedError(event.httpMethod);
     }
   });
 };
