@@ -11,24 +11,23 @@ import {
   handleErrors,
   methodNotAllowedError,
   createJsonResult,
-} from "../helper/result-helper.ts";
+} from "../../helper/result-helper.ts";
 import {
   getUserIdentityWithAuthCode,
   putUserIdentityWithToken,
-} from "../shared-identity/service/dynamodb-form-response-service.ts";
-import { randomBytes } from "crypto";
-import { logger } from "../logger.ts";
-import { getHeaderValueFromHeaders } from "../util/request-header-helper.ts";
-import { getOrchJwks } from "../shared-identity/helper/key-helpers.ts";
+} from "../service/dynamodb-form-response-service.ts";
+import { randomBytes } from "node:crypto";
+import { logger } from "../../logger.ts";
+import { getHeaderValueFromHeaders } from "../../util/request-header-helper.ts";
+import { getOrchJwks } from "../helper/key-helpers.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   return handleErrors(async () => {
-    switch (event.httpMethod) {
-      case "POST":
+    if (event.httpMethod === "POST") {
         return await post(event, "ORCH_IDENTITY_JWKS_URL");
-      default:
+    } else {
         throw methodNotAllowedError(event.httpMethod);
     }
   });

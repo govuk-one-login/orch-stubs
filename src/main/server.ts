@@ -5,7 +5,7 @@ import { handler as authToken } from "./auth-stub/auth-token.ts";
 import { handler as authUserinfo } from "./auth-stub/auth-userinfo.ts";
 import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
-import { handler as ipvToken } from "./ipv-stub/ipv-token.ts";
+import { handler as ipvToken } from "./shared-identity/handler/identity-token.ts";
 import { handler as ipvUserIdentity } from "./ipv-stub/ipv-user-identity.ts";
 import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";

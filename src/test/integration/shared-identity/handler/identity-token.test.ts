@@ -1,16 +1,16 @@
 import { generateKeyPair, importPKCS8, SignJWT } from "jose";
-import { IpvTokenResponse } from "../../../main/ipv-stub/interfaces/ipv-token-response-interface.ts";
+import { IpvTokenResponse } from "../../../../main/ipv-stub/interfaces/ipv-token-response-interface.ts";
 import {
   getUserIdentity,
   putUserIdentity,
   resetUserIdentityTable,
-} from "../helper/dynamo-helper.ts";
-import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
-import localParams from "../../../../parameters.json";
-import { handler } from "../../../main/ipv-stub/ipv-token.ts";
-import { createApiGatewayEvent } from "../util.ts";
+} from "../../helper/dynamo-helper.ts";
+import { USER_IDENTITY } from "../../../../main/ipv-stub/data/ipv-dummy-constants.ts";
+import localParams from "../../../../../parameters.json";
+import { handler } from "../../../../main/shared-identity/handler/identity-token.ts";
+import { createApiGatewayEvent } from "../../util.ts";
 
-describe("IPV Token", () => {
+describe("Identity Token", () => {
   const AUTH_CODE = "12345";
   let privateKey: CryptoKey;
   vi.stubEnv("IDENTITY_STUB", "IpvStub");
