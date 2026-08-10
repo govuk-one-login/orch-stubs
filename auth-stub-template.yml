@@ -32,7 +32,7 @@ Conditions:
 Mappings:
   EnvironmentConfiguration:
     dev:
-      authStubDomainName: authstub.oidc.authdev3.dev.account.gov.uk
+      authStubDomainName: authstub.oidc.dev.account.gov.uk
       authDomain: authdev3.dev.account.gov.uk
       orchAuthJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/auth-jwks.json
     build:
@@ -380,24 +380,48 @@ Resources:
       PendingWindowInDays: 30
       KeyUsage: ENCRYPT_DECRYPT
       KeySpec: RSA_2048
-
-  PublicHostedZone:
-    Type: AWS::Route53::HostedZone
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+  
+  AuthStubCertificate:
+    Type: AWS::CertificateManager::Certificate
     Properties:
-      Name:
-        !FindInMap [
-          EnvironmentConfiguration,
-          !Ref Environment,
-          authStubDomainName,
-        ]
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+          HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      ValidationMethod: DNS
+
+  AuthStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref AuthStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  AuthStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      RestApiId: !Ref ApiGateway
+      Stage: Live
+    DependsOn:
+      - AuthStubApiDomain
+
+  AuthStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
+      HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      AliasTarget:
+        DNSName: !GetAtt AuthStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt AuthStubApiDomain.RegionalHostedZoneId
 
 Outputs:
-  AuthHostedZoneId:
-    Value: !GetAtt PublicHostedZone.Id
-    Export:
-      Name: AuthHostedZoneId
   AuthApiGatewayId:
     Value: !Ref ApiGateway
     Export:
