@@ -6,7 +6,7 @@ import { handler as authUserinfo } from "./auth-stub/auth-userinfo.ts";
 import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
 import { createHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
-import { handler as ipvUserIdentity } from "./ipv-stub/ipv-user-identity.ts";
+import { handler as ipvUserIdentity } from "./shared-identity/handler/user-identity.ts";
 import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";
 import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dynamo-service.ts";
