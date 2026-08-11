@@ -159,6 +159,48 @@ Resources:
       LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-authorize-lambda
       RetentionInDays: 30
 
+  IPVUserIdentityLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/shared-identity/handler/user-identity.handler
+      LoggingConfig:
+        LogGroup: !Ref SISUserIdentityLambdaLogGroup
+      Runtime: nodejs24.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          IDENTITY_STUB: "SisStub"
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SISApiGateway
+            Path: /user-identity
+            Method: get
+      Policies:
+        - !Ref SISUserIdentityTableReadAccessPolicy
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/shared-identity/handler/user-identity.ts
+        Minify: true
+        External:
+          - "@aws-sdk/client-dynamodb"
+          - "@aws-sdk/lib-dynamodb"
+        Sourcemap: true
+        Target: es2022
+        UseNpmCi: True
+
+  SISUserIdentityLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/orch-stubs/lambda/${Environment}-sis-user-identity-lambda
+      RetentionInDays: 30
+
   SISJwksLambda:
     Type: AWS::Serverless::Function
     Properties:
