@@ -6,7 +6,6 @@ import {
 import { logger } from "../logger.ts";
 import { compactDecrypt, base64url, jwtVerify } from "jose";
 import renderIPVAuthorize from "./render-ipv-authorize.ts";
-import { ROOT_URI } from "./data/ipv-dummy-constants.ts";
 import {
   CodedError,
   handleErrors,
@@ -22,6 +21,7 @@ import {
 import { randomBytes } from "crypto";
 import { UserIdentity } from "../shared-identity/interfaces/user-identity-interface.ts";
 import { getIpvPrivateKey, getIpvOrchJwks } from "./helper/key-helpers.ts";
+import { ROOT_URI } from "../shared-identity/data/identity-dummy-constants.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent

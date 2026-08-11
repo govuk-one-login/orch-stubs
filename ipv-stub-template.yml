@@ -37,7 +37,6 @@ Conditions:
   UseCodeSigning: !Not [!Equals [none, !Ref CodeSigningConfigArn]]
   UsePermissionsBoundary: !Not [!Equals [none, !Ref PermissionsBoundary]]
   IsLocalEnv: !Equals [!Ref Environment, local]
-  IsDev: !Equals [!Ref Environment, dev]
 
 Globals:
   Function:
@@ -147,7 +146,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/ipv-stub/ipv-token.handler
+      Handler: src/main/shared-identity/handler/identity-token.handler
       LoggingConfig:
         LogGroup: !Ref IPVTokenLambdaLogGroup
       Runtime: nodejs24.x
@@ -156,7 +155,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_IPV_JWKS_URL:
+          ORCH_IDENTITY_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !Sub https://identity.${Environment}.account.gov.uk/
           IDENTITY_STUB: "IpvStub"
@@ -189,7 +188,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/main/ipv-stub/ipv-token.ts
+          - src/main/shared-identity/handler/identity-token.ts
         Minify: true
         External:
           - "@aws-sdk/client-dynamodb"

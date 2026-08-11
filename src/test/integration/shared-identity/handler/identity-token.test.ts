@@ -1,16 +1,16 @@
 import { generateKeyPair, importPKCS8, SignJWT } from "jose";
-import { IpvTokenResponse } from "../../../main/ipv-stub/interfaces/ipv-token-response-interface.ts";
+import { IdentityTokenResponse } from "../../../../main/shared-identity/interfaces/identity-token-response-interface.ts";
 import {
   getUserIdentity,
   putUserIdentity,
   resetUserIdentityTable,
-} from "../helper/dynamo-helper.ts";
-import { USER_IDENTITY } from "../../../main/ipv-stub/data/ipv-dummy-constants.ts";
-import localParams from "../../../../parameters.json";
-import { handler } from "../../../main/ipv-stub/ipv-token.ts";
-import { createApiGatewayEvent } from "../util.ts";
+} from "../../helper/dynamo-helper.ts";
+import { USER_IDENTITY } from "../../../../main/shared-identity/data/identity-dummy-constants.ts";
+import localParams from "../../../../../parameters.json";
+import { handler } from "../../../../main/shared-identity/handler/identity-token.ts";
+import { createApiGatewayEvent } from "../../util.ts";
 
-describe("IPV Token", () => {
+describe("Identity Token", () => {
   const AUTH_CODE = "12345";
   let privateKey: CryptoKey;
   vi.stubEnv("IDENTITY_STUB", "IpvStub");
@@ -51,7 +51,7 @@ describe("IPV Token", () => {
 
     expect(response.statusCode).toBe(200);
 
-    const tokenResponse: IpvTokenResponse = JSON.parse(response.body);
+    const tokenResponse: IdentityTokenResponse = JSON.parse(response.body);
 
     expectTypeOf(tokenResponse.access_token).toBeString();
 
