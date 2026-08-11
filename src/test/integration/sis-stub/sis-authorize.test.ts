@@ -1,8 +1,14 @@
-import { getState, resetUserIdentityTable } from "../helper/dynamo-helper";
+import {
+  getState,
+  getUserIdentity,
+  resetUserIdentityTable,
+} from "../helper/dynamo-helper";
 import { handler } from "./../../../main/sis-stub/sis-authorize.ts";
 import { createApiGatewayEvent } from "../util.ts";
 import { Context } from "aws-lambda";
 import { generateJwe } from "../helper/identity-helper.ts";
+import formConfig from "../../../main/shared-identity/config/config.ts";
+import { AUTH_CODE } from "../../../main/shared-identity/data/identity-dummy-constants.ts";
 
 const STATE = "test-state";
 const AUDIENCE = "https://sisstub.oidc.local.account.gov.uk";
@@ -88,4 +94,79 @@ describe("SIS Authorize", () => {
       "Signature verification failed"
     );
   });
+
+  it.for([
+    ["access_denied", "access_denied", "record_unavailable"],
+    ["update_identity", "access_denied", "record_update_requested"],
+    ["generic_error", "server_error", "server_had_a_problem"],
+  ])(
+    "should return a 302 with the oauth error %s and not update dynamo",
+    async ([formOption, error, errorDescription]) => {
+      const response = await handler(
+        createApiGatewayEvent(
+          "POST",
+          new URLSearchParams({
+            "oAuth-error": formOption,
+          }).toString(),
+          {},
+          {}
+        ),
+        {} as Context,
+        () => {}
+      );
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.Location).toBe(
+        `https://oidc.local.account.gov.uk/sis-callback?${new URLSearchParams({
+          error: error,
+          error_description: errorDescription,
+        }).toString()}`
+      );
+    }
+  );
+
+  it("should return 302 for valid POST request and update Dynamo", async () => {
+    const response = await handler(
+      createApiGatewayEvent("POST", generateFormBody(), {}, {}),
+      {} as Context,
+      () => {}
+    );
+
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.Location).toBe(
+      `https://oidc.local.account.gov.uk/sis-callback?code=${AUTH_CODE}`
+    );
+
+    const expectedUserIdentity = {
+      sub: formConfig.coreIdentityJWT.sub,
+      vot: formConfig.coreIdentityJWT.vot,
+      vtm: formConfig.coreIdentityJWT.vtm,
+      "https://vocab.account.gov.uk/v1/coreIdentity":
+        formConfig.coreIdentityJWT.vc,
+      "https://vocab.account.gov.uk/v1/address": formConfig.address,
+      "https://vocab.account.gov.uk/v1/drivingPermit": formConfig.drivingPermit,
+      "https://vocab.account.gov.uk/v1/socialSecurityRecord":
+        formConfig.socialSecurityRecord,
+      "https://vocab.account.gov.uk/v1/passport": formConfig.passport,
+      "https://vocab.account.gov.uk/v1/returnCode": formConfig.returnCode,
+    };
+    const actualUserIdentity = await getUserIdentity(AUTH_CODE);
+
+    expect(actualUserIdentity).toMatchObject(expectedUserIdentity);
+  });
+
+  function generateFormBody(): string {
+    return new URLSearchParams({
+      authCode: AUTH_CODE,
+      sub: formConfig.coreIdentityJWT.sub,
+      vot: formConfig.coreIdentityJWT.vot,
+      vtm: formConfig.coreIdentityJWT.vtm,
+      identity_claim: JSON.stringify(formConfig.coreIdentityJWT.vc),
+      address_claim: JSON.stringify(formConfig.address),
+      passport_claim: JSON.stringify(formConfig.passport),
+      driving_permit_claim: JSON.stringify(formConfig.drivingPermit),
+      nino_claim: JSON.stringify(formConfig.socialSecurityRecord),
+      return_code_claim: JSON.stringify(formConfig.returnCode),
+    } as Record<string, string>).toString();
+  }
 });

@@ -122,6 +122,12 @@ Resources:
             RestApiId: !Ref SISApiGateway
             Path: /authorize
             Method: get
+        Post:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SISApiGateway
+            Path: /authorize
+            Method: post
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
