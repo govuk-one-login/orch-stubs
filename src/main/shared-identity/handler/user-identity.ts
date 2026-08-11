@@ -19,11 +19,10 @@ export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   return handleErrors(async () => {
-    switch (event.httpMethod) {
-      case "GET":
-        return await get(event);
-      default:
-        throw methodNotAllowedError(event.httpMethod);
+    if (event.httpMethod === "GET") {
+      return await get(event);
+    } else {
+      throw methodNotAllowedError(event.httpMethod);
     }
   });
 };
