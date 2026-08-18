@@ -136,7 +136,6 @@ Resources:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           DUMMY_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
-          IDENTITY_STUB: "SisStub"
       Policies:
         - !Ref SISUserIdentityTableReadAccessPolicy
         - !Ref SISUserIdentityTableWriteAccessPolicy

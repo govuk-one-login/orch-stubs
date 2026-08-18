@@ -11,8 +11,8 @@ const dynamoClient = new DynamoDBClient({
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
-const tableName = () =>
-  `${process.env.ENVIRONMENT}-${process.env.IDENTITY_STUB}-UserIdentity`;
+const tableName = (identityStub?: string) =>
+  `${process.env.ENVIRONMENT}-${identityStub ?? process.env.IDENTITY_STUB}-UserIdentity`;
 
 const primaryKey = "UserIdentityId";
 
@@ -20,10 +20,11 @@ export const warmUp = async (): Promise<void> =>
   warmSimpleKeyTable(dynamoClient, tableName(), primaryKey);
 
 export const getUserIdentityWithAuthCode = async (
-  authCode: string
+  authCode: string,
+  identityStub?: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Key: { UserIdentityId: authCode },
   });
   if (response.Item) {
@@ -35,11 +36,12 @@ export const getUserIdentityWithAuthCode = async (
 };
 
 export const putUserIdentityWithAuthCode = async (
+  identityStub: string,
   authCode: string,
   userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Item: {
       UserIdentityId: authCode,
       userIdentity,
@@ -49,10 +51,11 @@ export const putUserIdentityWithAuthCode = async (
 };
 
 export const getUserIdentityWithToken = async (
-  token: string
+  token: string,
+  identityStub?: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Key: { UserIdentityId: token },
   });
   if (response.Item) {
@@ -65,10 +68,11 @@ export const getUserIdentityWithToken = async (
 
 export const putUserIdentityWithToken = async (
   token: string,
-  userIdentity: UserIdentity
+  userIdentity: UserIdentity,
+  identityStub?: string
 ) => {
   return await dynamo.put({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Item: {
       UserIdentityId: token,
       userIdentity,
@@ -78,19 +82,24 @@ export const putUserIdentityWithToken = async (
 };
 
 export const getStateWithAuthCode = async (
+  identityStub: string,
   authCode: string
 ): Promise<string> => {
   const response = await dynamo.get({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Key: { UserIdentityId: authCode + "-state" },
   });
 
   return response.Item?.state;
 };
 
-export const putStateWithAuthCode = async (authCode: string, state: string) => {
+export const putStateWithAuthCode = async (
+  identityStub: string,
+  authCode: string,
+  state: string
+) => {
   return await dynamo.put({
-    TableName: tableName(),
+    TableName: tableName(identityStub),
     Item: {
       UserIdentityId: authCode + "-state",
       state,

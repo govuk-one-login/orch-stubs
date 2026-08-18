@@ -3,6 +3,8 @@ import { handlePost } from "./authorize-helpers";
 
 import * as dynamoService from "../service/dynamodb-form-response-service";
 
+const IDENTITY_STUB_NAME = "IpvStub";
+
 describe("Identity authorize helpers test", () => {
   describe("Handle POST requests", () => {
     const redirectUri = new URL("http://test.com/redirect");
@@ -13,7 +15,7 @@ describe("Identity authorize helpers test", () => {
 
     it("should return 400 error when body is not present", async () => {
       const action = async () =>
-        await handlePost(undefined, redirectUri, () => {});
+        await handlePost(IDENTITY_STUB_NAME, undefined, redirectUri, () => {});
 
       await expect(action).rejects.toThrow(
         new CodedError(400, "Missing request body")
@@ -26,7 +28,7 @@ describe("Identity authorize helpers test", () => {
       );
 
       const action = async () =>
-        await handlePost("test=abc", redirectUri, () => {});
+        await handlePost(IDENTITY_STUB_NAME, "test=abc", redirectUri, () => {});
 
       await expect(action).rejects.toThrow(
         new CodedError(
@@ -41,6 +43,7 @@ describe("Identity authorize helpers test", () => {
         "test-state"
       );
       const result = await handlePost(
+        IDENTITY_STUB_NAME,
         "error=access_denied",
         redirectUri,
         (parsedBody, url) => {

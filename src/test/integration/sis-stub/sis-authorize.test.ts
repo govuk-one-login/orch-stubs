@@ -12,12 +12,11 @@ import { AUTH_CODE } from "../../../main/shared-identity/data/identity-dummy-con
 
 const STATE = "test-state";
 const AUDIENCE = "https://sisstub.oidc.local.account.gov.uk";
+const IDENTITY_STUB_NAME = "SisStub";
 
 describe("SIS Authorize", () => {
-  vi.stubEnv("IDENTITY_STUB", "SisStub");
-
   beforeEach(async () => {
-    await resetUserIdentityTable();
+    await resetUserIdentityTable(IDENTITY_STUB_NAME);
   });
 
   it("should return 200 for valid GET request and update Dynamo", async () => {
@@ -43,7 +42,7 @@ describe("SIS Authorize", () => {
     expect(response.body).toMatch(htmlRegex);
 
     const { authCode } = htmlRegex.exec(response.body)!.groups!;
-    const state = await getState(authCode);
+    const state = await getState(IDENTITY_STUB_NAME, authCode);
 
     expect(state).toBe(STATE);
   });
@@ -150,7 +149,10 @@ describe("SIS Authorize", () => {
       "https://vocab.account.gov.uk/v1/passport": formConfig.passport,
       "https://vocab.account.gov.uk/v1/returnCode": formConfig.returnCode,
     };
-    const actualUserIdentity = await getUserIdentity(AUTH_CODE);
+    const actualUserIdentity = await getUserIdentity(
+      IDENTITY_STUB_NAME,
+      AUTH_CODE
+    );
 
     expect(actualUserIdentity).toMatchObject(expectedUserIdentity);
   });
