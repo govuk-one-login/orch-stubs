@@ -204,7 +204,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/user-identity.handler
+      Handler: src/main/shared-identity/handler/user-identity.ipvUserIdentityHandler
       LoggingConfig:
         LogGroup: !Ref IPVUserIdentityLambdaLogGroup
       Runtime: nodejs24.x
@@ -213,7 +213,6 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IDENTITY_STUB: "IpvStub"
       Events:
         Get:
           Type: Api

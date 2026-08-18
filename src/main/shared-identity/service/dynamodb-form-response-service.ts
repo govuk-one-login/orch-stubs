@@ -12,7 +12,7 @@ const dynamoClient = new DynamoDBClient({
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = (identityStub?: string) =>
-  `${process.env.ENVIRONMENT}-${identityStub ?? process.env.IDENTITY_STUB}-UserIdentity`;
+  `${process.env.ENVIRONMENT}-${identityStub}-UserIdentity`;
 
 const primaryKey = "UserIdentityId";
 

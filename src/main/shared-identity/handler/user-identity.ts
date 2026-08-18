@@ -15,20 +15,26 @@ import {
   getHeaderValueFromHeaders,
 } from "../../util/request-header-helper.ts";
 
-export const handler: Handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  return handleErrors(async () => {
-    if (event.httpMethod === "GET") {
-      return await get(event);
-    } else {
-      throw methodNotAllowedError(event.httpMethod);
-    }
-  });
+export const createHandler = (identityStubName: string): Handler => {
+  return async (
+    event: APIGatewayProxyEvent
+  ): Promise<APIGatewayProxyResult> => {
+    return handleErrors(async () => {
+      if (event.httpMethod === "GET") {
+        return await get(event, identityStubName);
+      } else {
+        throw methodNotAllowedError(event.httpMethod);
+      }
+    });
+  };
 };
 
+export const ipvUserIdentityHandler: Handler = createHandler("IpvStub");
+export const sisUserIdentityHandler: Handler = createHandler("SisStub");
+
 async function get(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
+  identityStubName: string
 ): Promise<APIGatewayProxyResult> {
   const authorizationHeader = getHeaderValueFromHeaders(
     event.headers,
@@ -48,7 +54,10 @@ async function get(
 
   let userIdentity;
   try {
-    userIdentity = await getUserIdentityWithToken(accessToken);
+    userIdentity = await getUserIdentityWithToken(
+      identityStubName,
+      accessToken
+    );
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
