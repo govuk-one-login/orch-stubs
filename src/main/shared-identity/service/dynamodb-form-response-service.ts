@@ -20,8 +20,8 @@ export const warmUp = async (): Promise<void> =>
   warmSimpleKeyTable(dynamoClient, tableName(), primaryKey);
 
 export const getUserIdentityWithAuthCode = async (
-  authCode: string,
-  identityStub?: string
+  identityStub: string,
+  authCode: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
     TableName: tableName(identityStub),
@@ -51,8 +51,8 @@ export const putUserIdentityWithAuthCode = async (
 };
 
 export const getUserIdentityWithToken = async (
-  token: string,
-  identityStub?: string
+  identityStub: string,
+  token: string
 ): Promise<UserIdentity | null> => {
   const response = await dynamo.get({
     TableName: tableName(identityStub),
@@ -67,9 +67,9 @@ export const getUserIdentityWithToken = async (
 };
 
 export const putUserIdentityWithToken = async (
+  identityStub: string,
   token: string,
-  userIdentity: UserIdentity,
-  identityStub?: string
+  userIdentity: UserIdentity
 ) => {
   return await dynamo.put({
     TableName: tableName(identityStub),

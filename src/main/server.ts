@@ -5,7 +5,7 @@ import { handler as authToken } from "./auth-stub/auth-token.ts";
 import { handler as authUserinfo } from "./auth-stub/auth-userinfo.ts";
 import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
-import { createHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
+import { ipvTokenHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
 import { handler as ipvUserIdentity } from "./shared-identity/handler/user-identity.ts";
 import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";
@@ -38,7 +38,7 @@ const initialise = async (): Promise<void> => {
 
   // IPV stub
   app.all("/ipv-stub/authorize", apiGatewayRoute(ipvAuthorize));
-  app.all("/ipv-stub/token", apiGatewayRoute(ipvToken("ORCH_IPV_JWKS_URL")));
+  app.all("/ipv-stub/token", apiGatewayRoute(ipvToken));
   app.all("/ipv-stub/.well-known/jwks.json", apiGatewayRoute(ipvJwks));
   app.all("/ipv-stub/user-identity", apiGatewayRoute(ipvUserIdentity));
 

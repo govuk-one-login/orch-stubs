@@ -144,7 +144,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/identity-token.handler
+      Handler: src/main/shared-identity/handler/identity-token.ipvTokenHandler
       LoggingConfig:
         LogGroup: !Ref IPVTokenLambdaLogGroup
       Runtime: nodejs24.x
@@ -153,10 +153,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_IDENTITY_JWKS_URL:
+          ORCH_IPV_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !Sub https://identity.${Environment}.account.gov.uk/
-          IDENTITY_STUB: "IpvStub"
       Events:
         Get:
           Type: Api

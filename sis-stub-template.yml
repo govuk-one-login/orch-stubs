@@ -162,7 +162,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/identity-token.handler
+      Handler: src/main/shared-identity/handler/identity-token.sisTokenHandler
       LoggingConfig:
         LogGroup: !Ref SISTokenLambdaLogGroup
       Runtime: nodejs24.x
@@ -171,9 +171,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_IDENTITY_JWKS_URL:
+          ORCH_SIS_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
-          IDENTITY_STUB: "SisStub"
       Events:
         Post:
           Type: Api
