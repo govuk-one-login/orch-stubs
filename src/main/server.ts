@@ -7,6 +7,10 @@ import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
 import { ipvTokenHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
 import { ipvUserIdentityHandler as ipvUserIdentity } from "./shared-identity/handler/user-identity.ts";
+import { handler as sisAuthorize } from "./sis-stub/sis-authorize.ts";
+import { handler as sisJwks } from "./sis-stub/sis-jwks.ts";
+import { sisTokenHandler as sisToken } from "./shared-identity/handler/identity-token.ts";
+import { sisUserIdentityHandler as sisUserIdentity } from "./shared-identity/handler/user-identity.ts";
 import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";
 import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dynamo-service.ts";
@@ -41,6 +45,12 @@ const initialise = async (): Promise<void> => {
   app.all("/ipv-stub/token", apiGatewayRoute(ipvToken));
   app.all("/ipv-stub/.well-known/jwks.json", apiGatewayRoute(ipvJwks));
   app.all("/ipv-stub/user-identity", apiGatewayRoute(ipvUserIdentity));
+
+  // SIS stub
+  app.all("/sis-stub/authorize", apiGatewayRoute(sisAuthorize));
+  app.all("/sis-stub/token", apiGatewayRoute(sisToken));
+  app.all("/sis-stub/.well-known/jwks.json", apiGatewayRoute(sisJwks));
+  app.all("/sis-stub/user-identity", apiGatewayRoute(sisUserIdentity));
 
   // AIS stub
   app.all("/ais-stub/{*path}", apiGatewayRoute(aisStub));
