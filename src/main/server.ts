@@ -5,14 +5,22 @@ import { handler as authToken } from "./auth-stub/auth-token.ts";
 import { handler as authUserinfo } from "./auth-stub/auth-userinfo.ts";
 import { handler as ipvAuthorize } from "./ipv-stub/ipv-authorize.ts";
 import { handler as ipvJwks } from "./ipv-stub/ipv-jwks.ts";
-import { createHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
-import { handler as ipvUserIdentity } from "./shared-identity/handler/user-identity.ts";
+import { ipvTokenHandler as ipvToken } from "./shared-identity/handler/identity-token.ts";
+import { ipvUserIdentityHandler as ipvUserIdentity } from "./shared-identity/handler/user-identity.ts";
+import { handler as sisAuthorize } from "./sis-stub/sis-authorize.ts";
+import { handler as sisJwks } from "./sis-stub/sis-jwks.ts";
+import { sisTokenHandler as sisToken } from "./shared-identity/handler/identity-token.ts";
+import { sisUserIdentityHandler as sisUserIdentity } from "./shared-identity/handler/user-identity.ts";
 import { handler as spotHandler } from "./spot-stub/spot.ts";
 import { apiGatewayRoute } from "./helper/api-gateway-mapper.ts";
 import { warmUp as aisInterventionWarmUp } from "./ais-stub/service/ais-stub-dynamo-service.ts";
 import { warmUp as authCodeWarmUp } from "./auth-stub/services/auth-code-dynamodb-service.ts";
 import { warmUp as accessTokenWarmUp } from "./auth-stub/services/access-token-dynamodb-service.ts";
 import { warmUp as userProfileWarmUp } from "./auth-stub/services/user-profile-dynamodb-service.ts";
+import {
+  ipvStubTableWarmUp,
+  sisStubTableWarmUp,
+} from "./shared-identity/service/dynamodb-form-response-service.ts";
 import { startPoll } from "./helper/sqs-listener.ts";
 import renderAuthError from "./auth-stub/render-auth-error.ts";
 import renderAuthLogout from "./auth-stub/render-auth-logout.ts";
@@ -38,9 +46,15 @@ const initialise = async (): Promise<void> => {
 
   // IPV stub
   app.all("/ipv-stub/authorize", apiGatewayRoute(ipvAuthorize));
-  app.all("/ipv-stub/token", apiGatewayRoute(ipvToken("ORCH_IPV_JWKS_URL")));
+  app.all("/ipv-stub/token", apiGatewayRoute(ipvToken));
   app.all("/ipv-stub/.well-known/jwks.json", apiGatewayRoute(ipvJwks));
   app.all("/ipv-stub/user-identity", apiGatewayRoute(ipvUserIdentity));
+
+  // SIS stub
+  app.all("/sis-stub/authorize", apiGatewayRoute(sisAuthorize));
+  app.all("/sis-stub/token", apiGatewayRoute(sisToken));
+  app.all("/sis-stub/.well-known/jwks.json", apiGatewayRoute(sisJwks));
+  app.all("/sis-stub/user-identity", apiGatewayRoute(sisUserIdentity));
 
   // AIS stub
   app.all("/ais-stub/{*path}", apiGatewayRoute(aisStub));
@@ -56,6 +70,8 @@ const initialise = async (): Promise<void> => {
   await accessTokenWarmUp();
   await userProfileWarmUp();
   await aisInterventionWarmUp();
+  await ipvStubTableWarmUp();
+  await sisStubTableWarmUp();
 
   const server = app.listen(PORT, () => console.log(`listening on ${PORT}`));
 

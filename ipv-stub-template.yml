@@ -11,7 +11,6 @@ Parameters:
   Environment:
     Type: String
     Description: The name of the environment to deploy to
-    Default: none
   CodeSigningConfigArn:
     Type: String
     Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
@@ -97,7 +96,6 @@ Resources:
           # These will always be over-written when running locally in parameters.json
           DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           DUMMY_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
-          IDENTITY_STUB: "IpvStub"
       Events:
         Get:
           Type: Api
@@ -146,7 +144,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/identity-token.handler
+      Handler: src/main/shared-identity/handler/identity-token.ipvTokenHandler
       LoggingConfig:
         LogGroup: !Ref IPVTokenLambdaLogGroup
       Runtime: nodejs24.x
@@ -155,10 +153,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_IDENTITY_JWKS_URL:
+          ORCH_IPV_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           IPV_AUDIENCE: !Sub https://identity.${Environment}.account.gov.uk/
-          IDENTITY_STUB: "IpvStub"
       Events:
         Get:
           Type: Api
@@ -207,7 +204,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/user-identity.handler
+      Handler: src/main/shared-identity/handler/user-identity.ipvUserIdentityHandler
       LoggingConfig:
         LogGroup: !Ref IPVUserIdentityLambdaLogGroup
       Runtime: nodejs24.x
@@ -216,7 +213,6 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IDENTITY_STUB: "IpvStub"
       Events:
         Get:
           Type: Api

@@ -21,12 +21,16 @@ import { logger } from "../../logger.ts";
 import { getHeaderValueFromHeaders } from "../../util/request-header-helper.ts";
 import { getOrchJwks } from "../helper/key-helpers.ts";
 
-// This is only used by local running
-export const createHandler = (jwksEnvVar: string): Handler => {
-  return (event) => {
-    handleErrors(async () => {
+const createHandler = (
+  jwksUrlEnvVar: string,
+  identityStubName: string
+): Handler => {
+  return async (
+    event: APIGatewayProxyEvent
+  ): Promise<APIGatewayProxyResult> => {
+    return handleErrors(async () => {
       if (event.httpMethod === "POST") {
-        return await post(event, jwksEnvVar);
+        return await post(event, jwksUrlEnvVar, identityStubName);
       } else {
         throw methodNotAllowedError(event.httpMethod);
       }
@@ -34,21 +38,19 @@ export const createHandler = (jwksEnvVar: string): Handler => {
   };
 };
 
-export const handler: Handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  return handleErrors(async () => {
-    if (event.httpMethod === "POST") {
-      return await post(event, "ORCH_IDENTITY_JWKS_URL");
-    } else {
-      throw methodNotAllowedError(event.httpMethod);
-    }
-  });
-};
+export const ipvTokenHandler: Handler = createHandler(
+  "ORCH_IPV_JWKS_URL",
+  "IpvStub"
+);
+export const sisTokenHandler: Handler = createHandler(
+  "ORCH_SIS_JWKS_URL",
+  "SisStub"
+);
 
 async function post(
   event: APIGatewayProxyEvent,
-  jwksEnvVar: string
+  jwksEnvVar: string,
+  identityStubName: string
 ): Promise<APIGatewayProxyResult> {
   validateHeadersOrThrow(event.headers);
   const body = getValidBodyOrThrow(event.body);
@@ -66,14 +68,17 @@ async function post(
   const authCode = body.code as string;
   let userIdentity;
   try {
-    userIdentity = await getUserIdentityWithAuthCode(authCode);
+    userIdentity = await getUserIdentityWithAuthCode(
+      identityStubName,
+      authCode
+    );
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
   if (userIdentity == null) {
     throw new CodedError(500, "Auth code not found in DB, or is expired");
   }
-  await putUserIdentityWithToken(accessToken, userIdentity);
+  await putUserIdentityWithToken(identityStubName, accessToken, userIdentity);
   return createJsonResult(200, {
     access_token: accessToken,
     token_type: "Bearer",

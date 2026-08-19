@@ -6,22 +6,22 @@ const dynamoClient = new DynamoDBClient({
   endpoint: process.env.DYNAMO_ENDPOINT!,
 });
 
-const getUserIdentityTableName = () =>
-  `${process.env.ENVIRONMENT ?? "local"}-${process.env.IDENTITY_STUB}-UserIdentity`;
+const getUserIdentityTableName = (identityStubName: string) =>
+  `${process.env.ENVIRONMENT ?? "local"}-${identityStubName}-UserIdentity`;
 
 const dynamoDoc = DynamoDBDocument.from(dynamoClient);
 
-export async function resetUserIdentityTable() {
-  console.log("Table: ", getUserIdentityTableName());
+export async function resetUserIdentityTable(identityStubName: string) {
+  console.log("Table: ", getUserIdentityTableName(identityStubName));
   const result = await dynamoDoc.scan({
-    TableName: getUserIdentityTableName(),
+    TableName: getUserIdentityTableName(identityStubName),
     ConsistentRead: true,
   });
 
   if (result.Items) {
     for (const item of result.Items) {
       await dynamoDoc.delete({
-        TableName: getUserIdentityTableName(),
+        TableName: getUserIdentityTableName(identityStubName),
         Key: {
           UserIdentityId: item.UserIdentityId,
         },
@@ -31,6 +31,7 @@ export async function resetUserIdentityTable() {
 }
 
 export async function putUserIdentity(
+  identityStubName: string,
   userIdentityId: string,
   userIdentity: object
 ): Promise<void> {
@@ -40,16 +41,17 @@ export async function putUserIdentity(
     ttl: Math.floor(Date.now() / 1000) + 3600,
   };
   await dynamoDoc.put({
-    TableName: getUserIdentityTableName(),
+    TableName: getUserIdentityTableName(identityStubName),
     Item: userIdentityEntry,
   });
 }
 
 export async function getUserIdentity(
+  identityStubName: string,
   userIdentityId: string
 ): Promise<Record<string, unknown>> {
   const result = await dynamoDoc.get({
-    TableName: getUserIdentityTableName(),
+    TableName: getUserIdentityTableName(identityStubName),
     Key: { UserIdentityId: userIdentityId },
     ConsistentRead: true,
   });
@@ -62,9 +64,12 @@ export async function getUserIdentity(
   return userIdentity;
 }
 
-export async function getState(userIdentityId: string): Promise<string> {
+export async function getState(
+  identityStubName: string,
+  userIdentityId: string
+): Promise<string> {
   const result = await dynamoDoc.get({
-    TableName: getUserIdentityTableName(),
+    TableName: getUserIdentityTableName(identityStubName),
     Key: { UserIdentityId: `${userIdentityId}-state` },
     ConsistentRead: true,
   });

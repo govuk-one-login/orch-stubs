@@ -54,6 +54,7 @@ const tryParseOrThrowError = (claim: string, ClaimName: string) => {
 };
 
 export const handlePost = async (
+  identityStubName: string,
   body: string | undefined,
   redirectUrl: URL,
   earlyRedirect: (
@@ -68,7 +69,7 @@ export const handlePost = async (
   const authCode = parsedBody.authCode;
 
   try {
-    const state = await getStateWithAuthCode(authCode);
+    const state = await getStateWithAuthCode(identityStubName, authCode);
     if (state) {
       logger.info("state: " + state);
       redirectUrl.searchParams.append("state", state);
@@ -96,7 +97,7 @@ export const handlePost = async (
   redirectUrl.searchParams.append("code", authCode);
 
   try {
-    await putUserIdentityWithAuthCode(authCode, userIdentity);
+    await putUserIdentityWithAuthCode(identityStubName, authCode, userIdentity);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }

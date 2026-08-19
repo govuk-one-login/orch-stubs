@@ -136,7 +136,6 @@ Resources:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
           DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
           DUMMY_JWKS: !If [IsLocalEnv, "", !Ref AWS::NoValue]
-          IDENTITY_STUB: "SisStub"
       Policies:
         - !Ref SISUserIdentityTableReadAccessPolicy
         - !Ref SISUserIdentityTableWriteAccessPolicy
@@ -163,7 +162,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/identity-token.handler
+      Handler: src/main/shared-identity/handler/identity-token.sisTokenHandler
       LoggingConfig:
         LogGroup: !Ref SISTokenLambdaLogGroup
       Runtime: nodejs24.x
@@ -172,9 +171,8 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          ORCH_IDENTITY_JWKS_URL:
+          ORCH_SIS_JWKS_URL:
             !FindInMap [EnvironmentConfiguration, !Ref Environment, orchJwksUrl]
-          IDENTITY_STUB: "SisStub"
       Events:
         Post:
           Type: Api
@@ -209,7 +207,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/main/shared-identity/handler/user-identity.handler
+      Handler: src/main/shared-identity/handler/user-identity.sisUserIdentityHandler
       LoggingConfig:
         LogGroup: !Ref SISUserIdentityLambdaLogGroup
       Runtime: nodejs24.x
@@ -218,7 +216,6 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Sub ${Environment}
-          IDENTITY_STUB: "SisStub"
       Events:
         Get:
           Type: Api

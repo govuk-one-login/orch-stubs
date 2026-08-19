@@ -21,6 +21,8 @@ import renderSISAuthorize from "./render-sis-authorize";
 import { handlePost } from "../shared-identity/helper/authorize-helpers";
 import { ROOT_URI } from "../shared-identity/data/identity-dummy-constants";
 
+const IDENTITY_STUB_NAME = "SisStub";
+
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -76,7 +78,11 @@ async function get(
 
   const authCode = base64url.encode(randomBytes(32));
   try {
-    await putStateWithAuthCode(authCode, payload.state as string);
+    await putStateWithAuthCode(
+      IDENTITY_STUB_NAME,
+      authCode,
+      payload.state as string
+    );
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
@@ -90,7 +96,12 @@ async function post(
   const redirectUri = `${ROOT_URI}/sis-callback`;
   const url = new URL(redirectUri);
 
-  return handlePost(event.body || undefined, url, handlePostErrors);
+  return handlePost(
+    IDENTITY_STUB_NAME,
+    event.body || undefined,
+    url,
+    handlePostErrors
+  );
 }
 
 type OAuthError = {

@@ -7,8 +7,10 @@ import {
 } from "../../helper/dynamo-helper.ts";
 import { USER_IDENTITY } from "../../../../main/shared-identity/data/identity-dummy-constants.ts";
 import localParams from "../../../../../parameters.json";
-import { handler } from "../../../../main/shared-identity/handler/identity-token.ts";
+import { ipvTokenHandler as handler } from "../../../../main/shared-identity/handler/identity-token.ts";
 import { createApiGatewayEvent } from "../../util.ts";
+
+const IDENTITY_STUB_NAME = "IpvStub";
 
 describe("Identity Token", () => {
   const AUTH_CODE = "12345";
@@ -27,7 +29,7 @@ describe("Identity Token", () => {
   });
 
   afterEach(async () => {
-    await resetUserIdentityTable();
+    await resetUserIdentityTable(IDENTITY_STUB_NAME);
   });
 
   it("should return 200 for valid POST request and update Dynamo", async () => {
@@ -58,6 +60,7 @@ describe("Identity Token", () => {
     expect(tokenResponse.token_type).toBe("Bearer");
 
     const actualUserIdentity = await getUserIdentity(
+      IDENTITY_STUB_NAME,
       tokenResponse.access_token
     );
 
@@ -257,6 +260,6 @@ describe("Identity Token", () => {
   }
 
   async function setUpUserIdentity(): Promise<void> {
-    await putUserIdentity(AUTH_CODE, USER_IDENTITY);
+    await putUserIdentity(IDENTITY_STUB_NAME, AUTH_CODE, USER_IDENTITY);
   }
 });
