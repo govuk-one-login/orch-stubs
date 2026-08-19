@@ -11,13 +11,17 @@ const dynamoClient = new DynamoDBClient({
 });
 const dynamo = DynamoDBDocument.from(dynamoClient);
 
-const tableName = (identityStub?: string) =>
+const tableName = (identityStub: string) =>
   `${process.env.ENVIRONMENT}-${identityStub}-UserIdentity`;
 
 const primaryKey = "UserIdentityId";
 
-export const warmUp = async (): Promise<void> =>
-  warmSimpleKeyTable(dynamoClient, tableName(), primaryKey);
+export const ipvStubTableWarmUp = async (): Promise<void> => warmUp("IpvStub");
+
+export const sisStubTableWarmUp = async (): Promise<void> => warmUp("SisStub");
+
+const warmUp = async (identityStub: string): Promise<void> =>
+  warmSimpleKeyTable(dynamoClient, tableName(identityStub), primaryKey);
 
 export const getUserIdentityWithAuthCode = async (
   identityStub: string,
