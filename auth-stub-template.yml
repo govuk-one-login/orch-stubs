@@ -34,7 +34,7 @@ Mappings:
     dev:
       authStubDomainName: authstub.oidc.dev.account.gov.uk
       authDomain: authdev3.dev.account.gov.uk
-      orchAuthJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/auth-jwks.json
+      orchAuthJwksUrl: https://oidc.dev.account.gov.uk/.well-known/auth-jwks.json
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
       authDomain: build.account.gov.uk
