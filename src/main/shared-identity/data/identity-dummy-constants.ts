@@ -1,7 +1,6 @@
 import { UserIdentity } from "../../shared-identity/interfaces/user-identity-interface.ts";
 
-const env =
-  process.env.ENVIRONMENT == "dev" ? "authdev3.dev" : process.env.ENVIRONMENT;
+const env = process.env.ENVIRONMENT || "local";
 
 export const AUTH_CODE = "12345";
 
