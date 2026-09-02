@@ -33,7 +33,7 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       sisStubDomainName: sisstub.oidc.dev.account.gov.uk
-      orchJwksUrl: https://oidc.authdev3.dev.account.gov.uk/.well-known/sis-jwks.json
+      orchJwksUrl: https://oidc.dev.account.gov.uk/.well-known/sis-jwks.json
     build:
       sisStubDomainName: sisstub.oidc.build.account.gov.uk
       orchJwksUrl: https://oidc.build.account.gov.uk/.well-known/sis-jwks.json
