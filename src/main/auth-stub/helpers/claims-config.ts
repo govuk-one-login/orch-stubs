@@ -2,6 +2,23 @@ import {
   getOrchToAuthExpectedClientId,
   getOrchToAuthExpectedAudience,
 } from "./config.ts";
+export const VALID_AUTH_USER_INFO_CLAIMS = Object.freeze([
+  "legacy_subject_id",
+  "public_subject_id",
+  "local_account_id",
+  "rp_pairwise_id",
+  "email",
+  "email_verified",
+  "phone_number",
+  "phone_number_verified",
+  "salt",
+  "verified_mfa_method_type",
+  "new_account",
+  "uplift_required",
+  "achieved_credential_strength",
+  "account_data_api_access_token",
+] as const);
+export type AuthUserInfoClaim = (typeof VALID_AUTH_USER_INFO_CLAIMS)[number];
 
 export interface Claims {
   iss: string;

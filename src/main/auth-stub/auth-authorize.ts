@@ -94,7 +94,7 @@ async function get(
     email: email,
     passwordResetTime: passwordResetTime,
     sectorIdentifier: parsedBody.sectorIdentifier,
-    isNewAccount: parsedBody.isNewAccount,
+    isNewAccount: parsedBody.isNewAccount === "true",
     claims: claims,
   };
 
@@ -121,9 +121,20 @@ async function post(
     );
   }
   logger.info("Parsing authRequest in body");
-  const authRequest: AuthRequestBody = JSON.parse(
-    body.authRequest
+  const authRequestFields = getPrefixedFields(
+    body,
+    "auth-request-"
   ) as unknown as AuthRequestBody;
+  const claims = getPrefixedFields(body, "claims-") as unknown as Claims;
+  const userInfoClaims = getPrefixedFields(body, "userinfo-");
+
+  const authRequest: AuthRequestBody = {
+    ...authRequestFields,
+    claims: {
+      ...claims,
+      claim: JSON.stringify({ userinfo: userInfoClaims }),
+    },
+  };
 
   let authCode: string;
 
@@ -131,9 +142,7 @@ async function post(
     logger.info("Getting user profile by email");
     const user = await getUserProfileByEmail(authRequest.email);
     logger.info("Parsing claims list");
-    const claimsList = authRequest.claims.claim
-      ? JSON.parse(authRequest.claims.claim)
-      : [];
+    const claimsList = Object.keys(userInfoClaims) ?? {};
 
     logger.info("Generating auth code");
 
@@ -144,7 +153,7 @@ async function post(
       subjectId: user.subjectId,
       claims: claimsList,
       sectorIdentifier: authRequest.sectorIdentifier,
-      isNewAccount: authRequest.isNewAccount === "true",
+      isNewAccount: authRequest.isNewAccount,
       passwordResetTime: authRequest.passwordResetTime,
       hasBeenUsed: false,
       journeyId: journeyId,
@@ -176,4 +185,15 @@ function validateQueryParams(clientId: string, responseType: string) {
   if (clientId !== getOrchToAuthExpectedClientId()) {
     throw new CodedError(400, "Client ID value is incorrect");
   }
+}
+
+function getPrefixedFields(
+  body: Record<string, string>,
+  prefix: string
+): Record<string, string | undefined> {
+  return Object.fromEntries(
+    Object.keys(body)
+      .filter((key) => key.startsWith(prefix))
+      .map((key) => [key.substring(prefix.length), body[key] || undefined])
+  );
 }
