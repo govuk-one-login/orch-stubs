@@ -39,6 +39,15 @@ Globals:
       - !Ref PermissionsBoundary
       - !Ref AWS::NoValue
 
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      oidcStubDomainName: oidc-stub.oidc.dev.account.gov.uk
+      oidcStubIssuer: https://oidc-stub.oidc.dev.account.gov.uk
+    build:
+      oidcStubDomainName: oidc-stub.oidc.build.account.gov.uk
+      oidcStubIssuer: https://oidc-stub.oidc.build.account.gov.uk
+
 Resources:
   StubInterventionsTable:
     Type: AWS::DynamoDB::Table
@@ -118,7 +127,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/main/ais-stub/ais-stub.handler
-      Runtime: nodejs24.x
+      Runtime: nodejs22.x
       Architectures:
         - arm64
       Environment:
@@ -159,3 +168,163 @@ Resources:
               - dynamodb:Query
               - dynamodb:Scan
             Resource: !GetAtt StubInterventionsTable.Arn
+
+
+  OidcDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${Environment}-OidcStore
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: grantId
+          AttributeType: S
+        - AttributeName: uid
+          AttributeType: S
+        - AttributeName: userCode
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: GSI-1
+          KeySchema:
+            - AttributeName: grantId
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+        - IndexName: GSI-2
+          KeySchema:
+            - AttributeName: uid
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+        - IndexName: GSI-3
+          KeySchema:
+            - AttributeName: userCode
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  OidcStubSessionTableAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowAccessToStubInterventionsTable
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+              - dynamodb:BatchWriteItem
+            Resource:
+              - !GetAtt OidcDynamoTable.Arn
+              - !Sub "${OidcDynamoTable.Arn}/index/*"
+                
+  OidcApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}-OidcApiGateway
+      StageName: Live
+      AlwaysDeploy: true
+
+  OidcViewsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: oidc-nunjucks-views
+      Description: Nunjucks templates for OIDC interaction views
+      ContentUri: ./src/main/oidc-stub/views
+      CompatibleRuntimes:
+        - nodejs22.x
+
+  OidcLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/main/oidc-stub/handler.ts
+      Runtime: nodejs22.x
+      Layers:
+        - !Ref OidcViewsLayer
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ENVIRONMENT: !Sub ${Environment}
+          # These will always be over-written when running locally in parameters.json
+          DYNAMO_ENDPOINT: !If [IsLocalEnv, "", !Ref AWS::NoValue]
+          TABLE_NAME: !Ref OidcDynamoTable
+          ISSUER_URL:  !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubIssuer ]
+      Policies:
+        - !Ref OidcStubSessionTableAccessPolicy
+      Events:
+        RootPath:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OidcApiGateway
+            Path: /
+            Method: ANY
+        ProxyPath:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OidcApiGateway
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/main/oidc-stub/handler.ts
+        Minify: true
+        Sourcemap: true
+        Target: es2022
+        UseNpmCi: True
+        Loader:
+          - .node=file
+  
+  OidcStubCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:  
+        !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubDomainName ]
+      DomainValidationOptions:
+        - DomainName: 
+            !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubDomainName ]
+          HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      ValidationMethod: DNS
+
+  OidcStubApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubDomainName ]
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref OidcStubCertificate
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  OidcStubApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubDomainName ]
+      RestApiId: !Ref OidcApiGateway
+      Stage: Live
+    DependsOn:
+      - OidcStubApiDomain
+
+  OidcStubDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !FindInMap [ EnvironmentConfiguration, !Ref Environment, oidcStubDomainName ]
+      HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
+      AliasTarget:
+        DNSName: !GetAtt OidcStubApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt OidcStubApiDomain.RegionalHostedZoneId
