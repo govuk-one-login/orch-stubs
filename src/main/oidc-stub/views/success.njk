@@ -1,0 +1,68 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+<h2 class="govuk-heading-m">Successful response</h2>
+<p>Return a successful OIDC response. Select from a pre-configured account, or specify the claims yourself.</p>
+
+<form method="POST" action="{{ interactionUid }}/login">
+  {{ govukSelect({
+    id: "account",
+    name: "account",
+    label: {
+      text: "Pre-configured account"
+    },
+    items: accountOptions
+  }) }}
+
+  {{ govukInput({
+    label: {
+      text: "Subject ID"
+    },
+    id: "sub",
+    name: "sub"
+  }) }}
+
+  {{ govukInput({
+    label: {
+      text: "Name"
+    },
+    id: "name",
+    name: "name"
+  }) }}
+
+  {{ govukInput({
+    label: {
+      text: "Email"
+    },
+    id: "email",
+    name: "email"
+  }) }}
+
+  {{ govukTextarea({
+    label: {
+      text: "Additional ID token claims JSON"
+    },
+    hint: {
+      html: "These will be merged with standard claims such as <code>iss</code>, <code>sub</code>, etc."
+    },
+    id: "idtoken",
+    name: "idtoken"
+  }) }}
+
+  {{ govukTextarea({
+    label: {
+      html: "Additional userinfo claims JSON"
+    },
+    hint: {
+      html: "These will be merged with standard claims such as <code>sub</code> etc."
+    },
+    id: "userinfo",
+    name: "userinfo"
+  }) }}
+
+  {{ govukButton({
+    text: "Continue to service"
+  }) }}
+</form>
