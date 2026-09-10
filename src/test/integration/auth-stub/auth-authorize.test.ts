@@ -111,8 +111,14 @@ describe("Auth Authorize", () => {
   }
 
   function createFormBodyWithErrorCode(error?: string): string {
+    const authRequest = generateAuthRequest();
     const formObject: Record<string, string> = {
-      authRequest: JSON.stringify(generateAuthRequest()),
+      ...Object.fromEntries(
+        Object.entries(authRequest).map(([key, value]) => [
+          `auth-request-${key}`,
+          value,
+        ])
+      ),
     };
     if (error) {
       formObject.error = error;
@@ -154,7 +160,7 @@ describe("Auth Authorize", () => {
       service_type: "MANDATORY",
       nbf: timestamp,
       cookie_consent_shared: true,
-      state: "WLUNPYv0RPdVjhBsG4QMHYYMhGaOc8X-t83Y1XsVh1w",
+      state: "WLUNPYv0RPdVjhBsG4QMHYYMhGaOc8X-t83Y1XsVh1w", //pragma: allowlist secret
       redirect_uri: "UNKNOWN",
       exp: timestamp + 1000,
       iat: timestamp,

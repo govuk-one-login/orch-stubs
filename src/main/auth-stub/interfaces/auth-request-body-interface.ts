@@ -6,6 +6,6 @@ export interface AuthRequestBody {
   email: string;
   passwordResetTime: number;
   sectorIdentifier: string;
-  isNewAccount: string;
+  isNewAccount: boolean;
   claims: Claims;
 }
