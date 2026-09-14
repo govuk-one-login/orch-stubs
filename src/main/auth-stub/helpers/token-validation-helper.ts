@@ -7,8 +7,11 @@ import {
   decodeJwt,
   jwtVerify,
 } from "jose";
+import { AuthCodeStore } from "../interfaces/auth-code-store-interface.ts";
 
-export const validateAuthCode = async (authCode: string | undefined) => {
+export const validateAuthCode = async (
+  authCode: string | undefined
+): Promise<AuthCodeStore> => {
   if (!authCode) {
     logger.error(`Missing Auth Code`);
     throw new CodedError(400, "Missing Auth Code");
@@ -21,6 +24,7 @@ export const validateAuthCode = async (authCode: string | undefined) => {
     logger.error("Auth code expired");
     throw new CodedError(400, "Invalid Auth Code: expired");
   }
+  return authCodeStore;
 };
 
 export const validatePlainTextParameters = (

@@ -7,6 +7,7 @@ import { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { mockEnvVariableSetup } from "./test-helper/test-setup.ts";
 import { MockInstance } from "vitest";
 import { createRemoteJWKSet, generateKeyPair } from "jose";
+import { createAuthCodeStore } from "./test-helper/mock-auth-code-data-helper.ts";
 
 vi.mock(import("jose"), async (importActual) => {
   const actual = await importActual<typeof import("jose")>();
@@ -26,6 +27,7 @@ describe("Auth Token", () => {
   let ensureClientAssertionTypeSpy: MockInstance;
   let verifyClientAssertionSpy: MockInstance;
   let mockDynamoDbReponse: PutCommandOutput;
+  const authCodeStore = createAuthCodeStore("12345");
 
   beforeEach(async () => {
     mockDynamoDbReponse = { $metadata: { httpStatusCode: 200 } };
@@ -37,7 +39,7 @@ describe("Auth Token", () => {
       .mockResolvedValue(mockDynamoDbReponse);
     validateAuthCodeSpy = vi
       .spyOn(tokenValidationHelper, "validateAuthCode")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue(authCodeStore);
     validatePlainTextParametersSpy = vi
       .spyOn(tokenValidationHelper, "validatePlainTextParameters")
       .mockReturnValue(undefined);
