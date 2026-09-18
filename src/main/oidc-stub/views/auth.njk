@@ -1,0 +1,37 @@
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+
+{% extends "base.njk" %}
+
+{% set pageTitle = "OIDC identity provider stub" %}
+
+{% block content %}
+<h1 class="govuk-heading-l">OIDC identity provider stub</h1>
+
+{% set successfulHtml %}
+{% include 'success.njk' %}
+{% endset %}
+
+{% set failureHtml %}
+{% include 'failure.njk' %}
+{% endset %}
+
+{{ govukTabs({
+  items: [
+    {
+      label: "Successful",
+      id: "successful",
+      panel: {
+        html: successfulHtml
+      }
+    },
+    {
+      label: "Failure",
+      id: "failure",
+      panel: {
+        html: failureHtml
+      }
+    }
+  ]
+}) }}
+
+{% endblock %}

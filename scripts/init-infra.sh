@@ -18,3 +18,22 @@ awslocal dynamodb create-table --table-name local-AuthStub-UserProfile --key-sch
 
 
   awslocal dynamodb create-table --table-name local-AIS-stub-interventions --key-schema AttributeName=pairwiseId,KeyType=HASH --billing-mode PAY_PER_REQUEST --attribute-definitions AttributeName=pairwiseId,AttributeType=S --region eu-west-2
+
+  ws dynamodb create-table \
+    --table-name local-OidcStore \
+    --billing-mode PAY_PER_REQUEST \
+    --attribute-definitions \
+        AttributeName=PK,AttributeType=S \
+        AttributeName=grantId,AttributeType=S \
+        AttributeName=uid,AttributeType=S \
+        AttributeName=userCode,AttributeType=S \
+    --key-schema \
+        AttributeName=PK,KeyType=HASH \
+    --global-secondary-indexes \
+        'IndexName=GSI-1,KeySchema=[{AttributeName=grantId,KeyType=HASH}],Projection={ProjectionType=KEYS_ONLY}' \
+        'IndexName=GSI-2,KeySchema=[{AttributeName=uid,KeyType=HASH}],Projection={ProjectionType=KEYS_ONLY}' \
+        'IndexName=GSI-3,KeySchema=[{AttributeName=userCode,KeyType=HASH}],Projection={ProjectionType=KEYS_ONLY}'
+
+  aws dynamodb update-time-to-live \
+    --table-name local-OidcStore \
+    --time-to-live-specification "Enabled=true, AttributeName=expiresAt"
