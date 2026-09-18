@@ -14,7 +14,6 @@ import {
   createSignedJwt,
   mockEnvVariableSetup,
 } from "./test-helper/test-setup.ts";
-import { createUserProfile } from "./test-helper/mock-user-profile-data-helper.ts";
 import {
   createRemoteJWKSet,
   generateKeyPair,
@@ -38,14 +37,7 @@ describe("Auth Authorize", () => {
   });
 
   describe("GET endpoint", () => {
-    let addUserProfileSpy: MockInstance;
-    let mockDynamoDbReponse: PutCommandOutput;
-
     beforeEach(async () => {
-      mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
-      addUserProfileSpy = vi
-        .spyOn(userProfileDynamoDbService, "addUserProfile")
-        .mockResolvedValue(mockDynamoDbReponse);
       vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
         await createSignedJwt(
           {
@@ -68,12 +60,6 @@ describe("Auth Authorize", () => {
 
     afterEach(() => {
       vi.clearAllMocks();
-    });
-
-    it("should try add a user-profile", async () => {
-      await handler(createValidAuthorizeRequest(), {} as Context, () => {});
-
-      expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
     });
 
     it("should return a 400 error when queryParameters are not given", async () => {
@@ -180,24 +166,6 @@ describe("Auth Authorize", () => {
       expect(JSON.parse(response.body).message).toBe("Decryption failed");
     });
 
-    it("should return a 500 when failing to get user-profile", async () => {
-      addUserProfileSpy = vi
-        .spyOn(userProfileDynamoDbService, "addUserProfile")
-        .mockImplementation(() => {
-          throw new Error();
-        });
-
-      const response = await handler(
-        createValidAuthorizeRequest(),
-        {} as Context,
-        () => {}
-      );
-
-      expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
-      expect(response.statusCode).toBe(500);
-      expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
-    });
-
     function createValidAuthorizeRequest() {
       return {
         httpMethod: "GET",
@@ -213,19 +181,19 @@ describe("Auth Authorize", () => {
 
   describe("POST Endpoint", () => {
     let addAuthCodeStoreSpy: MockInstance;
-    let getUserProfileByEmailSpy: MockInstance;
+    let addUserProfileSpy: MockInstance;
     let mockDynamoDbReponse: PutCommandOutput;
 
     beforeEach(() => {
       mockDynamoDbReponse = { $metadata: { httpStatusCode: 302 } };
+      addUserProfileSpy = vi
+        .spyOn(userProfileDynamoDbService, "addUserProfile")
+        .mockResolvedValue(mockDynamoDbReponse);
       addAuthCodeStoreSpy = vi
         .spyOn(authCodeDynamoDbService, "addAuthCodeStore")
         .mockResolvedValue(mockDynamoDbReponse);
-      getUserProfileByEmailSpy = vi
-        .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
-        .mockResolvedValue(createUserProfile("testEmail", "testSubjectId"));
       vi.spyOn(decryptionHelper, "decrypt").mockResolvedValue(
-        "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg"
+        "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnQtbmFtZSI6ImRpLWF1dGgtc3R1Yi1yZWx5aW5nLXBhcnR5LXNhbmRwaXQifQ.FFNDcj3znW5JPillhEIgCvWFCinlX0PMdvfVxgDArYueiVH6VDvlhaZyS70ocm9eOXBlB8pe449vpJrcKllBBg" // pragma: allowlist secret
       );
       vi.spyOn(jwtHelper, "validateClaims").mockResolvedValue(
         createMockClaims()
@@ -267,9 +235,15 @@ describe("Auth Authorize", () => {
     });
 
     describe("accessing dynamoDb", () => {
-      it("should return a 500 when failing to get user-profile", async () => {
-        getUserProfileByEmailSpy = vi
-          .spyOn(userProfileDynamoDbService, "getUserProfileByEmail")
+      it("should try add a user-profile", async () => {
+        await handler(createValidPostRequest(), {} as Context, () => {});
+
+        expect(addUserProfileSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it("should return a 500 when failing to add user-profile", async () => {
+        addUserProfileSpy = vi
+          .spyOn(userProfileDynamoDbService, "addUserProfile")
           .mockImplementation(() => {
             throw new Error();
           });
@@ -280,7 +254,6 @@ describe("Auth Authorize", () => {
           () => {}
         );
 
-        expect(getUserProfileByEmailSpy).toHaveBeenCalledTimes(1);
         expect(response.statusCode).toBe(500);
         expect(JSON.parse(response.body).message).toBe("dynamoDb error: Error");
       });

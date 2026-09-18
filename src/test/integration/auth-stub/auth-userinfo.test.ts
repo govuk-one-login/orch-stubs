@@ -14,7 +14,7 @@ import {
   AccessTokenStoreOptions,
   createAccessTokenStoreInput,
   createCustomAccessTokenStore,
-  createUserPofile,
+  createUserProfile,
 } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
 import { UserProfile } from "../../../main/auth-stub/interfaces/user-profile-interface.ts";
 import { UserInfoClaims } from "../../../main/auth-stub/interfaces/user-info-claim-interface.ts";
@@ -27,7 +27,7 @@ describe("Auth User Info", () => {
   let userProfileMock: UserProfile;
 
   beforeEach(async () => {
-    userProfileMock = createUserPofile(EMAIL, SUBJECT_ID);
+    userProfileMock = createUserProfile(EMAIL, SUBJECT_ID);
     await setUpAccessToken();
     await addUserProfile(userProfileMock);
   });
@@ -58,7 +58,7 @@ describe("Auth User Info", () => {
 
     expect(authUserInfoResponse.email).toBe(userProfileMock.email);
     expect(authUserInfoResponse.local_account_id).toBe(
-      userProfileMock.subjectId
+      userProfileMock.subject_id
     );
 
     const accessTokenStore = await getAccessTokenStore(ACCESS_TOKEN);

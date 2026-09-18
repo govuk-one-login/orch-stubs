@@ -5,10 +5,7 @@ import {
 } from "aws-lambda";
 import { AuthCodeStoreInput } from "./interfaces/auth-code-store-interface.ts";
 import { addAuthCodeStore } from "./services/auth-code-dynamodb-service.ts";
-import {
-  addUserProfile,
-  getUserProfileByEmail,
-} from "./services/user-profile-dynamodb-service.ts";
+import { addUserProfile } from "./services/user-profile-dynamodb-service.ts";
 import { getOrchToAuthExpectedClientId } from "./helpers/config.ts";
 import { decrypt } from "./helpers/decryption-helper.ts";
 import { validateClaims } from "./helpers/jwt-helper.ts";
@@ -21,10 +18,13 @@ import {
   createJsonResult,
 } from "../helper/result-helper.ts";
 import { ROOT_URI } from "./data/auth-dummy-constants.ts";
-import { createUserPofile } from "./helpers/mock-token-data-helper.ts";
 import renderAuthAuthorize from "./render-auth-authorize.ts";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface.ts";
 import { logger } from "../logger.ts";
+import {
+  UserProfile,
+  UserProfileClaims,
+} from "./interfaces/user-profile-interface.ts";
 
 const SFAD_ERROR = "SFAD_ERROR";
 const AUTHORIZE_ERRORS: string[] = [SFAD_ERROR];
@@ -63,7 +63,6 @@ async function get(
   }
 
   const parsedBody = Object.fromEntries(new URLSearchParams(requestBody));
-  const email = parsedBody.email ?? "dummy.email@mail.com";
   const passwordResetTime = parsedBody.password_reset_time
     ? Number(parsedBody.password_reset_time)
     : 10;
@@ -82,16 +81,9 @@ async function get(
     );
   }
 
-  try {
-    await addUserProfile(createUserPofile("dummy.email@mail.com"));
-  } catch (error) {
-    throw new CodedError(500, `dynamoDb error: ${error}`);
-  }
-
   const authRequest: AuthRequestBody = {
     clientId: clientId,
     responseType: responseType,
-    email: email,
     passwordResetTime: passwordResetTime,
     sectorIdentifier: parsedBody.sectorIdentifier,
     isNewAccount: parsedBody.isNewAccount === "true",
@@ -126,23 +118,32 @@ async function post(
     "auth-request-"
   ) as unknown as AuthRequestBody;
   const claims = getPrefixedFields(body, "claims-") as unknown as Claims;
-  const userInfoClaims = getPrefixedFields(body, "userinfo-");
+  const userProfile = getPrefixedFields(
+    body,
+    "userinfo-"
+  ) as unknown as UserProfile;
+
+  logger.info("Storing user profile");
+  try {
+    await addUserProfile(userProfile);
+    console.log(userProfile);
+  } catch (error) {
+    throw new CodedError(500, `dynamoDb error: ${error}`);
+  }
 
   const authRequest: AuthRequestBody = {
     ...authRequestFields,
     claims: {
       ...claims,
-      claim: JSON.stringify({ userinfo: userInfoClaims }),
+      claim: JSON.stringify({ userinfo: userProfile as UserProfileClaims }),
     },
   };
 
   let authCode: string;
 
   try {
-    logger.info("Getting user profile by email");
-    const user = await getUserProfileByEmail(authRequest.email);
     logger.info("Parsing claims list");
-    const claimsList = Object.keys(userInfoClaims) ?? {};
+    const claimsList = Object.keys(userProfile as UserProfileClaims) ?? {};
 
     logger.info("Generating auth code");
 
@@ -150,7 +151,7 @@ async function post(
     authCode = generateAuthCode();
     const authCodeResult: AuthCodeStoreInput = {
       authCode,
-      subjectId: user.subjectId,
+      subjectId: userProfile.subject_id,
       claims: claimsList,
       sectorIdentifier: authRequest.sectorIdentifier,
       isNewAccount: authRequest.isNewAccount,
