@@ -4,7 +4,6 @@ import {
   Handler,
 } from "aws-lambda";
 import { addAccessTokenStore } from "./services/access-token-dynamodb-service.ts";
-import { createAccessTokenStoreInput } from "./helpers/mock-token-data-helper.ts";
 import { updateHasBeenUsedAuthCodeStore } from "./services/auth-code-dynamodb-service.ts";
 import { createBearerAccessToken } from "./helpers/create-token-helper.ts";
 import {
@@ -21,6 +20,7 @@ import {
 } from "./helpers/token-validation-helper.ts";
 import { getOrchToAuthExpectedClientId } from "./helpers/config.ts";
 import { getAuthJwks } from "./helpers/key-helpers.ts";
+import { AccessTokenStore } from "./interfaces/access-token-store-interface.ts";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent
@@ -42,9 +42,10 @@ async function post(
 ): Promise<APIGatewayProxyResult> {
   const body = getBody(event);
   const authCode = body.code;
+  let authCodeStore;
 
   try {
-    await validateAuthCode(authCode);
+    authCodeStore = await validateAuthCode(authCode);
     // The redirect between orch and auth is never used and is in auths code
     // just as part of Oauth2 formalities so left empty.
     // Since its in Auth's code we have replicated the validation in the stub as well.
@@ -62,9 +63,11 @@ async function post(
   const accessToken = createBearerAccessToken();
 
   try {
-    await addAccessTokenStore(
-      createAccessTokenStoreInput(accessToken.access_token)
-    );
+    await addAccessTokenStore({
+      accessToken: accessToken.access_token,
+      ...authCodeStore,
+    } as AccessTokenStore);
+
     await updateHasBeenUsedAuthCodeStore(authCode, true);
   } catch (error) {
     throw new CodedError(500, `dynamoDb error: ${error}`);

@@ -1,13 +1,6 @@
-import { AccessTokenStoreInput } from "../interfaces/access-token-store-interface.ts";
 import { UserProfile } from "../interfaces/user-profile-interface.ts";
 
 const MOCK_SUBJECT_ID = "123456";
-const MOCK_CLAIMS = ["claim1"];
-const MOCK_SECTOR_IDENTIFIER = "9876543";
-const MOCK_IS_NEW_ACCOUNT = false;
-const MOCK_PASSWORD_RESET_TIME = 12;
-const MOCK_HAS_BEEN_USED = false;
-
 const MOCK_EMAIL_VERIFIED = true;
 const MOCK_PHONE_NUMBER = "07123098567";
 const MOCK_PHONE_NUMBER_VERIFIED = true;
@@ -22,20 +15,6 @@ const MOCK_LEGACY_SUBJECT_ID = "legacy-subject-id";
 const MOCK_SALT = "salt";
 const MOCK_ACCOUNT_VERIFIED = 1;
 const MOCK_TEST_USER = 0;
-
-export const createAccessTokenStoreInput = (
-  accessToken: string
-): AccessTokenStoreInput => {
-  return {
-    accessToken: accessToken,
-    subjectId: MOCK_SUBJECT_ID,
-    claims: MOCK_CLAIMS,
-    sectorIdentifier: MOCK_SECTOR_IDENTIFIER,
-    isNewAccount: MOCK_IS_NEW_ACCOUNT,
-    passwordResetTime: MOCK_PASSWORD_RESET_TIME,
-    hasBeenUsed: MOCK_HAS_BEEN_USED,
-  };
-};
 
 export const createUserPofile = (email: string): UserProfile => {
   return {

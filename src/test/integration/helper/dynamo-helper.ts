@@ -12,7 +12,6 @@ const getUserIdentityTableName = (identityStubName: string) =>
 const dynamoDoc = DynamoDBDocument.from(dynamoClient);
 
 export async function resetUserIdentityTable(identityStubName: string) {
-  console.log("Table: ", getUserIdentityTableName(identityStubName));
   const result = await dynamoDoc.scan({
     TableName: getUserIdentityTableName(identityStubName),
     ConsistentRead: true,
