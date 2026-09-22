@@ -5,14 +5,14 @@ import { Optional } from "../types/Optional.ts";
 import { getEnv } from "../../../main/util/getEnv.ts";
 import { warmSimpleKeyTable } from "../../util/dynamo-table-initialiser.ts";
 
-const dynamoClient = DynamoDBDocument.from(
-  new DynamoDBClient({
-    region: "eu-west-2",
-    ...(process.env.DYNAMO_ENDPOINT && {
-      endpoint: process.env.DYNAMO_ENDPOINT,
-    }),
-  })
-);
+const dynamoClient = new DynamoDBClient({
+  region: "eu-west-2",
+  ...(process.env.DYNAMO_ENDPOINT && {
+    endpoint: process.env.DYNAMO_ENDPOINT,
+  }),
+});
+
+const dynamo = DynamoDBDocument.from(dynamoClient);
 
 const tableName = getEnv("STUB_AIS_TABLE_NAME");
 
@@ -29,7 +29,7 @@ export const getStubIntervention = async (
   try {
     interventionOpt = Optional.of(
       (
-        await dynamoClient.get({
+        await dynamo.get({
           TableName: tableName,
           Key: {
             pairwiseId: internalPairwiseId,
