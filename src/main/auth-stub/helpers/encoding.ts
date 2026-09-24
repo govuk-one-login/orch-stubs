@@ -1,6 +1,8 @@
 import { CodedError } from "../../helper/result-helper.ts";
 
-export function base64DecodeToUint8Array(value: string): Uint8Array {
+export function base64DecodeToUint8Array(
+  value: string
+): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
   const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
 
