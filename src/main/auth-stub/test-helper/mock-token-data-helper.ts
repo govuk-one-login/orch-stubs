@@ -85,23 +85,24 @@ export const createCustomAccessTokenStore = (
   };
 };
 
-export const createUserPofile = (
+export const createUserProfile = (
   email: string,
   subjectId?: string
 ): UserProfile => {
   return {
-    subjectId: subjectId ?? MOCK_SUBJECT_ID,
+    subject_id: subjectId ?? MOCK_SUBJECT_ID,
     email: email,
-    emailVerified: MOCK_EMAIL_VERIFIED,
-    phoneNumber: MOCK_PHONE_NUMBER,
-    phoneNumberVerified: MOCK_PHONE_NUMBER_VERIFIED,
+    email_verified: MOCK_EMAIL_VERIFIED,
+    phone_number: MOCK_PHONE_NUMBER,
+    phone_number_verified: MOCK_PHONE_NUMBER_VERIFIED,
     created: MOCK_CREATED,
     updated: MOCK_UPDATED,
-    termsAndConditions: MOCK_TERMS_AND_CONDITIONS,
-    publicSubjectId: MOCK_PUBLIC_SUBJECT_ID,
-    legacySubjectId: MOCK_LEGACY_SUBJECT_ID,
+    terms_and_conditions: MOCK_TERMS_AND_CONDITIONS,
+    public_subject_id: MOCK_PUBLIC_SUBJECT_ID,
+    legacy_subject_id: MOCK_LEGACY_SUBJECT_ID,
     salt: MOCK_SALT,
-    accountVerified: MOCK_ACCOUNT_VERIFIED,
-    testUser: MOCK_TEST_USER,
+    account_verified: MOCK_ACCOUNT_VERIFIED,
+    test_user: MOCK_TEST_USER,
+    achieved_credentials_strength: "MEDIUM_LEVEL",
   };
 };

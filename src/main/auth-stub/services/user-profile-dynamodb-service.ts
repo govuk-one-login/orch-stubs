@@ -56,26 +56,19 @@ export const getUserProfileBySubjectId = async (
       ":subjectId": subjectId,
     },
   });
-  return response.Items![0] as UserProfile;
+  const item = response.Items![0];
+  return {
+    subject_id: subjectId,
+    ...item,
+  } as UserProfile;
 };
 
 export const addUserProfile = async (userProfile: UserProfile) => {
   return await dynamo.put({
     TableName: tableName,
     Item: {
-      subjectId: userProfile.subjectId,
-      email: userProfile.email,
-      emailVerified: userProfile.emailVerified,
-      phoneNumber: userProfile.phoneNumber,
-      phoneNumberVerified: userProfile.phoneNumberVerified,
-      created: userProfile.created,
-      updated: userProfile,
-      termsAndConditions: userProfile.termsAndConditions,
-      publicSubjectId: userProfile.publicSubjectId,
-      legacySubjectId: userProfile.legacySubjectId,
-      salt: userProfile.salt,
-      accountVerified: userProfile.accountVerified,
-      testUser: userProfile.testUser,
+      subjectId: userProfile.subject_id,
+      ...userProfile,
     },
   });
 };

@@ -62,19 +62,8 @@ export const addUserProfile = async (userProfile: UserProfile) => {
   return await dynamo.put({
     TableName: userProfileTableName,
     Item: {
-      subjectId: userProfile.subjectId,
-      email: userProfile.email,
-      emailVerified: userProfile.emailVerified,
-      phoneNumber: userProfile.phoneNumber,
-      phoneNumberVerified: userProfile.phoneNumberVerified,
-      created: userProfile.created,
-      updated: userProfile,
-      termsAndConditions: userProfile.termsAndConditions,
-      publicSubjectID: userProfile.publicSubjectId,
-      legacySubjectID: userProfile.legacySubjectId,
-      salt: userProfile.salt,
-      accountVerified: userProfile.accountVerified,
-      testUser: userProfile.testUser,
+      subjectId: userProfile.subject_id,
+      ...userProfile,
     },
   });
 };

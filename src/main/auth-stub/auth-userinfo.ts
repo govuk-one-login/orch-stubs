@@ -109,17 +109,33 @@ const populateUserInfo = async (
     rp_pairwise_id: "test-rp-pairwise-id",
     new_account: accessTokenStore.isNewAccount,
     password_reset_time: accessTokenStore.passwordResetTime,
-    legacy_subject_id: userProfile.legacySubjectId,
-    public_subject_id: userProfile.publicSubjectId,
-    local_account_id: userProfile.subjectId,
-    email: userProfile.email,
-    email_verified: userProfile.emailVerified,
-    phone_number: userProfile.phoneNumber,
-    phone_number_verified: userProfile.phoneNumberVerified,
-    salt: "",
     verified_mfa_method_type: "",
     uplift_required: "",
     achieved_credential_strength: "MEDIUM_LEVEL",
     account_data_api_access_token: "account-data-api-access-token",
+    ...(userProfile.email && {
+      email: userProfile.email,
+    }),
+    ...(userProfile.email_verified && {
+      email_verified: userProfile.email_verified,
+    }),
+    ...(userProfile.phone_number && {
+      phone_number: userProfile.phone_number,
+    }),
+    ...(userProfile.phone_number_verified && {
+      phone_number_verified: userProfile.phone_number_verified,
+    }),
+    ...(userProfile.legacy_subject_id && {
+      legacy_subject_id: userProfile.legacy_subject_id,
+    }),
+    ...(userProfile.public_subject_id && {
+      public_subject_id: userProfile.public_subject_id,
+    }),
+    ...(userProfile.salt && {
+      salt: userProfile.salt,
+    }),
+    ...(userProfile.subject_id && {
+      local_account_id: userProfile.subject_id,
+    }),
   };
 };

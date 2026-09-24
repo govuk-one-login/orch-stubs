@@ -8,9 +8,10 @@ import {
   deleteAuthCode,
   deleteUserProfile,
 } from "./helpers/dynamo-helper.ts";
-import { createUserPofile } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
+import { createUserProfile } from "../../../main/auth-stub/test-helper/mock-token-data-helper.ts";
 import { SignJWT, importPKCS8 } from "jose";
 import localParams from "../../../../parameters.json";
+import { UserProfileClaims } from "../../../main/auth-stub/interfaces/user-profile-interface.ts";
 
 vi.mock("node:crypto", () => {
   return { getRandomValues: vi.fn(() => Buffer.from("test")) };
@@ -19,7 +20,7 @@ const AUTH_CODE = Buffer.from("test").toString("base64url");
 
 describe("Auth Authorize", () => {
   const EMAIL = "dummy.email@mail.com";
-  const USER_PROFILE = createUserPofile(EMAIL);
+  const USER_PROFILE = createUserProfile(EMAIL);
 
   beforeEach(async () => {
     mockEnvVariableSetup();
@@ -113,12 +114,15 @@ describe("Auth Authorize", () => {
   function createFormBodyWithErrorCode(error?: string): string {
     const authRequest = generateAuthRequest();
     const formObject: Record<string, string> = {
-      ...Object.fromEntries(
-        Object.entries(authRequest).map(([key, value]) => [
+      ...Object.fromEntries([
+        ...Object.entries(authRequest).map(([key, value]) => [
           `auth-request-${key}`,
           value,
-        ])
-      ),
+        ]),
+        ...Object.entries(USER_PROFILE as UserProfileClaims).map(
+          ([key, value]) => [`userinfo-${key}`, value]
+        ),
+      ]),
     };
     if (error) {
       formObject.error = error;
@@ -135,7 +139,7 @@ describe("Auth Authorize", () => {
       passwordResetTime: "10",
       sectorIdentifier: "test",
       claims: JSON.stringify({
-        claim: "testClaim",
+        claim: USER_PROFILE as UserProfileClaims,
       }),
     } as Record<string, string>;
   }

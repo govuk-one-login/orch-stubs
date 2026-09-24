@@ -33,13 +33,13 @@ describe("User Profile DynamoDb Service", () => {
     const userProfile = await getUserProfileByEmail(EMAIL);
 
     expect(userProfile.email).toBe(EMAIL);
-    expect(userProfile.subjectId).toBe(SUBJECT_ID);
+    expect(userProfile.subject_id).toBe(SUBJECT_ID);
   });
 
   it("should return the dummy UserProfile if the right subject ID is given", async () => {
     const userProfile = await getUserProfileBySubjectId(SUBJECT_ID);
 
-    expect(userProfile.subjectId).toBe(SUBJECT_ID);
+    expect(userProfile.subject_id).toBe(SUBJECT_ID);
     expect(userProfile.email).toBe(EMAIL);
   });
 });

@@ -1,5 +1,8 @@
 import { renderPage } from "../template.ts";
-import { VALID_AUTH_USER_INFO_CLAIMS } from "./helpers/claims-config.ts";
+import {
+  createUserProfile,
+  DEFAULT_CLAIMS,
+} from "./helpers/mock-token-data-helper.ts";
 import { AuthRequestBody } from "./interfaces/auth-request-body-interface.ts";
 
 export default function renderAuthAuthorize(
@@ -21,6 +24,7 @@ export default function renderAuthAuthorize(
   <h3 class="govuk-heading-s">Form:</h3>
   <p class="govuk-body">Use this form to configure the required Auth user identity response. On submit a POST request will be sent to /authorize and the Auth OAuth 2.0 flow will be initiated.</p>
   <form method="post">
+    <button name="continue" value="continue" class="govuk-button">Continue</button>
     <input type="hidden" name="authRequest" value='${JSON.stringify(authRequest)}'>
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row" id="emailRow">
@@ -56,45 +60,31 @@ export default function renderAuthAuthorize(
         `;
         })
         .join("\n")}
-      ${Object.entries(authRequest.claims)
-        .map(([key, value]) => {
-          if (key === "claim") {
+      <h3>User info Claim</h3>
+      ${Object.entries(createUserProfile(DEFAULT_CLAIMS))
+        .map((entry) => {
+          const key = entry[0];
+          const value = entry[1];
+          if (key === "terms_and_conditions") {
             return;
           }
           return `
           <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">${key}</dt>
-          <dd class="govuk-summary-list__value" id="claims-${key}">
+          <dd class="govuk-summary-list__value" id="userinfo-${key}">
           ${
             typeof value === "boolean"
               ? `<div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="claims-${key}" name="claims-${key}" type="checkbox" value="true" ${value ? "checked" : ""}/>
-            <label class="govuk-label govuk-checkboxes__label" for="claims-${key}"></label>
+            <input class="govuk-checkboxes__input" id="userinfo-${key}" name="userinfo-${key}" type="checkbox" value="true" ${value ? "checked" : ""}/>
+            <label class="govuk-label govuk-checkboxes__label" for="userinfo-${key}"></label>
             </div>`
-              : `<input class="govuk-textarea" id="claims-${key}" name="claims-${key}" type="text" value="${value || ""}">`
+              : `<input class="govuk-textarea" id="userinfo-${key}" name="userinfo-${key}" type="text" value="${value || ""}">`
           }
-          </dd>
           </dd>
           </div>
         `;
         })
         .join("\n")}
-      <h3>User info Claim</h3>
-      ${VALID_AUTH_USER_INFO_CLAIMS.map((claim) => {
-        const userInfoClaims = Object.keys(
-          JSON.parse(authRequest.claims.claim!).userinfo
-        );
-        return `
-          <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">${claim}</dt>
-          <dd class="govuk-summary-list__value" id="userinfo-${claim}">
-          <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="userinfo-${claim}" name="userinfo-${claim}" type="checkbox" value="true" ${userInfoClaims.includes(claim) ? "checked" : ""}/>
-          <label class="govuk-label govuk-checkboxes__label" for="userinfo-${claim}"></label>
-          </dd>
-          </div>
-        `;
-      }).join("\n")}
     </dl>
 
     <button name="continue" value="continue" class="govuk-button">Continue</button>
