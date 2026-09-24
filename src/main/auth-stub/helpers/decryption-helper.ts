@@ -51,7 +51,7 @@ export const decryptPayloadUsingCek = async (
   const webcrypto = crypto.webcrypto;
   const cryptoKey = await webcrypto.subtle.importKey(
     "raw",
-    contentEncryptionKeyData,
+    contentEncryptionKeyData as NodeJS.BufferSource,
     "AES-GCM",
     false,
     ["decrypt"]
