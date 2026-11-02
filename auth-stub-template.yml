@@ -6,6 +6,15 @@ Description: Authentication, IPV and SPOT stubs
 #        Service: Authentication, IPV and SPOT stubs
 #        Source: govuk-one-login/orch-stubs
 #        Owner: di-orchestration@digital.cabinet-office.gov.uk
+Metadata:
+  cfn-lint:
+    config:
+      configure_rules:
+        E3031:
+          exceptions:
+            - none
+      ignore_checks:
+        - E3724 # The latest version of cfn-lint seems to think that CodeSigningConfigArn is not a valid parameter in Globals
 
 Parameters:
   Environment:
