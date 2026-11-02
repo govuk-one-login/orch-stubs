@@ -114,6 +114,7 @@ describe("Auth Authorize", () => {
   function createFormBodyWithErrorCode(error?: string): string {
     const authRequest = generateAuthRequest();
     const formObject: Record<string, string> = {
+      authRequest: JSON.stringify(authRequest),
       ...Object.fromEntries([
         ...Object.entries(authRequest).map(([key, value]) => [
           `auth-request-${key}`,

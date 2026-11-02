@@ -165,8 +165,9 @@ async function post(
     throw new CodedError(500, `dynamoDb error: ${error}`);
   }
 
+  const originalAuthRequest = JSON.parse(body["authRequest"]);
   url.searchParams.append("code", authCode);
-  url.searchParams.append("state", authRequest.claims.state);
+  url.searchParams.append("state", originalAuthRequest.claims.state);
 
   return createJsonResult(
     302,
