@@ -33,7 +33,7 @@ Mappings:
   EnvironmentConfiguration:
     dev:
       authStubDomainName: authstub.oidc.dev.account.gov.uk
-      authDomain: authdev3.dev.account.gov.uk
+      authDomain: dev.account.gov.uk
       orchAuthJwksUrl: https://oidc.dev.account.gov.uk/.well-known/auth-jwks.json
     build:
       authStubDomainName: authstub.oidc.build.account.gov.uk
@@ -144,9 +144,9 @@ Resources:
               orchAuthJwksUrl,
             ]
           ORCH_TO_AUTH_CLIENT_ID: "orchestrationAuth"
-          ORCH_TO_AUTH_AUDIENCE: !If 
+          ORCH_TO_AUTH_AUDIENCE: !If
             - IsDev
-            - "https://authstub.oidc.authdev3.dev.account.gov.uk/"
+            - "https://authstub.oidc.dev.account.gov.uk/"
             - !Sub
               - "https://signin.${authDomain}/"
               - authDomain: !FindInMap [EnvironmentConfiguration, !Ref Environment, authDomain]
@@ -380,14 +380,14 @@ Resources:
       PendingWindowInDays: 30
       KeyUsage: ENCRYPT_DECRYPT
       KeySpec: RSA_2048
-  
+
   AuthStubCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName:  
+      DomainName:
         !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
       DomainValidationOptions:
-        - DomainName: 
+        - DomainName:
             !FindInMap [ EnvironmentConfiguration, !Ref Environment, authStubDomainName ]
           HostedZoneId: "{{resolve:ssm:/deploy/hosted-zone/oidc/hosted-zone-id}}"
       ValidationMethod: DNS
