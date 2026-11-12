@@ -10,12 +10,25 @@ import * as process from "node:process";
 import { logger } from "../logger.ts";
 import { SpotRequest } from "./spot-request.ts";
 import { SpotResponse } from "./spot-response.ts";
+import { SignJWT } from "jose";
+import { generateKeyPairSync } from "node:crypto";
 
 const sqsConfig: SQSClientConfig = process.env.SQS_ENDPOINT
   ? { endpoint: process.env.SQS_ENDPOINT }
   : {};
 const sqsClient = new SQSClient(sqsConfig);
 const destinationQueueUrl: string = process.env.DESTINATION_QUEUE_URL!;
+const { privateKey } = generateKeyPairSync("rsa", {
+  modulusLength: 4096,
+  publicKeyEncoding: {
+    type: "spki",
+    format: "jwk",
+  },
+  privateKeyEncoding: {
+    type: "pkcs8",
+    format: "jwk",
+  },
+});
 
 export const handler: SQSHandler = async (
   event: SQSEvent
@@ -43,7 +56,8 @@ async function processRecord(
     status: "ACCEPTED",
     reason: "STUB",
     claims: {
-      "https://vocab.account.gov.uk/v1/coreIdentityJWT": "STUB_IDENTITY",
+      "https://vocab.account.gov.uk/v1/coreIdentityJWT":
+        await createCoreIdentityJwt(),
     },
   };
   const sendMessageCommand = new SendMessageCommand({
@@ -60,3 +74,45 @@ async function processRecord(
 
   return ok<void>(undefined);
 }
+
+const createCoreIdentityJwt = async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const claims = {
+    aud: "3NKFv679oYlMdyrhKErrTGbzBy2h8rrd",
+    sub: "urn:fdc:gov.uk:2022:95S4a38abnez3SPmGmzU_J9_9_xGoylvIO65LZmCvpY",
+    nbf: now,
+    iss: "https://test-issuer.gov.uk/",
+    vot: "P2",
+    exp: now + 1800,
+    vc: {
+      type: ["VerifiableCredential", "IdentityCheckCredential"],
+      credentialSubject: {
+        birthDate: [
+          {
+            value: "1965-07-08",
+          },
+        ],
+        name: [
+          {
+            nameParts: [
+              {
+                type: "GivenName",
+                value: "KENNETH",
+              },
+              {
+                type: "FamilyName",
+                value: "DECERQUEIRA",
+              },
+            ],
+          },
+        ],
+      },
+    },
+  };
+  return new SignJWT(claims)
+    .setProtectedHeader({
+      kid: "test-kid",
+      alg: "RSA-OAEP-256",
+    })
+    .sign(privateKey);
+};

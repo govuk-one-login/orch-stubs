@@ -8,12 +8,16 @@ import {
   ReceiveMessageCommand,
   SQSClient,
 } from "@aws-sdk/client-sqs";
+import { decodeJwt } from "jose";
 
 const sqsClient = new SQSClient({ endpoint: process.env.SQS_ENDPOINT });
+const mockNow = 1516239022;
 
 describe("SPOT stub handler", () => {
   beforeAll(async () => {
     await createSqsQueue();
+    vi.useFakeTimers();
+    vi.setSystemTime(mockNow);
   });
 
   afterEach(async () => {
@@ -49,20 +53,54 @@ describe("SPOT stub handler", () => {
 
     const queueResponseBody = JSON.parse(queueItems![0].Body!);
 
-    expect(queueResponseBody).toStrictEqual({
-      claims: {
-        "https://vocab.account.gov.uk/v1/coreIdentityJWT": "STUB_IDENTITY",
+    expect(queueResponseBody.log_ids).toStrictEqual({
+      clientId: "",
+      clientSessionId: "",
+      persistentSessionId: "",
+      requestId: "",
+      sessionId: "",
+    });
+    expect(queueResponseBody.reason).toBe("STUB");
+    expect(queueResponseBody.sub).toBe("");
+    expect(queueResponseBody.status).toBe("ACCEPTED");
+
+    const claimsJwt = decodeJwt(
+      queueResponseBody.claims[
+        "https://vocab.account.gov.uk/v1/coreIdentityJWT"
+      ]
+    );
+
+    expect(claimsJwt).toStrictEqual({
+      aud: "3NKFv679oYlMdyrhKErrTGbzBy2h8rrd",
+      sub: "urn:fdc:gov.uk:2022:95S4a38abnez3SPmGmzU_J9_9_xGoylvIO65LZmCvpY",
+      nbf: mockNow,
+      iss: "https://test-issuer.gov.uk/",
+      vot: "P2",
+      exp: mockNow + 1800,
+      vc: {
+        type: ["VerifiableCredential", "IdentityCheckCredential"],
+        credentialSubject: {
+          birthDate: [
+            {
+              value: "1965-07-08",
+            },
+          ],
+          name: [
+            {
+              nameParts: [
+                {
+                  type: "GivenName",
+                  value: "KENNETH",
+                },
+                {
+                  type: "FamilyName",
+                  value: "DECERQUEIRA",
+                },
+              ],
+            },
+          ],
+        },
       },
-      log_ids: {
-        clientId: "",
-        clientSessionId: "",
-        persistentSessionId: "",
-        requestId: "",
-        sessionId: "",
-      },
-      reason: "STUB",
-      status: "ACCEPTED",
-      sub: "",
     });
   });
 });
