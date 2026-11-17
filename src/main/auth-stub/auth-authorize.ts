@@ -26,8 +26,8 @@ import {
   UserProfileClaims,
 } from "./interfaces/user-profile-interface.ts";
 
-const SFAD_ERROR = "SFAD_ERROR";
-const AUTHORIZE_ERRORS: string[] = [SFAD_ERROR];
+const SSAD_ERROR = "account_creation_required";
+const AUTHORIZE_ERRORS: Record<string, string> = { SSAD_ERROR };
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent

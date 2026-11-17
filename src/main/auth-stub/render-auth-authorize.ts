@@ -7,7 +7,7 @@ import { AuthRequestBody } from "./interfaces/auth-request-body-interface.ts";
 
 export default function renderAuthAuthorize(
   authRequest: AuthRequestBody,
-  authorizeErrors: string[]
+  authorizeErrors: Record<string, string>
 ) {
   return renderPage(
     "Auth Stub Form",
@@ -34,7 +34,7 @@ export default function renderAuthAuthorize(
         <dd class="govuk-summary-list__value" id="email">
         <select class="govuk-select" id="error" name="error">
           <option value="">None</option>
-          ${authorizeErrors.map((errorCode) => `<option value="${errorCode}">${errorCode}</option>`)}
+          ${Object.entries(authorizeErrors).map(([key, value]) => `<option value="${value}">${key}</option>`)}
         </select>
         </dd>
       </div>
